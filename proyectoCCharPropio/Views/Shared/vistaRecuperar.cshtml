@@ -1,0 +1,83 @@
+﻿@model pruebaRazor.DTOs.UsuarioDTO
+@{
+    ViewData["Title"] = "Recupera contraseña";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>@ViewData["Title"]</title>
+	<link rel="stylesheet" href="~/css/style.css">
+	<script src="https://kit.fontawesome.com/64d58efce2.js"></script>
+</head>
+<body>
+	<!--Script Para la alerta-->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+
+		var mensajeAlerta = '@TempData["MensajeAlerta"]';
+		var tipo = '@TempData["Tipo"]';
+		var icono = '@TempData["Icono"]';
+		var titulo = '@TempData["Titulo"]';
+
+		function mostrarAlertaPersonalizada() {
+			if (icono == "check") {
+				icono = '<i class="fas fa-check" style="font-size: 1em;"></i>';
+			}
+			else {
+				icono = '<i class="fas fa-times" style="font-size: 1em;"></i>'
+			}
+			Swal.fire({
+				icon: tipo,
+				title: titulo,
+				text: mensajeAlerta,
+				showCancelButton: false,
+				confirmButtonColor: '#3085d6',
+				confirmButtonText: 'OK',
+				iconHtml: icono,  // Ajusta el tamaño según sea necesario
+			});
+		}
+	</script>
+	<script>
+		var mostrarAlerta = '@TempData["MostrarAlerta"]';
+		console.log('Valor de mostrarAlerta:', mostrarAlerta);
+
+		if (mostrarAlerta && mostrarAlerta.toLowerCase() === 'true') {
+			console.log('Mostrando la alerta');
+			mostrarAlertaPersonalizada();
+		}
+	</script>
+	<!---->
+	<div class="container" id="container">
+
+		<div class="form-container sign-in-container" id="formLogin">
+			<form method="post" asp-controller="RegistroControlador" asp-action="ModificarContrasenya">
+				<h1>Restablecer Contraseña</h1>
+				<input type="password" placeholder="Contraseña" name="clave_usuario" />
+				<input type="password" placeholder="Repita la contraseña" name="email_usuario" />
+				<input type="text" name="nombre_usuario" id="idToken" value="" style="display: none;"/>
+				<a id="recupera" href="#">¿Has olvidado tu contraseña?</a>
+				<button onclick="enviarRegistrar()">Enviar</button>
+			</form>
+		</div>
+
+		<div class="overlay-container">
+			<div class="overlay">
+				<div class="overlay-panel overlay-right">
+					<h1>¿Has recordado la contraseña?</h1>
+					<button class="ghost" id="signUp" style="margin-top: 15px;">Volver</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const urlParams = new URLSearchParams(window.location.search).get("tk");
+			const idTokenInput = document.getElementById('idToken');
+			idTokenInput.value = urlParams;
+		});
+	</script>
+</body>
+</html>
