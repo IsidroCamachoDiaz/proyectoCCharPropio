@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using pruebaRazor.DTOs;
 using System.Web;
+using System;
+using proyectoCCharPropio.Recursos;
 
 namespace pruebaRazor.Controllers
 {
@@ -83,8 +85,49 @@ namespace pruebaRazor.Controllers
 			return View();
 		}
 
-		// Acción HTTP POST para el registro de usuarios
-		[HttpPost]
+        // Acción HTTP GET para la vista principal
+        [HttpGet]
+        public IActionResult Home()
+        {
+            return View();
+        }
+
+        // Acción HTTP GET para la vista principal
+        [HttpGet]
+        public IActionResult AltaHecha()
+        {
+            //Cojo la url del navegador
+            string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
+            Uri uri = new Uri(urlCompleta);
+			//Cojo el valor tk
+            string valorTk = HttpUtility.ParseQueryString(uri.Query)["tk"];
+            accionesCRUD acciones=new accionesCRUD();
+			//Cojo el token de la base de datos
+			TokenDTO token=acciones.SeleccionarToken("token/"+valorTk);
+			//Cojemos el usuario a partir del id del usuario del token 
+			UsuarioDTO usuario = acciones.SeleccionarUsuario(token.Id_usuario.ToString());
+			//Cojo la fecha de ahora para ver si ha pasado eol tiempo de espera
+			DateTime ahora = DateTime.Now;
+            if(ahora>token.Fecha_limite_token)
+			{
+				//Si paso el tiempo se elimina la cuenta para que vuelva a crearla
+				acciones.EliminarToken(token.Id_token_tabla.ToString());
+				acciones.EliminarUsuario(usuario.Id_usuario.ToString());
+                MostrarAlerta("Tiempo Agotado", "Se le agoto el tiempo para verificar se elimino la cuenta vuelva a registrarse", "error");
+                return RedirectToAction("index");
+            }
+			else
+			{
+				usuario.Id_acceso = 3;
+				acciones.ActualizarUsuario(usuario);
+				MostrarAlerta("Confirmado", "Su cuenta ha sido Verificada", "success");
+			}
+
+            return View();
+        }
+
+        // Acción HTTP POST para el registro de usuarios
+        [HttpPost]
 		public ActionResult RegistroUsuario(UsuarioDTO usuarioDTO, IFormFile archivo)
 		{
 			// Verificar si algún parámetro requerido está vacío
@@ -117,14 +160,15 @@ namespace pruebaRazor.Controllers
 				//HttpContext.Session.SetString("correo", usuarioDTO.Dni_usuario);
 				//HttpContext.Session.SetString("acceso", "1");
 
-				// Redireccionar a la vista de bienvenida
-				return RedirectToAction("Bienvenida");
+				// Redireccionar a la vista de index
+				return RedirectToAction("index");
             }	
 		}
 
         [HttpPost]
         public ActionResult LoginUsuario(UsuarioDTO usuarioDTO)
         {
+			//Comprobamos que no hay metido datos vacios
             if (usuarioDTO.Correo_usuario == null || usuarioDTO.Contrasenia_usuario == null)
             {
 				MostrarAlerta("¡Campos Incompletos!","Hay Campos Vacios", "error");
@@ -136,12 +180,9 @@ namespace pruebaRazor.Controllers
                 bool ok = implInteraccionUsuario.LoginUsuario(usuarioDTO).Result;
                 if (ok)
                 {
-
-					//HttpContext.Session.SetString("correo", usuarioDTO.Dni_usuario);
-					//HttpContext.Session.SetString("acceso", "1");
-
-
-					return RedirectToAction("Bienvenida");
+                    HttpContext.Session.SetString("usuario", "");
+                    HttpContext.Session.SetString("acceso", "1");
+                    return RedirectToAction("Home");
                 }
                 else
                 {

@@ -1,6 +1,6 @@
 ﻿@model pruebaRazor.DTOs.UsuarioDTO
 @{
-    ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
+    ViewData["Title"] = "Recupera contraseña";
 }
 
 <!DOCTYPE html>
@@ -19,10 +19,10 @@
         <input type="checkbox" id="flip">
         <div class="cover">
             <div class="front">
-                <img src="/img/personaContenta.jpg" alt="">
+                <img src="/img/prueba3.jpg" alt="">
                 <div class="text">
-                    <span class="text-1">Felicidades</span>
-                    <span class="text-2">Has dado de alta tu cuenta</span>
+                    <span class="text-1">Te Enviaremos</span>
+                    <span class="text-2">Un Correo</span>
                 </div>
             </div>
             <div class="back">
@@ -36,11 +36,17 @@
         <div class="forms">
             <div class="form-content">
                 <div class="login-form">
-                    <div class="title">Alta Confirmada</div>
+                    <div class="title">Olvide La Contraseña</div>
                     <form action="#">
                         <div class="input-boxes">
-                            <p>Has dado de alta tu cuenta con el correo acceda a la web</p>
-                            <div class="text sign-up-text">Incie Sesion en la Cuenta <label><a href="@Url.Action("index", "RegistroControlador")">Iniciar Sesion</a></label></div>
+                            <div class="input-box">
+                                <i class="fas fa-envelope"></i>
+                                <input type="text" placeholder="Introduzca Su Email" required>
+                            </div>
+                            <div class="button input-box">
+                                <input type="submit" value="Enviar Correo">
+                            </div>
+                            <div class="text sign-up-text">Te Acordaste De La Contraseña? <label><a href="index.html">Iniciar Sesion</a></label></div>
                         </div>
                     </form>
                 </div>

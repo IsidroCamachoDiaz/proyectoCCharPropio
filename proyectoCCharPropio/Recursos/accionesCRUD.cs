@@ -119,7 +119,7 @@ namespace proyectoCCharPropio.Recursos
                 }
 
                 var response = (HttpWebResponse)request.GetResponse();
-                return response.StatusCode == HttpStatusCode.OK;
+                return response.StatusCode == HttpStatusCode.Created;
             }
             catch (Exception e)
             {

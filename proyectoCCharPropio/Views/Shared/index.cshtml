@@ -48,6 +48,7 @@
         if (mostrarAlerta && mostrarAlerta.toLowerCase() === 'true') {
             console.log('Mostrando la alerta');
             mostrarAlertaPersonalizada();
+            mostrarAlerta = "false";
         }
     </script>
     <div class="container">
@@ -72,11 +73,11 @@
             <div class="form-content">
                 <div class="login-form">
                     <div class="title">Iniciar Sesion</div>
-                    <form action="#">
+                    <form method="post" asp-controller="RegistroControlador" asp-action="LoginUsuario">
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope"></i>
-                                <input type="text" placeholder="Introduzca Su Email" required name="correo_usuario" >
+                                <input type="text" placeholder="Introduzca Su Email" required name="correo_usuario">
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock"></i>

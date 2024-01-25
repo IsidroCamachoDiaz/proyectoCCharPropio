@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NuGet.Common;
 using proyectoCCharPropio.Recursos;
 using pruebaRazor.DTOs;
 using System.Net;
@@ -14,68 +15,45 @@ namespace pruebaRazor.DTOs
 		{
 			try
 			{
-				accionesCRUD a = new accionesCRUD();
+				accionesCRUD acciones = new accionesCRUD();
 				usu.Id_acceso = 1;
-				if(a.InsertarUsuario(usu))
+                usu.Contrasenia_usuario = Util.EncriptarContra(usu.Contrasenia_usuario);
+                if (acciones.InsertarUsuario(usu))
 				{
-					Console.WriteLine("bien");
-				}
-				else
-				{
-					Console.WriteLine("mal");
-				}
-				JsonSerializerSettings jsonSettings = new JsonSerializerSettings
-				{
-					NullValueHandling = NullValueHandling.Ignore
-				};
+                    // Creamos el token
+                    // Primero creamos la fecha limite
+                    DateTime fechaLimite = DateTime.Now.AddMinutes(10);
+                    Console.WriteLine(fechaLimite);
 
-				// Encriptamos la contraseña
-				usu.Contrasenia_usuario = Util.EncriptarContra(usu.Contrasenia_usuario);
+                    // Ahora creamos el token
+                    Guid guid = Guid.NewGuid();
 
-				string usuarioJson = JsonConvert.SerializeObject(usu, jsonSettings);
-				Uri url = new Uri("https://localhost:7079/api/Usuarios");
+                    // Convertir el GUID a una cadena (string)
+                    string token = guid.ToString();
+                    Correo c = new Correo();
+					UsuarioDTO usuarioConId = acciones.SeleccionarUsuario("correo/"+usu.Correo_usuario);
+					//Creamos el token
+                    TokenDTO tokenDto = new TokenDTO(token, usuarioConId.Id_usuario, fechaLimite);
 
-				HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-				request.Method = "POST";
-				request.ContentType = "application/json";
-				request.Timeout = 10000; // Tiempo de espera en milisegundos
-
-				using (StreamWriter streamWriter = new StreamWriter(request.GetRequestStream()))
-				{
-					streamWriter.Write(usuarioJson);
-					streamWriter.Flush();
-					streamWriter.Close();
-				}
-
-				try
-				{
-					using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    String mensaje = c.MensajeCorreoAlta(token, "https://localhost:7048/RegistroControlador/altaHecha");
+                   
+					//Comprobamos si se ha enviado bien el correo
+					if(c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Recuperar Contraseña", "isidro@isidrocamachodiaz.es", true))
 					{
-						if (response.StatusCode == HttpStatusCode.Created)
-						{
-							// Si la respuesta es HTTP_CREATED (201), se ha creado correctamente
-							Console.WriteLine("Usuario creado exitosamente");
-							return true;
-						}
-						else
-						{
-							// Si no es HTTP_CREATED, imprime la respuesta para depurar
-							Console.WriteLine($"Respuesta del servidor: {response.StatusCode} {response.StatusDescription}");
-						}
-					}
-				}
-				catch (WebException ex)
-				{
-					if (ex.Response is HttpWebResponse errorResponse)
-					{
-						// Imprime el código de error si se produce una excepción en la solicitud HTTP
-						Console.WriteLine($"1Error en la solicitud HTTP: {errorResponse.StatusCode} {errorResponse.StatusDescription}");
+						//Insertamos en el token
+						acciones.InsertarToken(tokenDto);
+						return true;
 					}
 					else
 					{
-						Console.WriteLine($"2Error en la solicitud HTTP: {ex.Message}");
+						return false;
 					}
 				}
+				else
+				{
+					return false;
+				}
+
 			}
 			catch (JsonException e)
 			{
@@ -101,59 +79,31 @@ namespace pruebaRazor.DTOs
 			{
 				Console.Error.WriteLine(io.Message);
 			}
-
 			return false;
 		}
 
 		public async Task<bool> LoginUsuario(UsuarioDTO usuario)
 		{
-            Console.WriteLine("Ha entrado en Login");
-			Console.WriteLine(usuario.Contrasenia_usuario);
-
-			// Encriptamos la contraseña del usuario para poder comparar con las de la base de datos
-			usuario.Contrasenia_usuario = Util.EncriptarContra(usuario.Contrasenia_usuario);
-
-			// URL de la API que deseas consultar
-			string apiUrl = "https://localhost:7079/api/Usuarios";
 
 			try
 			{
-				// Realiza la consulta GET
-				string responseData;
-				using (HttpClient client = new HttpClient())
-				{
-					// Realiza la solicitud GET a la API
-					HttpResponseMessage response = await client.GetAsync(apiUrl);
+                accionesCRUD acciones = new accionesCRUD();
 
-					// Verifica si la solicitud fue exitosa
-					if (response.IsSuccessStatusCode)
-					{
-						// Lee y devuelve el contenido de la respuesta como cadena
-						responseData = await response.Content.ReadAsStringAsync();
-					}
-					else
-					{
-						// En caso de error, lanza una excepción o maneja el error según tus necesidades
-						throw new Exception($"Error al realizar la solicitud. Código de estado: {response.StatusCode}");
-					}
+                // Encriptamos la contraseña del usuario para poder comparar con las de la base de datos
+                usuario.Contrasenia_usuario = Util.EncriptarContra(usuario.Contrasenia_usuario);
+
+                UsuarioDTO usuarioBD = acciones.SeleccionarUsuario("correo/" + usuario.Correo_usuario);
+
+				if(usuario.Contrasenia_usuario!=usuarioBD.Contrasenia_usuario)
+				{
+					return false;
+				}
+				else
+				{
+                    return true;
 				}
 
-				// Deserializa la respuesta JSON a un objeto C#
-				List<UsuarioDTO> usuarios = JsonConvert.DeserializeObject<List<UsuarioDTO>>(responseData);
-
-                // Ahora puedes trabajar con 'usuarios', que es una lista con los datos de la API
-                foreach (UsuarioDTO aux in usuarios)
-                {
-					if(aux.Correo_usuario == usuario.Correo_usuario && aux.Contrasenia_usuario == usuario.Contrasenia_usuario)
-					{
-						Console.WriteLine("Hay coincidencia");
-						return true;
-					}
-                }
-
-				Console.WriteLine("No hay coincidencia");
-				return false;
-			}
+            }
 			catch (HttpRequestException e)
 			{
 				Console.WriteLine($"Error de solicitud HTTP: {e.Message}");
@@ -178,7 +128,7 @@ namespace pruebaRazor.DTOs
 
 				// Creamos el token
 				// Primero creamos la fecha limite
-				DateTime fechaLimite = DateTime.Now.AddMinutes(1);
+				DateTime fechaLimite = DateTime.Now.AddMinutes(10);
 				Console.WriteLine(fechaLimite);
 
 				// Ahora creamos el token

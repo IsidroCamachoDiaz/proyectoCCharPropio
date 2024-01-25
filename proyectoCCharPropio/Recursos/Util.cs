@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace pruebaRazor.DTOs
@@ -32,5 +33,5 @@ namespace pruebaRazor.DTOs
 
 			return hexString.ToString();
 		}
-	}
+    }
 }

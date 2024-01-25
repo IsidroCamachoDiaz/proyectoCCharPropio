@@ -28,8 +28,8 @@ namespace proyectoCCharPropio.Recursos
 
                 // Parámetros de conexión con un correo de ionos
                 string host = "smtp.ionos.es";
-                string miLogin = "infolentos@frangallegodorado.es";
-                string miPassword = "LentosJavaC23;24/Java&C";
+                string miLogin = "isidro@isidrocamachodiaz.es";
+                string miPassword = "Flash12311oo11oo22oo33oo44";
 
                 // Configurar cliente SMTP
                 using (smtpClient = new SmtpClient(host))
@@ -43,7 +43,7 @@ namespace proyectoCCharPropio.Recursos
                     using (MailMessage msg = new MailMessage())
                     {
                         // Dirección de quien lo envía
-                        msg.From = new MailAddress($"'InfoWeb' <infolentos@aaronsmunpra.com>");
+                        msg.From = new MailAddress($"'SystemRevive' <isidro@isidrocamachodiaz.es>");
 
                         // A quien envía el correo
                         msg.ReplyToList.Add(new MailAddress(frommail));
@@ -110,6 +110,28 @@ namespace proyectoCCharPropio.Recursos
             </a>
         </div>
     ";
+        }
+
+        public string MensajeCorreoAlta(string token, string direccion)
+        {
+            return $@"
+    <div style=""font-family: 'Optima', sans-serif; max-width: 600px; margin: 0 auto; color: #192255; line-height: 1.6;"">
+        <h2 style=""color: #192255; font-size: 24px; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; text-align: left;"">Restablecer Contraseña</h2>
+
+        <p style=""font-size: 16px; text-align: left; margin-bottom: 30px;"">
+            Se ha enviado una petición para restablecer la contraseña. Si no has sido tú, por favor cambia la contraseña inmediatamente.
+            Si has sido tú, haz clic en el siguiente botón para restablecer tu contraseña:
+        </p>
+
+        <div style=""text-align: center;"">
+            <a href=""{direccion}?tk={token}"" style=""text-decoration: none;"" target=""_blank"">
+                <button style=""background-color: #7d2ae8; color: white; padding: 15px 25px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; text-transform: uppercase;"">
+                    Restablecer Contraseña
+                </button>
+            </a>
+        </div>
+    </div>
+";
         }
 
 
