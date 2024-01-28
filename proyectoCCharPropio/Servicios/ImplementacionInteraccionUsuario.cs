@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NuGet.Common;
+using proyectoCCharPropio.DTOS;
 using proyectoCCharPropio.Recursos;
 using pruebaRazor.DTOs;
 using System.Net;

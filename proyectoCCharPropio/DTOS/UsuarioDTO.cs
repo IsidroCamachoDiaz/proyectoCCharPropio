@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace pruebaRazor.DTOs
+namespace proyectoCCharPropio.DTOS
 {
     [Serializable]
     public class UsuarioDTO

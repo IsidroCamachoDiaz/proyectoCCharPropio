@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using proyectoCCharPropio.DTOS;
-using pruebaRazor.DTOs;
 using System.Net;
 
 namespace proyectoCCharPropio.Recursos

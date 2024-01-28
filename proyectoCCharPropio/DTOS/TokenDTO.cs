@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace pruebaRazor.DTOs
+namespace proyectoCCharPropio.DTOS
 {
 	public class TokenDTO
 	{

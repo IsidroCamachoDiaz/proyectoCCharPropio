@@ -29,9 +29,10 @@ https://templatemo.com/tm-556-catalog-z
     border-radius: 50%; /* Hace que la imagen sea redonda */
     margin-right: 10px; /* Ajusta el espacio entre la imagen y el texto según sea necesario */
 }
-.logo{
+
+.logo {
     width: 50px; /* Ajusta el tamaño de la imagen según sea necesario */
-    height: 50px; 
+    height: 50px;
 }
 
 body{

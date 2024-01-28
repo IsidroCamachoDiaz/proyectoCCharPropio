@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace pruebaRazor.DTOs
+namespace proyectoCCharPropio.Recursos
 {
 	public static class Util
 	{

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
-using pruebaRazor.DTOs;
 
-namespace pruebaRazor.DTOs
+namespace proyectoCCharPropio.DTOS
 {
 	public class AccesoDTO
 	{

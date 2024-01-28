@@ -1,4 +1,5 @@
 ﻿using System;
+using proyectoCCharPropio.DTOS;
 
 namespace pruebaRazor.DTOs
 {

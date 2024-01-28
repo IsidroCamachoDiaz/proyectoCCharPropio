@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using pruebaRazor.DTOs;
+using proyectoCCharPropio.DTOS;
 using System.Web;
 using System;
 using proyectoCCharPropio.Recursos;
+using pruebaRazor.DTOs;
 
-namespace pruebaRazor.Controllers
+namespace proyectoCCharPropio.Controllers
 {
 	[Controller]
 	public class RegistroControlador : Controller
@@ -177,12 +178,17 @@ namespace pruebaRazor.Controllers
             else
             {
                 ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
+                accionesCRUD acciones = new accionesCRUD();
                 bool ok = implInteraccionUsuario.LoginUsuario(usuarioDTO).Result;
                 if (ok)
                 {
-                    HttpContext.Session.SetString("usuario", "");
+                    HttpContext.Session.SetString("usuario", usuarioDTO.Id_usuario.ToString());
                     HttpContext.Session.SetString("acceso", "1");
-                    return RedirectToAction("Home");
+                    // Aquí usamos ViewBag para pasar el modelo a la vista
+                    ViewBag.UsuarioDTO = usuarioDTO;
+					usuarioDTO = acciones.SeleccionarUsuario("Correo/" + usuarioDTO.Correo_usuario);
+					return View("Home", usuarioDTO);
+                    //return RedirectToAction("Home");
                 }
                 else
                 {
