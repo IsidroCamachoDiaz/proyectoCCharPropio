@@ -97,10 +97,15 @@ namespace pruebaRazor.DTOs
 
 				if(usuario.Contrasenia_usuario!=usuarioBD.Contrasenia_usuario)
 				{
+				
 					return false;
 				}
 				else
 				{
+                    if (!usuarioBD.Alta_usuario)
+                    {
+                        return false;
+                    }
                     return true;
 				}
 

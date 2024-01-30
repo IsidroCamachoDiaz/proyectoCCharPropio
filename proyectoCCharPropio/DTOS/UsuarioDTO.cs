@@ -18,6 +18,8 @@ namespace proyectoCCharPropio.DTOS
         private string contrasenia_usuario;
        [JsonProperty("IdAcceso")]
         private int id_acceso;
+        [JsonProperty("Alta")]
+        private bool alta_usuario;
         [JsonProperty("FotoUsuario")]
         private byte[] foto_usuario;
 
@@ -54,8 +56,7 @@ namespace proyectoCCharPropio.DTOS
 		public string Contrasenia_usuario { get => contrasenia_usuario; set => contrasenia_usuario = value; }
 		public int Id_acceso { get => id_acceso; set => id_acceso = value;}
         public byte[] Foto_usuario { get => foto_usuario; set => foto_usuario = value; }
-
-
+        public bool Alta_usuario { get => alta_usuario; set => alta_usuario = value; }
 
         // toString
     }
