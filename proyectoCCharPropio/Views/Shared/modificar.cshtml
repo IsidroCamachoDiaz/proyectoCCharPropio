@@ -1,7 +1,8 @@
-﻿@model proyectoCCharPropio.DTOS.UsuarioDTO
+﻿@model proyectoCCharPropio.Controllers.RegistroControlador.ModificarViewModel
 @{
     ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
 }
+
 
 <!DOCTYPE html>
 <!-- Coding by CodingNepal | www.codingnepalweb.com-->
@@ -37,16 +38,17 @@
             <div class="form-content">
                 <div class="login-form">
                     <div class="title">Modificar Contraseña</div>
-                    <form action="#">
+                    <form method="post" asp-controller="RegistroControlador" asp-action="ModificarContrasenya">
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" placeholder="Introduzca Contraseña" required>
+                                <input type="password" placeholder="Introduzca Contraseña" required name="contrasenia_usuario">
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" placeholder="Repita Contraseña" required>
+                                <input type="password" placeholder="Repita Contraseña" required name="correo_usuario">
                             </div>
+                            <input type="text" value="@Model.Token" style="display: none;" name="Token">
                             <div class="button input-box">
                                 <input type="submit" value="Modificar Contraseña">
                             </div>

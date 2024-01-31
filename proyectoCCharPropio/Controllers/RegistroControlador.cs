@@ -14,18 +14,23 @@ namespace proyectoCCharPropio.Controllers
 	[Controller]
 	public class RegistroControlador : Controller
 	{
-		// Acción para la vista de bienvenida
-		public IActionResult Bienvenida()
+
+        // Modelo para la vista
+        public class ModificarViewModel
+        {
+            public string Token { get; set; }
+        }
+        // Acción para la vista de bienvenida
+        public IActionResult Bienvenida()
 		{
-			try
+            try
 			{
 				// AQUÍ VA EL CONTROL DE SESIÓN
 				string dni = String.Empty;
 				string acceso = String.Empty;
-				dni = HttpContext.Session.GetString("dni");
 				acceso = HttpContext.Session.GetString("acceso");
 
-				if (acceso != "1")
+				if (acceso != "2"&& acceso != "3"&&acceso != "4")
 				{
 					MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder","error");
 					return RedirectToAction("Index");
@@ -81,16 +86,50 @@ namespace proyectoCCharPropio.Controllers
 
         // Acción HTTP GET para la vista principal
         [HttpGet]
-		public IActionResult VistaRecuperar()
+		public IActionResult Modificar()
 		{
-			return View();
+            //Cojo la url del navegador
+            string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
+            Uri uri = new Uri(urlCompleta);
+            //Cojo el valor tk
+            string valorTk = HttpUtility.ParseQueryString(uri.Query)["tk"];
+
+			// Crear un modelo y establecer el valor del token
+			var modelo = new ModificarViewModel
+			{
+				Token = valorTk
+            };
+
+            // Pasar el modelo a la vista
+            return View(modelo);
 		}
 
         // Acción HTTP GET para la vista principal
         [HttpGet]
         public IActionResult Home()
         {
-            return View();
+			UsuarioDTO usuario;
+            try
+            {
+                // AQUÍ VA EL CONTROL DE SESIÓN
+                string acceso = String.Empty;
+				accionesCRUD acciones=new accionesCRUD();
+                acceso = HttpContext.Session.GetString("acceso");
+				string idUsuario= HttpContext.Session.GetString("usuario");
+                usuario = acciones.SeleccionarUsuario(idUsuario);
+
+                if (acceso != "2" && acceso != "3" && acceso != "4")
+                {
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception e)
+            {
+                MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                return RedirectToAction("Index");
+            }
+            return View(usuario);
         }
 
         // Acción HTTP GET para la vista principal
@@ -119,7 +158,7 @@ namespace proyectoCCharPropio.Controllers
             }
 			else
 			{
-				usuario.Id_acceso = 3;
+				usuario.Alta_usuario = true;
 				acciones.ActualizarUsuario(usuario);
 				MostrarAlerta("Confirmado", "Su cuenta ha sido Verificada", "success");
 			}
@@ -179,16 +218,15 @@ namespace proyectoCCharPropio.Controllers
             {
                 ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
                 accionesCRUD acciones = new accionesCRUD();
-                bool ok = implInteraccionUsuario.LoginUsuario(usuarioDTO).Result;
+                bool ok = implInteraccionUsuario.LoginUsuario(usuarioDTO, HttpContext).Result;
                 if (ok)
                 {
-                    HttpContext.Session.SetString("usuario", usuarioDTO.Id_usuario.ToString());
-                    HttpContext.Session.SetString("acceso", "1");
+
                     // Aquí usamos ViewBag para pasar el modelo a la vista
                     ViewBag.UsuarioDTO = usuarioDTO;
 					usuarioDTO = acciones.SeleccionarUsuario("Correo/" + usuarioDTO.Correo_usuario);
-					return View("Home", usuarioDTO);
-                    //return RedirectToAction("Home");
+					//return View("Home", usuarioDTO);
+                    return RedirectToAction("Home");
                 }
                 else
                 {
@@ -201,6 +239,7 @@ namespace proyectoCCharPropio.Controllers
 		[HttpPost]
 		public async Task<ActionResult> RecuperarContrasenya(UsuarioDTO usuarioDTO)
 		{
+			accionesCRUD acciones = new accionesCRUD(); 
 			Console.WriteLine(usuarioDTO.Correo_usuario);
 			if (usuarioDTO.Correo_usuario == null)
 			{
@@ -213,7 +252,7 @@ namespace proyectoCCharPropio.Controllers
 				UsuarioDTO usu = null;
 				try
 				{
-					usu = await implInteraccionUsuario.ObtieneUsuarioPorGmail(usuarioDTO);
+					usu = acciones.SeleccionarUsuario("correo/"+usuarioDTO.Correo_usuario);
 				}
 				catch (Exception e)
 				{
@@ -246,53 +285,66 @@ namespace proyectoCCharPropio.Controllers
 
 		// Método modificar contrasenya
 		[HttpPost]
-		public async Task<ActionResult> ModificarContrasenya(UsuarioDTO usuario)
+		public async Task<ActionResult> ModificarContrasenya(UsuarioDTO usuario, ModificarViewModel m)
 		{
 			ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
-			// Verificar si HttpContext está disponible (para aplicaciones web ASP.NET)
-			Console.WriteLine("Contrasenya 1: " + usuario.Contrasenia_usuario);
-			Console.WriteLine("Contrasenya 2: " + usuario.Correo_usuario);
-			Console.WriteLine("Token: " + usuario.Nombre_usuario);
-			bool ok1 = false;
+			//Cogemos el valor del modelo
+			string contrasenia1 = Util.EncriptarContra(usuario.Contrasenia_usuario);
+            string contrasenia2 = Util.EncriptarContra(usuario.Correo_usuario);
+
+            string valorTk=m.Token.ToString();
 			TokenDTO token = null;
 			try
 			{
-				token = await implInteraccionUsuario.ObtenerToken(usuario);
+				//Cogemos el token que le pertenece
+				token = await implInteraccionUsuario.ObtenerToken(valorTk);
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("[ERROR-RegistroControlador-RecuperarContrasenya] Error: " + e.Message);
 			}
-			Console.WriteLine(token.Id_usuario);
 
 			// Comprobamos si la fecha limite del token es igual o mayor que la hora actual
 			// Si es mayor que la hora actual, quiere decir que el token ha caducado.
-			DateTime horaActual = DateTime.Now;
-			DateTime fechaToken = token.Fecha_limite_token;
+			try
+			{
 
-			bool ok = false;
-			if(fechaToken > horaActual)
-			{
-				// El token sigue siendo válido
-				ok = implInteraccionUsuario.CambiarContrasenia(Util.EncriptarContra(usuario.Contrasenia_usuario), token).Result;
-			}
-			else
-			{
-				MostrarAlerta("¡Demasiado Tarde!", "No se pudo cambiar la clave por paso el limite de la fecha", "error");
-				// El token es inválido
-				return RedirectToAction("Index", new { error = "tokenCaducado" });
-			}
+				DateTime horaActual = DateTime.Now;
+				DateTime fechaToken = token.Fecha_limite_token;
 
-			if (ok)
+				bool ok = false;
+				if (fechaToken > horaActual)
+				{
+					if (contrasenia1 != contrasenia2)
+					{
+						MostrarAlerta("¡Incorrecta las contraseñas!", "No puso bien las contraseñas iguales", "error");
+					}
+					// El token sigue siendo válido
+					ok = await implInteraccionUsuario.CambiarContrasenia(contrasenia1, token);
+				}
+				else
+				{
+					MostrarAlerta("¡Demasiado Tarde!", "No se pudo cambiar la clave por paso el limite de la fecha", "error");
+					// El token es inválido
+					return RedirectToAction("Index", new { error = "tokenCaducado" });
+				}
+
+				if (ok)
+				{
+					MostrarAlerta("¡Clave Cambiada!", "La clave se Modifico Correctamente", "success");
+					return RedirectToAction("Index", new { bien = "claveCambiada" });
+				}
+				else
+				{
+					MostrarAlerta("¡Hubo Un Error!", "Ha habido un error Por Favor Intentelo En Otro Momento", "error");
+					return RedirectToAction("Index", new { error = "errorNoSeHaHechoPost" });
+				}
+			
+			}catch (Exception e)
 			{
-				MostrarAlerta("¡Clave Cambiada!", "La clave se Modifico Correctamente", "success");
-				return RedirectToAction("Index", new { bien = "claveCambiada" });
-			}
-			else
-			{
-				MostrarAlerta("¡Hubo Un Error!", "Ha habido un error Por Favor Intentelo En Otro Momento", "error");
-				return RedirectToAction("Index", new { error = "errorNoSeHaHechoPost" });
-			}
+                MostrarAlerta("¡Hubo Un Error!", "Ha habido un error Por Favor Intentelo En Otro Momento", "error");
+                return RedirectToAction("Index", new { error = "errorNoSeHaHechoPost" });
+            }
 		}
 
 		[AllowAnonymous]

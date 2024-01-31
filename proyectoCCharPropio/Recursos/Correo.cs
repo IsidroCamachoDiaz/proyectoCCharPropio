@@ -86,31 +86,34 @@ namespace proyectoCCharPropio.Recursos
             return resultado;
         }
 
-                /**
-         * Método donde crea el cuerpo del correo
-         * @param token
-         * @param direccion
-         * @return string
-         */
+        /**
+ * Método donde crea el cuerpo del correo
+ * @param token
+ * @param direccion
+ * @return string
+ */
         public string MensajeCorreo(string token, string direccion)
         {
             return $@"
-        <div style=""font-family: 'Optima', sans-serif; max-width: 600px; margin: 0 auto; color: #192255; line-height: 1.6;"">
-            <h2 style=""color: #192255; font-size: 24px; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; text-align: left;"">Restablecer Contraseña</h2>
+<div style=""font-family: 'Optima', sans-serif; max-width: 600px; margin: 0 auto; color: #192255; line-height: 1.6;"">
+    <h2 style=""color: #192255; font-size: 24px; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; text-align: left;"">Restablecer Contraseña</h2>
 
-            <p style=""font-size: 16px; text-align: left; margin-bottom: 30px;"">
-                Se ha enviado una petición para restablecer la contraseña. Si no has sido tú, por favor cambia la contraseña inmediatamente.
-                Si has sido tú, haz clic en el siguiente botón para restablecer tu contraseña:
-            </p>
+    <p style=""font-size: 16px; text-align: left; margin-bottom: 30px;"">
+        Se ha enviado una petición para restablecer la contraseña. Si no has sido tú, por favor cambia la contraseña inmediatamente.
+        Si has sido tú, haz clic en el siguiente botón para restablecer tu contraseña:
+    </p>
 
-            <a href=""{direccion}?tk={token}"" style=""text-decoration: none;"" target=""_blank"">
-                <button style=""background-color: #285845; color: white; padding: 15px 25px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; text-transform: uppercase;"">
-                    Restablecer Contraseña
-                </button>
-            </a>
-        </div>
-    ";
+    <div style=""text-align: center;"">
+        <a href=""{direccion}?tk={token}"" style=""text-decoration: none;"" target=""_blank"">
+            <button style=""background-color: #7d2ae8; color: white; padding: 15px 25px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; text-transform: uppercase;"">
+                Restablecer Contraseña
+            </button>
+        </a>
+    </div>
+</div>
+";
         }
+
 
         public string MensajeCorreoAlta(string token, string direccion)
         {
@@ -126,7 +129,7 @@ namespace proyectoCCharPropio.Recursos
         <div style=""text-align: center;"">
             <a href=""{direccion}?tk={token}"" style=""text-decoration: none;"" target=""_blank"">
                 <button style=""background-color: #7d2ae8; color: white; padding: 15px 25px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; text-transform: uppercase;"">
-                    Restablecer Contraseña
+                    Darme de Alta
                 </button>
             </a>
         </div>

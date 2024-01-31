@@ -17,8 +17,9 @@ namespace pruebaRazor.DTOs
 			try
 			{
 				accionesCRUD acciones = new accionesCRUD();
-				usu.Id_acceso = 1;
+				usu.Id_acceso = 3;
                 usu.Contrasenia_usuario = Util.EncriptarContra(usu.Contrasenia_usuario);
+				usu.Alta_usuario = false;
                 if (acciones.InsertarUsuario(usu))
 				{
                     // Creamos el token
@@ -83,7 +84,7 @@ namespace pruebaRazor.DTOs
 			return false;
 		}
 
-		public async Task<bool> LoginUsuario(UsuarioDTO usuario)
+		public async Task<bool> LoginUsuario(UsuarioDTO usuario, HttpContext httpContext)
 		{
 
 			try
@@ -94,8 +95,10 @@ namespace pruebaRazor.DTOs
                 usuario.Contrasenia_usuario = Util.EncriptarContra(usuario.Contrasenia_usuario);
 
                 UsuarioDTO usuarioBD = acciones.SeleccionarUsuario("correo/" + usuario.Correo_usuario);
+                httpContext.Session.SetString("usuario", usuarioBD.Id_usuario.ToString());
+                httpContext.Session.SetString("acceso", usuarioBD.Id_acceso.ToString());
 
-				if(usuario.Contrasenia_usuario!=usuarioBD.Contrasenia_usuario)
+                if (usuario.Contrasenia_usuario!=usuarioBD.Contrasenia_usuario)
 				{
 				
 					return false;
@@ -125,78 +128,43 @@ namespace pruebaRazor.DTOs
 		public bool RecuperarContrasenya(UsuarioDTO usu)
 		{
 			bool ok = false;
-			try
+			accionesCRUD acciones = new accionesCRUD();
+           
+            try
 			{
-				JsonSerializerSettings jsonSettings = new JsonSerializerSettings
+                // Creamos el token
+                // Primero creamos la fecha limite
+                DateTime fechaLimite = DateTime.Now.AddMinutes(10);
+                Console.WriteLine(fechaLimite);
+
+                // Ahora creamos el token
+                Guid guid = Guid.NewGuid();
+
+                // Convertir el GUID a una cadena (string)
+                string token = guid.ToString();
+        
+
+                Console.WriteLine(token);
+				//Creamos el token
+                TokenDTO tokenDto = new TokenDTO(token, usu.Id_usuario, fechaLimite);
+				//Comprobamos si se creo bien
+				if (acciones.InsertarToken(tokenDto))
 				{
-					NullValueHandling = NullValueHandling.Ignore
-				};
-
-				// Creamos el token
-				// Primero creamos la fecha limite
-				DateTime fechaLimite = DateTime.Now.AddMinutes(10);
-				Console.WriteLine(fechaLimite);
-
-				// Ahora creamos el token
-				Guid guid = Guid.NewGuid();
-
-				// Convertir el GUID a una cadena (string)
-				string token = guid.ToString();
-
-				// Aqui llamamos a los nuevos metodos
-
-				Correo c = new Correo();
-				String mensaje = c.MensajeCorreo(token, "https://localhost:7016/RegistroControlador/VistaRecuperar");
-				ok = c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Recuperar Contraseña", "infolentos@frangallegodorado.es", true);
-
-				Console.WriteLine(token);
-
-				TokenDTO tokenDto = new TokenDTO(token, usu.Id_usuario, fechaLimite);
-				string usuarioJson = JsonConvert.SerializeObject(tokenDto, jsonSettings);
-				Uri url = new Uri("https://localhost:7079/api/Token");
-
-				HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-				request.Method = "POST";
-				request.ContentType = "application/json";
-				request.Timeout = 10000; // Tiempo de espera en milisegundos
-
-				using (StreamWriter streamWriter = new StreamWriter(request.GetRequestStream()))
-				{
-					streamWriter.Write(usuarioJson);
-					streamWriter.Flush();
-					streamWriter.Close();
-				}
-
-				try
-				{
-					using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-					{
-						if (response.StatusCode == HttpStatusCode.Created)
-						{
-							// Si la respuesta es HTTP_CREATED (201), se ha creado correctamente
-							Console.WriteLine("Usuario creado exitosamente");
-							return true;
-						}
-						else
-						{
-							// Si no es HTTP_CREATED, imprime la respuesta para depurar
-							Console.WriteLine($"Respuesta del servidor: {response.StatusCode} {response.StatusDescription}");
-						}
-					}
-				}
-				catch (WebException ex)
-				{
-					if (ex.Response is HttpWebResponse errorResponse)
-					{
-						// Imprime el código de error si se produce una excepción en la solicitud HTTP
-						Console.WriteLine($"1Error en la solicitud HTTP: {errorResponse.StatusCode} {errorResponse.StatusDescription}");
-					}
+                    // Aqui llamamos a los nuevos metodos
+                    Correo c = new Correo();
+                    //Creamos el mensaje del correo con la url uy el token
+                    String mensaje = c.MensajeCorreo(token, "https://localhost:7048/RegistroControlador/Modificar");
+                    //Enviamos en el mensanje
+                    ok = c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Recuperar Contraseña", "isidro@isidrocamachodiaz.es", true);
+					//Comprobamos si se envio bien
+					if (ok)
+						return true;
 					else
-					{
-						Console.WriteLine($"2Error en la solicitud HTTP: {ex.Message}");
-					}
+						return false;
 				}
-			}
+				return false;
+
+            }
 			catch (JsonException e)
 			{
 				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] El objeto UsuarioDto no se pudo convertir a JSON. |" + e);
@@ -221,161 +189,34 @@ namespace pruebaRazor.DTOs
 			{
 				Console.Error.WriteLine(io.Message);
 			}
-
 			return false;
 		}
 
-		public async Task<UsuarioDTO> ObtieneUsuarioPorGmail(UsuarioDTO usu)
-		{
-			Console.WriteLine("Email: " + usu.Correo_usuario);
-			// URL de la API que deseas consultar
-			string apiUrl = "https://localhost:7079/api/Usuarios";
-
-			try
-			{
-				// Realiza la consulta GET
-				string responseData;
-				using (HttpClient client = new HttpClient())
-				{
-					// Realiza la solicitud GET a la API
-					HttpResponseMessage response = await client.GetAsync(apiUrl);
-
-					// Verifica si la solicitud fue exitosa
-					if (response.IsSuccessStatusCode)
-					{
-						// Lee y devuelve el contenido de la respuesta como cadena
-						responseData = await response.Content.ReadAsStringAsync();
-					}
-					else
-					{
-						// En caso de error, lanza una excepción o maneja el error según tus necesidades
-						throw new Exception($"Error al realizar la solicitud. Código de estado: {response.StatusCode}");
-					}
-				}
-
-				// Deserializa la respuesta JSON a un objeto C#
-				List<UsuarioDTO> usuarios = JsonConvert.DeserializeObject<List<UsuarioDTO>>(responseData);
-
-				// Ahora puedes trabajar con 'result', que es el objeto C# con los datos de la API
-				foreach (UsuarioDTO aux in usuarios)
-				{
-					if (aux.Correo_usuario == usu.Correo_usuario)
-					{
-						Console.WriteLine("Hay coincidencia");
-						return aux;
-					}
-				}
-
-				Console.WriteLine("No hay coincidencia");
-				return null;
-			}
-			catch (HttpRequestException e)
-			{
-				Console.WriteLine($"Error de solicitud HTTP: {e.Message}");
-				return null;
-			}
-			catch (JsonException e)
-			{
-				Console.WriteLine($"Error al deserializar JSON: {e.Message}");
-				return null;
-			}
-		}
 
 	
 
 		// Método cambiar
 		public async Task<bool> CambiarContrasenia(String contrasenia, TokenDTO to)
 		{
+			accionesCRUD acciones= new accionesCRUD();
+			UsuarioDTO usuario = null;
 
-
-			// URL de la API que deseas consultar
-			string apiUrl = "https://localhost:7079/api/Usuarios";
-
-			try
+            try
 			{
-				// Realiza la consulta GET
-				string responseData;
-				using (HttpClient client = new HttpClient())
+				//Buscamos al usuario por el id de usuario del token
+				usuario = acciones.SeleccionarUsuario(to.Id_usuario.ToString());
+				//Si no lo encuentra
+				if (usuario == null)
 				{
-					// Realiza la solicitud GET a la API
-					HttpResponseMessage response = await client.GetAsync(apiUrl);
-
-					// Verifica si la solicitud fue exitosa
-					if (response.IsSuccessStatusCode)
-					{
-						// Lee y devuelve el contenido de la respuesta como cadena
-						responseData = await response.Content.ReadAsStringAsync();
-					}
-					else
-					{
-						// En caso de error, lanza una excepción o maneja el error según tus necesidades
-						throw new Exception($"Error al realizar la solicitud. Código de estado: {response.StatusCode}");
-					}
-				}
-
-				// Deserializa la respuesta JSON a un objeto C#
-				List<UsuarioDTO> usuarios = JsonConvert.DeserializeObject<List<UsuarioDTO>>(responseData);
-				string apiU = "";
-				// Ahora puedes trabajar con 'result', que es el objeto C# con los datos de la API
-				foreach (UsuarioDTO aux in usuarios)
+                    return false;
+                }
+				//Si esta se le cambia la contraseña
+				usuario.Contrasenia_usuario= contrasenia;
+				//Se actualiza en la base de datos y se comprueba que este bien
+				if (acciones.ActualizarUsuario(usuario))
 				{
-					if (aux.Id_usuario == to.Id_usuario)
-					{
-						aux.Contrasenia_usuario = contrasenia;
-						JsonSerializerSettings jsonSettings = new JsonSerializerSettings
-						{
-							NullValueHandling = NullValueHandling.Ignore
-						};
-
-						apiUrl = "https://localhost:7079/api/Usuarios/" + aux.Id_usuario;
-						string usuarioJson = JsonConvert.SerializeObject(aux, jsonSettings);
-						HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiUrl);
-						request.Method = "PUT";
-						request.ContentType = "application/json";
-						request.Timeout = 10000; // Tiempo de espera en milisegundos
-
-						using (StreamWriter streamWriter = new StreamWriter(request.GetRequestStream()))
-						{
-							streamWriter.Write(usuarioJson);
-							streamWriter.Flush();
-							streamWriter.Close();
-						}
-
-						try
-						{
-							using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-							{
-								if (response.StatusCode == HttpStatusCode.Created)
-								{
-									// Si la respuesta es HTTP_CREATED (201), se ha creado correctamente
-									Console.WriteLine("Usuario Actualizado exitosamente");
-									return true;
-								}
-								else
-								{
-									// Si no es HTTP_CREATED, imprime la respuesta para depurar
-									Console.WriteLine($"Respuesta del servidor: {response.StatusCode} {response.StatusDescription}");
-								}
-							}
-						}
-						catch (WebException ex)
-						{
-							if (ex.Response is HttpWebResponse errorResponse)
-							{
-								// Imprime el código de error si se produce una excepción en la solicitud HTTP
-								Console.WriteLine($"1Error en la solicitud HTTP: {errorResponse.StatusCode} {errorResponse.StatusDescription}");
-							}
-							else
-							{
-								Console.WriteLine($"2Error en la solicitud HTTP: {ex.Message}");
-							}
-						}
-
-						return true;
-					}
+					return true;
 				}
-
-				Console.WriteLine("No hay coincidencia");
 				return false;
 			}
 			catch (HttpRequestException e)
@@ -390,38 +231,14 @@ namespace pruebaRazor.DTOs
 			}
 		}
 
-		public async Task<TokenDTO> ObtenerToken(UsuarioDTO usuario)
+		public async Task<TokenDTO> ObtenerToken(string valorTk)
 		{
-
-
-			// URL de la API que deseas consultar
-			string apiUrl = "https://localhost:7079/api/Token/token/" + usuario.Nombre_usuario;
+			accionesCRUD acciones = new accionesCRUD();
 
 			try
 			{
-				// Realiza la consulta GET
-				string responseData;
-				using (HttpClient client = new HttpClient())
-				{
-					// Realiza la solicitud GET a la API
-					HttpResponseMessage response = await client.GetAsync(apiUrl);
-
-					// Verifica si la solicitud fue exitosa
-					if (response.IsSuccessStatusCode)
-					{
-						// Lee y devuelve el contenido de la respuesta como cadena
-						responseData = await response.Content.ReadAsStringAsync();
-					}
-					else
-					{
-						// En caso de error, lanza una excepción o maneja el error según tus necesidades
-						throw new Exception($"Error al realizar la solicitud. Código de estado: {response.StatusCode}");
-					}
-				}
-
-				// Deserializa la respuesta JSON a un objeto C#
-				TokenDTO token = JsonConvert.DeserializeObject<TokenDTO>(responseData);
-				return token;
+				TokenDTO tokenEncontrado = acciones.SeleccionarToken("token/" + valorTk);
+				return tokenEncontrado;
 			}
 			catch (HttpRequestException e)
 			{

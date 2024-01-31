@@ -37,11 +37,11 @@
             <div class="form-content">
                 <div class="login-form">
                     <div class="title">Olvide La Contraseña</div>
-                    <form action="#">
+                    <form method="post" asp-controller="RegistroControlador" asp-action="RecuperarContrasenya">
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope"></i>
-                                <input type="text" placeholder="Introduzca Su Email" required>
+                                <input name="correo_usuario" type="text" placeholder="Introduzca Su Email" required>
                             </div>
                             <div class="button input-box">
                                 <input type="submit" value="Enviar Correo">

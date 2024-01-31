@@ -12,13 +12,7 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/ccs/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="/css/templatemo-style.css">
-    <!--
 
-    TemplateMo 556 Catalog-Z
-
-    https://templatemo.com/tm-556-catalog-z
-
-    -->
 </head>
 <body>
     <!-- Page Loader -->
@@ -32,7 +26,7 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand" href="@Url.Action("index", "RegistroControlador")">
-                <img class="logo" src="img/logo.png" alt="Imagen de Usuario">
+                <img class="logo" src="/img/logo.png" alt="Imagen de Usuario">
                 <span class="text-white">Menu</span>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +50,7 @@
         </div>
     </nav>
 
-    <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="img/hero.jpg">
+    <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
         <form class="d-flex tm-search-form">
             <h2 class="text-white">Modificar Perfil</h2>
         </form>
@@ -96,6 +90,12 @@
                         <label for="imagen">Imagen de Perfil:</label>
                         <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*" required>
                     </div>
+                    <!-- Campo de Contraseña -->
+                    <div class="form-group">
+                        <label for="contrasenia">Correo Electrónico:</label>
+                        <input type="password" class="form-control" id="contrasenia" name="contrasenia" required>
+                    </div>
+
 
                     <div class="mb-4 text-center">
                         <a href="@Url.Action("modificarPerfil", "RegistroControlador")" class="btn btn-primary tm-btn-big">Modificar Perfil</a>
@@ -107,11 +107,41 @@
     </div> <!-- container-fluid, tm-container-content -->
 
 
-    <script src="js/plugins.js"></script>
+    <script src="/js/plugins.js"></script>
     <script>
         $(window).on("load", function () {
             $('body').addClass('loaded');
         });
+    </script>
+    <script>
+        var formModified = false;
+
+        function setFormModified(modified) {
+            formModified = modified;
+        }
+
+        function showConfirmation() {
+            if (formModified) {
+                Swal.fire({
+                    title: 'Si Modifica el correo tendrá que volver a verificar el correo. ¿Está seguro?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, enviar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Envía el formulario si la confirmación es positiva
+                        document.getElementById("formulario").submit();
+                    } else {
+                        // No hace nada si la confirmación es cancelada
+                        Swal.fire('Envío cancelado', '', 'info');
+                    }
+                });
+            } else {
+                // El formulario no ha sido modificado, no se muestra la alerta
+                document.getElementById("formulario").submit();
+            }
+        }
     </script>
 </body>
 </html>

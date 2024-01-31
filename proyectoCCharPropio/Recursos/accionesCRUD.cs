@@ -204,7 +204,7 @@ namespace proyectoCCharPropio.Recursos
 
         public bool ActualizarUsuario(UsuarioDTO nuevoUsuario)
         {
-            return HacerPut($"api/Usuario/{nuevoUsuario.Id_usuario}", nuevoUsuario);
+            return HacerPut($"api/Usuario/"+nuevoUsuario.Id_usuario, nuevoUsuario);
         }
 
         private bool HacerPut(string endpoint, object entidad)
@@ -224,7 +224,7 @@ namespace proyectoCCharPropio.Recursos
                 }
 
                 var response = (HttpWebResponse)request.GetResponse();
-                return response.StatusCode == HttpStatusCode.OK;
+                return response.StatusCode == HttpStatusCode.NoContent;
             }
             catch (Exception e)
             {

@@ -7,10 +7,9 @@ namespace pruebaRazor.DTOs
 	{
 		public bool RegistrarUsuario(UsuarioDTO usu);
 
-		public Task<bool> LoginUsuario(UsuarioDTO usu);
+		public Task<bool> LoginUsuario(UsuarioDTO usu, HttpContext httpContext);
 
 		public bool RecuperarContrasenya(UsuarioDTO usu);
 
-		public Task<UsuarioDTO> ObtieneUsuarioPorGmail(UsuarioDTO usu);
 	}
 }
