@@ -33,5 +33,7 @@ namespace proyectoCCharPropio.Recursos
 
 			return hexString.ToString();
 		}
+
+
     }
 }

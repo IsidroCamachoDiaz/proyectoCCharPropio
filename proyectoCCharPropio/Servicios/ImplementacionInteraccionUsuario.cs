@@ -40,7 +40,7 @@ namespace pruebaRazor.DTOs
                     String mensaje = c.MensajeCorreoAlta(token, "https://localhost:7048/RegistroControlador/altaHecha");
                    
 					//Comprobamos si se ha enviado bien el correo
-					if(c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Recuperar Contraseña", "isidro@isidrocamachodiaz.es", true))
+					if(c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Alta De Usuario", "isidro@isidrocamachodiaz.es", true))
 					{
 						//Insertamos en el token
 						acciones.InsertarToken(tokenDto);
@@ -97,16 +97,17 @@ namespace pruebaRazor.DTOs
                 UsuarioDTO usuarioBD = acciones.SeleccionarUsuario("correo/" + usuario.Correo_usuario);
                 httpContext.Session.SetString("usuario", usuarioBD.Id_usuario.ToString());
                 httpContext.Session.SetString("acceso", usuarioBD.Id_acceso.ToString());
+                httpContext.Session.SetString("verificado", "");
 
                 if (usuario.Contrasenia_usuario!=usuarioBD.Contrasenia_usuario)
 				{
-				
-					return false;
+                    return false;
 				}
 				else
 				{
                     if (!usuarioBD.Alta_usuario)
                     {
+                        httpContext.Session.SetString("verificado", "false");
                         return false;
                     }
                     return true;
@@ -251,5 +252,38 @@ namespace pruebaRazor.DTOs
 				return null;
 			}
 		}
-	}
+
+        public bool EnviarCorreoConToken(UsuarioDTO usu)
+		{
+			accionesCRUD acciones = new accionesCRUD();
+
+            // Creamos el token
+            // Primero creamos la fecha limite
+            DateTime fechaLimite = DateTime.Now.AddMinutes(10);
+
+            // Ahora creamos el token
+            Guid guid = Guid.NewGuid();
+
+            // Convertir el GUID a una cadena (string)
+            string token = guid.ToString();
+            Correo c = new Correo();
+            //Creamos el token
+            TokenDTO tokenDto = new TokenDTO(token, usu.Id_usuario, fechaLimite);
+
+            String mensaje = c.MensajeCorreoAlta(token, "https://localhost:7048/RegistroControlador/altaHecha");
+
+            //Comprobamos si se ha enviado bien el correo
+            if (c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Alta del correo", "isidro@isidrocamachodiaz.es", true))
+            {
+                //Insertamos en el token
+                acciones.InsertarToken(tokenDto);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+    }
 }

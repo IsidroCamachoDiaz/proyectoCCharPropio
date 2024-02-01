@@ -75,7 +75,29 @@ namespace proyectoCCharPropio.Controllers
         [HttpGet]
         public IActionResult ModificarPerfil()
         {
-            return View();
+            try
+            {
+                // AQUÍ VA EL CONTROL DE SESIÓN
+                string acceso = String.Empty;
+                acceso = HttpContext.Session.GetString("acceso");
+
+                if (acceso != "2" && acceso != "3" && acceso != "4")
+                {
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception e)
+            {
+                MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                return RedirectToAction("Index");
+            }
+
+            string idUsuario = HttpContext.Session.GetString("usuario");
+			accionesCRUD acciones =new accionesCRUD();
+			UsuarioDTO usuario = acciones.SeleccionarUsuario(idUsuario);
+
+            return View(usuario);
         }
         // Acción HTTP GET para la vista principal
         [HttpGet]
@@ -208,31 +230,45 @@ namespace proyectoCCharPropio.Controllers
         [HttpPost]
         public ActionResult LoginUsuario(UsuarioDTO usuarioDTO)
         {
-			//Comprobamos que no hay metido datos vacios
-            if (usuarioDTO.Correo_usuario == null || usuarioDTO.Contrasenia_usuario == null)
-            {
-				MostrarAlerta("¡Campos Incompletos!","Hay Campos Vacios", "error");
-				return RedirectToAction("Index", new { error = "parametroVacio" });
-            }
-            else
-            {
-                ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
-                accionesCRUD acciones = new accionesCRUD();
-                bool ok = implInteraccionUsuario.LoginUsuario(usuarioDTO, HttpContext).Result;
-                if (ok)
-                {
-
-                    // Aquí usamos ViewBag para pasar el modelo a la vista
-                    ViewBag.UsuarioDTO = usuarioDTO;
-					usuarioDTO = acciones.SeleccionarUsuario("Correo/" + usuarioDTO.Correo_usuario);
-					//return View("Home", usuarioDTO);
-                    return RedirectToAction("Home");
-                }
-                else
-                {
-					MostrarAlerta("¡Datos Incorrectos!","El DNI y/o Clave son incorrectos", "error");
-					return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
+			try
+			{
+				//Comprobamos que no hay metido datos vacios
+				if (usuarioDTO.Correo_usuario == null || usuarioDTO.Contrasenia_usuario == null)
+				{
+					MostrarAlerta("¡Campos Incompletos!", "Hay Campos Vacios", "error");
+					return RedirectToAction("Index", new { error = "parametroVacio" });
 				}
+				else
+				{
+					ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
+					accionesCRUD acciones = new accionesCRUD();
+					bool ok = implInteraccionUsuario.LoginUsuario(usuarioDTO, HttpContext).Result;
+					if (ok)
+					{
+
+						// Aquí usamos ViewBag para pasar el modelo a la vista
+						ViewBag.UsuarioDTO = usuarioDTO;
+						usuarioDTO = acciones.SeleccionarUsuario("Correo/" + usuarioDTO.Correo_usuario);
+						//return View("Home", usuarioDTO);
+						return RedirectToAction("Home");
+					}
+					else
+					{
+                        string verificado = HttpContext.Session.GetString("verificado");
+                        if (verificado=="false")
+						{
+                            MostrarAlerta("¡No esta dado de alta!", "Tiene que darse de alta en la aplicacion", "error");
+                            return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
+                        }
+
+						MostrarAlerta("¡Datos Incorrectos!", "El Correo y/o Clave son incorrectos", "error");
+						return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
+					}
+				}
+			}catch(Exception e)
+			{
+                MostrarAlerta("¡Hubo un erro!", "Hubo un erroe intentelo mas tarde", "error");
+                return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
             }
         }
 
@@ -347,7 +383,100 @@ namespace proyectoCCharPropio.Controllers
             }
 		}
 
-		[AllowAnonymous]
+        [HttpPost]
+        public ActionResult ModificarPerfil(UsuarioDTO usuarioDTO, IFormFile archivo)
+        {
+            ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
+            accionesCRUD acciones = new accionesCRUD();
+			UsuarioDTO usuarioBD=null;
+            //Comprobamos que no hay metido datos vacios
+            if (usuarioDTO.Correo_usuario == null || usuarioDTO.Nombre_usuario == null|| usuarioDTO.Telefono_usuario==null)
+            {
+                MostrarAlerta("¡Campos Incompletos!", "No puede dejar campos vacios", "error");
+                return RedirectToAction("Index", new { error = "parametroVacio" });
+            }
+
+			try
+			{
+				bool cambioCorreo = false;
+				bool modifico=false;
+				usuarioBD = acciones.SeleccionarUsuario(usuarioDTO.Id_usuario.ToString());
+                if (usuarioBD == null)
+				{
+                    MostrarAlerta("No se encontro su usuario", "No se pudo encontrar a su usuario intentelo mas tarde", "error");
+                    return RedirectToAction("Index", new { error = "parametroVacio" });
+                }
+                if (archivo != null && archivo.Length > 0)
+                {
+                    //Convierto el archivo en array de byte
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        archivo.CopyTo(memoryStream);
+                        usuarioBD.Foto_usuario = memoryStream.ToArray();
+                    }
+					modifico = true;
+                }
+                if (usuarioDTO.Correo_usuario!=usuarioBD.Correo_usuario|| usuarioDTO.Nombre_usuario != usuarioBD.Nombre_usuario|| 
+					usuarioDTO.Telefono_usuario != usuarioBD.Telefono_usuario|| usuarioDTO.Contrasenia_usuario != null)
+				{
+					if (usuarioDTO.Contrasenia_usuario != null)
+					{
+						usuarioBD.Contrasenia_usuario = Util.EncriptarContra(usuarioDTO.Contrasenia_usuario);
+					}
+					if(usuarioDTO.Correo_usuario != usuarioBD.Correo_usuario)
+					{
+						usuarioBD.Correo_usuario = usuarioDTO.Correo_usuario;
+						usuarioBD.Alta_usuario = false;
+						cambioCorreo = true;
+                    }
+					usuarioBD.Telefono_usuario = usuarioDTO.Telefono_usuario;
+					usuarioBD.Nombre_usuario = usuarioDTO.Nombre_usuario;
+					modifico = true;
+                }
+				if (modifico)
+				{
+					if(acciones.ActualizarUsuario(usuarioBD))
+					{
+						if (cambioCorreo)
+						{
+							if (implInteraccionUsuario.EnviarCorreoConToken(usuarioBD))
+							{
+                                MostrarAlerta("Correo Cambiado", "Revise su bandeja de entrada le hemos enviado un correo", "success");
+                                return RedirectToAction("Index", new { error = "parametroVacio" });
+                            }
+							else
+							{
+                                MostrarAlerta("No se pudo Cambiar el correo", "Hubo un error al cambiar el correo intentelo mas tarde", "error");
+                                return RedirectToAction("Home");
+                            }
+						}
+						else
+						{
+                            MostrarAlerta("Se Actualizo Correctamente", "Se modifico los datos correctamente", "success");
+                            return RedirectToAction("ModificarPerfil");
+                        }
+					}
+					else
+					{
+                        MostrarAlerta("No se pudo actualizar su uauario", "No se pudo actualizar a su usuario intentelo mas tarde", "error");
+                        return RedirectToAction("ModificarPerfil", new { error = "parametroVacio" });
+                    }
+				}
+				else
+				{
+                    MostrarAlerta("No Modifico Nada", "No ha modificado ningun valor", "info");
+                    return RedirectToAction("ModificarPerfil", new { error = "parametroVacio" });
+                }
+			}
+			catch (Exception e)
+			{
+
+			}
+
+            return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
+        }
+
+        [AllowAnonymous]
 		public IActionResult ExternalLogin(string provider, string returnUrl = "/")
 		{
 			var properties = new AuthenticationProperties
