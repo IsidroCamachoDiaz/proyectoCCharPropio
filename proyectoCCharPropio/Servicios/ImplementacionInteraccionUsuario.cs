@@ -43,43 +43,52 @@ namespace pruebaRazor.DTOs
 					if(c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Alta De Usuario", "isidro@isidrocamachodiaz.es", true))
 					{
 						//Insertamos en el token
+						Util.EscribirEnElFichero("Se ha creado un usuario correctamente se le envio un correo de alta");
 						acciones.InsertarToken(tokenDto);
 						return true;
 					}
 					else
 					{
+						Util.EscribirEnElFichero("Hubo problemas para enviar el correo");
 						return false;
 					}
 				}
 				else
 				{
+					Util.EscribirEnElFichero("Hubo problemas para insertar al usuario");
 					return false;
 				}
 
 			}
 			catch (JsonException e)
 			{
+				Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] El objeto UsuarioDto no se pudo convertir a JSON. |" + e);
 				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] El objeto UsuarioDto no se pudo convertir a JSON. |" + e);
 			}
 			catch (IOException e)
 			{
+				Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] Se produjo un error al crear el flujo de salida. |" + e);
 				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] Se produjo un error al crear el flujo de salida. |" + e);
 			}
 			catch (InvalidOperationException e)
 			{
+				Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] Ya se ha utilizado el método para insertar el usuario. |" + e);
 				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] Ya se ha utilizado el método para insertar el usuario. |" + e);
 			}
-			catch (ArgumentNullException e)
+			catch (ArgumentNullException e)	
 			{
-				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] " + e.Message);
+                Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] " + e.Message);
+                Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] " + e.Message);
 			}
 			catch (SecurityException s)
 			{
-				Console.Error.WriteLine(s.Message);
+                Util.EscribirEnElFichero(s.Message);
+                Console.Error.WriteLine(s.Message);
 			}
 			catch (IndexOutOfRangeException io)
 			{
-				Console.Error.WriteLine(io.Message);
+                Util.EscribirEnElFichero(io.Message);
+                Console.Error.WriteLine(io.Message);
 			}
 			return false;
 		}
@@ -89,39 +98,46 @@ namespace pruebaRazor.DTOs
 
 			try
 			{
+				//Creamo lo que necesitemos
                 accionesCRUD acciones = new accionesCRUD();
 
                 // Encriptamos la contraseña del usuario para poder comparar con las de la base de datos
                 usuario.Contrasenia_usuario = Util.EncriptarContra(usuario.Contrasenia_usuario);
-
+				//Buscamos al usuario
                 UsuarioDTO usuarioBD = acciones.SeleccionarUsuario("correo/" + usuario.Correo_usuario);
+				//ponemos los valores que necesitemos
                 httpContext.Session.SetString("usuario", usuarioBD.Id_usuario.ToString());
                 httpContext.Session.SetString("acceso", usuarioBD.Id_acceso.ToString());
+				//Este campo es para verificar el controlador si esta dado de alta
                 httpContext.Session.SetString("verificado", "");
 
                 if (usuario.Contrasenia_usuario!=usuarioBD.Contrasenia_usuario)
 				{
+                    Util.EscribirEnElFichero("Un usuario intento acceder a la web y puso datos que no se asocian con ninguna cuenta");
                     return false;
 				}
 				else
 				{
                     if (!usuarioBD.Alta_usuario)
                     {
+                        Util.EscribirEnElFichero("Un usuario intento logearse sin haber dado de alta la cuenta");
+						//Ponemos la variable a false
                         httpContext.Session.SetString("verificado", "false");
                         return false;
                     }
+                    Util.EscribirEnElFichero("Un usuario accedio correctamente a la web: "+usuarioBD.Nombre_usuario);
                     return true;
 				}
 
             }
 			catch (HttpRequestException e)
 			{
-				Console.WriteLine($"Error de solicitud HTTP: {e.Message}");
+                Util.EscribirEnElFichero($"Error de solicitud HTTP: {e.Message}");
 				return false;
 			}
 			catch (JsonException e)
 			{
-				Console.WriteLine($"Error al deserializar JSON: {e.Message}");
+                Util.EscribirEnElFichero($"Error al deserializar JSON: {e.Message}");
 				return false;
 			}
 		}
@@ -159,36 +175,50 @@ namespace pruebaRazor.DTOs
                     ok = c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Recuperar Contraseña", "isidro@isidrocamachodiaz.es", true);
 					//Comprobamos si se envio bien
 					if (ok)
-						return true;
+					{
+                        Util.EscribirEnElFichero("Se envio un correo para cambiar una contraseña: "+usu.Nombre_usuario);
+                        return true;
+                    }
+
 					else
-						return false;
+					{
+                        Util.EscribirEnElFichero("Hubo un error para enviar un correo a un usuario");
+                        return false;
+                    }
 				}
-				return false;
+                Util.EscribirEnElFichero("Hubo problemas para insertar el token");
+                return false;
 
             }
 			catch (JsonException e)
 			{
-				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] El objeto UsuarioDto no se pudo convertir a JSON. |" + e);
+                Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] El objeto UsuarioDto no se pudo convertir a JSON. |" + e);
+                Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] El objeto UsuarioDto no se pudo convertir a JSON. |" + e);
 			}
 			catch (IOException e)
 			{
-				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] Se produjo un error al crear el flujo de salida. |" + e);
+                Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] Se produjo un error al crear el flujo de salida. |" + e);
+                Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] Se produjo un error al crear el flujo de salida. |" + e);
 			}
 			catch (InvalidOperationException e)
 			{
-				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] Ya se ha utilizado el método para insertar el usuario. |" + e);
+                Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] Ya se ha utilizado el método para insertar el usuario. |" + e);
+                Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] Ya se ha utilizado el método para insertar el usuario. |" + e);
 			}
 			catch (ArgumentNullException e)
 			{
-				Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] " + e.Message);
+                Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] " + e.Message);
+                Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RecuperarContrasenya] " + e.Message);
 			}
 			catch (SecurityException s)
 			{
-				Console.Error.WriteLine(s.Message);
+                Util.EscribirEnElFichero(s.Message);
+                Console.Error.WriteLine(s.Message);
 			}
 			catch (IndexOutOfRangeException io)
 			{
-				Console.Error.WriteLine(io.Message);
+                Util.EscribirEnElFichero(io.Message);
+                Console.Error.WriteLine(io.Message);
 			}
 			return false;
 		}
@@ -209,6 +239,7 @@ namespace pruebaRazor.DTOs
 				//Si no lo encuentra
 				if (usuario == null)
 				{
+                    Util.EscribirEnElFichero("Error al cambiar la contarseña no se encontro al usuario");
                     return false;
                 }
 				//Si esta se le cambia la contraseña
@@ -216,18 +247,22 @@ namespace pruebaRazor.DTOs
 				//Se actualiza en la base de datos y se comprueba que este bien
 				if (acciones.ActualizarUsuario(usuario))
 				{
-					return true;
+                    Util.EscribirEnElFichero("Se actualizo la contraseña de un usuario: "+usuario.Nombre_usuario);
+                    return true;
 				}
-				return false;
+                Util.EscribirEnElFichero("No se actualizo bien el usuario en cambiar la contraseña");
+                return false;
 			}
 			catch (HttpRequestException e)
 			{
-				Console.WriteLine($"Error de solicitud HTTP: {e.Message}");
+                Util.EscribirEnElFichero($"Error de solicitud HTTP: {e.Message}");
+                Console.WriteLine($"Error de solicitud HTTP: {e.Message}");
 				return false;
 			}
 			catch (JsonException e)
 			{
-				Console.WriteLine($"Error al deserializar JSON: {e.Message}");
+                Util.EscribirEnElFichero($"Error al deserializar JSON: {e.Message}");
+                Console.WriteLine($"Error al deserializar JSON: {e.Message}");
 				return false;
 			}
 		}
@@ -238,17 +273,19 @@ namespace pruebaRazor.DTOs
 
 			try
 			{
-				TokenDTO tokenEncontrado = acciones.SeleccionarToken("token/" + valorTk);
+                TokenDTO tokenEncontrado = acciones.SeleccionarToken("token/" + valorTk);
 				return tokenEncontrado;
 			}
 			catch (HttpRequestException e)
 			{
-				Console.WriteLine($"Error de solicitud HTTP: {e.Message}");
+                Util.EscribirEnElFichero($"Error de solicitud HTTP: {e.Message}");
+                Console.WriteLine($"Error de solicitud HTTP: {e.Message}");
 				return null;
 			}
 			catch (JsonException e)
 			{
-				Console.WriteLine($"Error al deserializar JSON: {e.Message}");
+                Util.EscribirEnElFichero($"Error al deserializar JSON: {e.Message}");
+                Console.WriteLine($"Error al deserializar JSON: {e.Message}");
 				return null;
 			}
 		}
@@ -277,10 +314,12 @@ namespace pruebaRazor.DTOs
             {
                 //Insertamos en el token
                 acciones.InsertarToken(tokenDto);
+                Util.EscribirEnElFichero("Se hizo una peticion de alta y se envio correctamente el correo y se actualizo el usuario: "+usu.Nombre_usuario);
                 return true;
             }
             else
             {
+                Util.EscribirEnElFichero("No se pudo enviar un correo para un alta");
                 return false;
             }
         }

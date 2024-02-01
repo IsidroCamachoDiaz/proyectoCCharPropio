@@ -233,5 +233,30 @@ namespace proyectoCCharPropio.Recursos
 
             return false;
         }
+
+        //List<UsuarioDTO> listaUsuarios = HacerGetLista<UsuarioDTO>("api/Usuario")
+        private List<T> HacerGetLista<T>(string endpoint)
+        {
+            try
+            {
+                var url = new Uri(BASE_URL + endpoint);
+                var request = WebRequest.Create(url);
+                request.Method = "GET";
+
+                using (var response = request.GetResponse())
+                using (var reader = new StreamReader(response.GetResponseStream()))
+                {
+                    var jsonResponse = reader.ReadToEnd();
+                    return JsonConvert.DeserializeObject<List<T>>(jsonResponse);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine($"[ERROR-InteraccionEntidad-HacerGet] Error al realizar la solicitud GET. | {e}");
+            }
+
+            return new List<T>();
+        }
+
     }
 }

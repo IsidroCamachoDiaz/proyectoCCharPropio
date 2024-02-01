@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ejercicioRepaso.Modelo;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -33,6 +35,17 @@ namespace proyectoCCharPropio.Recursos
 
 			return hexString.ToString();
 		}
+
+		public static void EscribirEnElFichero(string texto)
+		{
+			interfazEscritura es= new implementacionEscritura();
+			DateTime ahora = DateTime.Now;
+			StreamWriter sw= es.AbrirOCrearFichero("C:\\Users\\Puesto3\\Desktop\\FicheroLog\\log.txt", true);
+			es.escribir(sw,String.Format("[{0}]-{1}",ahora.ToString(),texto));
+			es.cerrar(sw);
+
+        }
+
 
 
     }

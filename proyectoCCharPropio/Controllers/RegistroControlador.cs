@@ -32,19 +32,21 @@ namespace proyectoCCharPropio.Controllers
 
 				if (acceso != "2"&& acceso != "3"&&acceso != "4")
 				{
-					MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder","error");
+                    Util.EscribirEnElFichero("Un usuario intento acceder a un sitio que no se le permite");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder","error");
 					return RedirectToAction("Index");
 				}
 			}
 			catch (Exception e)
 			{
-				MostrarAlerta("¡Alerta De Seguridad!","Usted tiene que iniciar Sesion Para Poder acceder","error");
+                Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                MostrarAlerta("¡Alerta De Seguridad!","Usted tiene que iniciar Sesion Para Poder acceder","error");
 				return RedirectToAction("Index");
 			}
 
-			// Verificar si el objeto se recuperó correctamente
-
-			return View();
+            // Verificar si el objeto se recuperó correctamente
+            Util.EscribirEnElFichero("Se le llevo a la bienvenida");
+            return View();
 		}
 		//Metodo Para Mostrar Alerta
 		public IActionResult MostrarAlerta(string titulo,string texto,string tipoDeNotificacion)
@@ -69,6 +71,7 @@ namespace proyectoCCharPropio.Controllers
 		[HttpGet]
         public IActionResult Index()
         {
+            Util.EscribirEnElFichero("Se llevo al index");
             return View();
         }
         // Acción HTTP GET para la vista principal
@@ -89,6 +92,7 @@ namespace proyectoCCharPropio.Controllers
             }
             catch (Exception e)
             {
+                Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
                 MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
                 return RedirectToAction("Index");
             }
@@ -97,12 +101,14 @@ namespace proyectoCCharPropio.Controllers
 			accionesCRUD acciones =new accionesCRUD();
 			UsuarioDTO usuario = acciones.SeleccionarUsuario(idUsuario);
 
+            Util.EscribirEnElFichero("Se le llevo al modificar perfil");
             return View(usuario);
         }
         // Acción HTTP GET para la vista principal
         [HttpGet]
         public IActionResult Contrasenia()
         {
+            Util.EscribirEnElFichero("Se le llevo a la pestaña de olvidar contraseña");
             return View();
         }
 
@@ -123,6 +129,7 @@ namespace proyectoCCharPropio.Controllers
             };
 
             // Pasar el modelo a la vista
+            Util.EscribirEnElFichero("Se le llevo a la vista de modificar contraseña");
             return View(modelo);
 		}
 
@@ -148,9 +155,11 @@ namespace proyectoCCharPropio.Controllers
             }
             catch (Exception e)
             {
+                Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
                 MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
                 return RedirectToAction("Index");
             }
+            Util.EscribirEnElFichero("Se le llevo al home");
             return View(usuario);
         }
 
@@ -176,13 +185,15 @@ namespace proyectoCCharPropio.Controllers
 				acciones.EliminarToken(token.Id_token_tabla.ToString());
 				acciones.EliminarUsuario(usuario.Id_usuario.ToString());
                 MostrarAlerta("Tiempo Agotado", "Se le agoto el tiempo para verificar se elimino la cuenta vuelva a registrarse", "error");
+                Util.EscribirEnElFichero("Una persona hizo el alta tarde y se borro la cuenta y el token :"+usuario.Nombre_usuario);
                 return RedirectToAction("index");
             }
 			else
 			{
 				usuario.Alta_usuario = true;
 				acciones.ActualizarUsuario(usuario);
-				MostrarAlerta("Confirmado", "Su cuenta ha sido Verificada", "success");
+                Util.EscribirEnElFichero("Un usuario hizo el alta correctamente: "+usuario.Nombre_usuario);
+                MostrarAlerta("Confirmado", "Su cuenta ha sido Verificada", "success");
 			}
 
             return View();
@@ -353,31 +364,36 @@ namespace proyectoCCharPropio.Controllers
 				{
 					if (contrasenia1 != contrasenia2)
 					{
-						MostrarAlerta("¡Incorrecta las contraseñas!", "No puso bien las contraseñas iguales", "error");
-					}
+
+                        Util.EscribirEnElFichero("Un usuario no puse bien las 2 contraseñas");
+                        MostrarAlerta("¡Incorrecta las contraseñas!", "No puso bien las contraseñas iguales", "error");
+                        return RedirectToAction("Index", new { error = "tokenCaducado" });
+                    }
 					// El token sigue siendo válido
 					ok = await implInteraccionUsuario.CambiarContrasenia(contrasenia1, token);
-				}
+                }
 				else
 				{
-					MostrarAlerta("¡Demasiado Tarde!", "No se pudo cambiar la clave por paso el limite de la fecha", "error");
+                    Util.EscribirEnElFichero("Una persona persona se paso de la fecha limite de cambiar contraseña");
+                    MostrarAlerta("¡Demasiado Tarde!", "No se pudo cambiar la clave por paso el limite de la fecha", "error");
 					// El token es inválido
 					return RedirectToAction("Index", new { error = "tokenCaducado" });
 				}
 
 				if (ok)
 				{
-					MostrarAlerta("¡Clave Cambiada!", "La clave se Modifico Correctamente", "success");
+                    MostrarAlerta("¡Clave Cambiada!", "La clave se Modifico Correctamente", "success");
 					return RedirectToAction("Index", new { bien = "claveCambiada" });
 				}
 				else
 				{
-					MostrarAlerta("¡Hubo Un Error!", "Ha habido un error Por Favor Intentelo En Otro Momento", "error");
+                    MostrarAlerta("¡Hubo Un Error!", "Ha habido un error Por Favor Intentelo En Otro Momento", "error");
 					return RedirectToAction("Index", new { error = "errorNoSeHaHechoPost" });
 				}
 			
 			}catch (Exception e)
 			{
+                Util.EscribirEnElFichero("hubo un error en cambiar la contraseña"+e.Message);
                 MostrarAlerta("¡Hubo Un Error!", "Ha habido un error Por Favor Intentelo En Otro Momento", "error");
                 return RedirectToAction("Index", new { error = "errorNoSeHaHechoPost" });
             }
@@ -388,6 +404,7 @@ namespace proyectoCCharPropio.Controllers
         {
             ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
             accionesCRUD acciones = new accionesCRUD();
+			//Ponemos a nulo para buscar
 			UsuarioDTO usuarioBD=null;
             //Comprobamos que no hay metido datos vacios
             if (usuarioDTO.Correo_usuario == null || usuarioDTO.Nombre_usuario == null|| usuarioDTO.Telefono_usuario==null)
@@ -400,12 +417,15 @@ namespace proyectoCCharPropio.Controllers
 			{
 				bool cambioCorreo = false;
 				bool modifico=false;
+				//Buscamos al usuario por el id para actualizarlo
 				usuarioBD = acciones.SeleccionarUsuario(usuarioDTO.Id_usuario.ToString());
+				//Comprobomos si no lo encontro
                 if (usuarioBD == null)
 				{
                     MostrarAlerta("No se encontro su usuario", "No se pudo encontrar a su usuario intentelo mas tarde", "error");
                     return RedirectToAction("Index", new { error = "parametroVacio" });
                 }
+				//Comprobamos si metio una imagen
                 if (archivo != null && archivo.Length > 0)
                 {
                     //Convierto el archivo en array de byte
@@ -416,62 +436,83 @@ namespace proyectoCCharPropio.Controllers
                     }
 					modifico = true;
                 }
+				//Comprobamos si cambio algun campo
                 if (usuarioDTO.Correo_usuario!=usuarioBD.Correo_usuario|| usuarioDTO.Nombre_usuario != usuarioBD.Nombre_usuario|| 
 					usuarioDTO.Telefono_usuario != usuarioBD.Telefono_usuario|| usuarioDTO.Contrasenia_usuario != null)
 				{
+					//Si puso una contraseña nueva se encripta
 					if (usuarioDTO.Contrasenia_usuario != null)
 					{
 						usuarioBD.Contrasenia_usuario = Util.EncriptarContra(usuarioDTO.Contrasenia_usuario);
 					}
+					//Comprobamos si cambio el correo
 					if(usuarioDTO.Correo_usuario != usuarioBD.Correo_usuario)
 					{
+						//Le asignamos nuevo correo
 						usuarioBD.Correo_usuario = usuarioDTO.Correo_usuario;
+						//Cambiamos el alta
 						usuarioBD.Alta_usuario = false;
+						//Comfirmamos que cambio el correo
 						cambioCorreo = true;
                     }
+					//Igualamos los valores
 					usuarioBD.Telefono_usuario = usuarioDTO.Telefono_usuario;
 					usuarioBD.Nombre_usuario = usuarioDTO.Nombre_usuario;
+					//Comfirmamos que se modifcaron campos
 					modifico = true;
                 }
+				//Comprobamos si modifico algo
 				if (modifico)
 				{
+					//Comprobamos que se actualice bien el usuario
 					if(acciones.ActualizarUsuario(usuarioBD))
 					{
+						//Coprobamos si cambio el correo
 						if (cambioCorreo)
 						{
+							//Enviamos un nuevo correo de alta y comprobamos si se hizo correctamente
 							if (implInteraccionUsuario.EnviarCorreoConToken(usuarioBD))
 							{
+                                Util.EscribirEnElFichero("Un usuario cambio su correo correctamente: "+usuarioBD.Nombre_usuario);
                                 MostrarAlerta("Correo Cambiado", "Revise su bandeja de entrada le hemos enviado un correo", "success");
                                 return RedirectToAction("Index", new { error = "parametroVacio" });
                             }
+							//Si no se hizo se avisa al usuario
 							else
 							{
+                                Util.EscribirEnElFichero("Hubo un problema para enviar el correo a un usuario");
                                 MostrarAlerta("No se pudo Cambiar el correo", "Hubo un error al cambiar el correo intentelo mas tarde", "error");
                                 return RedirectToAction("Home");
                             }
 						}
+						//Si actualizo pero no cambio el correo
 						else
 						{
+                            Util.EscribirEnElFichero("Actulizo bien sus sin cambiar el correo: "+usuarioBD.Nombre_usuario);
                             MostrarAlerta("Se Actualizo Correctamente", "Se modifico los datos correctamente", "success");
                             return RedirectToAction("ModificarPerfil");
                         }
 					}
+					//Si falla la actualizacion
 					else
 					{
+                        Util.EscribirEnElFichero("Hubo un problema para actualizar a un usuario");
                         MostrarAlerta("No se pudo actualizar su uauario", "No se pudo actualizar a su usuario intentelo mas tarde", "error");
                         return RedirectToAction("ModificarPerfil", new { error = "parametroVacio" });
                     }
 				}
+				//Si no cambia nada
 				else
 				{
+                    Util.EscribirEnElFichero("Un usuario quizo actualizar sus datos epro no cambio nada");
                     MostrarAlerta("No Modifico Nada", "No ha modificado ningun valor", "info");
                     return RedirectToAction("ModificarPerfil", new { error = "parametroVacio" });
                 }
 			}
 			catch (Exception e)
 			{
-
-			}
+                Util.EscribirEnElFichero("Hubo un error "+e.Message);
+            }
 
             return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
         }
