@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Web;
+using Microsoft.AspNetCore.Mvc;
 using proyectoCCharPropio.DTOS;
 using proyectoCCharPropio.Recursos;
+using proyectoCCharPropio.Servicios;
 using pruebaRazor.DTOs;
 using static proyectoCCharPropio.Controllers.RegistroControlador;
 
@@ -82,8 +84,25 @@ namespace proyectoCCharPropio.Controllers
         [HttpPost]
         public ActionResult BorrarUsuario(UsuarioDTO usuarioDTO)
         {
+            accionesCRUD acciones= new accionesCRUD();
+            //Cojo la url del navegador
+            string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
+            Uri uri = new Uri(urlCompleta);
+            //Cojo el valor id
+            string valorId = HttpUtility.ParseQueryString(uri.Query)["id"];
+            usuarioDTO=acciones.SeleccionarUsuario(valorId);
+            implementacionAdminsitracion impl = new implementacionAdminsitracion();
+            if (impl.eliminarUsuario(usuarioDTO))
+            {
+                MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
+            }
+            else
+            {
+                MostrarAlerta("Error", "No se pudo borrar el usuario", "error");
+            }
 
-           return View(usuarioDTO);
+            return RedirectToAction("index");
+            return View(usuarioDTO);
         }
 
     }
