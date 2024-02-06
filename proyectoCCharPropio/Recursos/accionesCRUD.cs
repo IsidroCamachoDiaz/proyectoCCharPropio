@@ -235,7 +235,7 @@ namespace proyectoCCharPropio.Recursos
         }
 
         //List<UsuarioDTO> listaUsuarios = HacerGetLista<UsuarioDTO>("api/Usuario")
-        private List<T> HacerGetLista<T>(string endpoint)
+        internal List<T> HacerGetLista<T>(string endpoint)
         {
             try
             {

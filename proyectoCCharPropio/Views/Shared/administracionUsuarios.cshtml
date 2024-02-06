@@ -1,4 +1,5 @@
-﻿@model proyectoCCharPropio.DTOS.UsuarioDTO
+﻿@using proyectoCCharPropio.DTOS;
+@model proyectoCCharPropio.Controllers.AdministracionControlador.ModeloAdministracion
 @{
     ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
 }
@@ -42,18 +43,18 @@
                     <li class="nav-item">
                         <a class="nav-link nav-link-2" href="modificarPerfil.jsp">
                             <div class="user-info-container d-flex align-items-center">
-                                @if (Model.Foto_usuario != null && Model.Foto_usuario.Length > 0)
+                                @if (Model.Usuario.Foto_usuario != null && Model.Usuario.Foto_usuario.Length > 0)
                                 {
                                     // Convertir el array de bytes a cadena Base64
-                                    var imagenBase64 = Convert.ToBase64String(Model.Foto_usuario);
+                                    var imagenBase64 = Convert.ToBase64String(Model.Usuario.Foto_usuario);
 
                                     // Mostrar la imagen usando la cadena Base64 en la etiqueta <img>
-                                    <img class="rounded-circle user-avatar2" src="data:image/png;base64,@imagenBase64" alt="Imagen de Usuario">
+                                    <img class="rounded-circle user-avatar" src="data:image/png;base64,@imagenBase64" alt="Imagen de Usuario">
                                 }
                                 else
                                 {
                                     // Mostrar una imagen predeterminada si el array de bytes es nulo o vacío
-                                    <img class="rounded-circle user-avatar2" src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" alt="Imagen de Usuario">
+                                    <img class="rounded-circle user-avatar" src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" alt="Imagen de Usuario">
                                 }
                                 <span class="ml-2 text-white">Perfil</span>
                             </div>
@@ -64,10 +65,9 @@
         </div>
     </nav>
 
-    <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="img/hero.jpg">
+    <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
         <form class="d-flex tm-search-form">
-            <div class="user-info-container2 d-flex align-items-center">
-                <img class="rounded-circle user-avatar2" src="data:image/jpeg;base64,${base64Image}" alt="Imagen de Usuario">
+            <div class="user-info-container2 d-flex align-items-center">            
                 <h2 class="text-white">Administracion de Usuarios</h2>
             </div>
         </form>
@@ -87,60 +87,58 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <%
-                            for(UsuarioDTO usuarioVer : usuarios){
-                            String foto = Base64.getEncoder().encodeToString(usuarioVer.getFoto());
-                            request.setAttribute("foto",foto);
-                            %>
+                        @foreach (UsuarioDTO usuarioVer in Model.ListaUsuarios){
+                                var foto= Convert.ToBase64String(usuarioVer.Foto_usuario);                       
+
                             <tr>
-                                <td> <img class="rounded-circleVer user-avatarVer" src="data:image/jpeg;base64,${foto}" alt="Imagen de Usuario"></td>
-                                <td><%=usuarioVer.getEmailUsuario() %></td>
-                                <td><%=usuarioVer.getNombreUsuario() %></td>
-                                <td><%=usuarioVer.getTlfUsuario() %></td>
-                                <td><%=usuarioVer.getAcceso().getCodigoAcceso()%></td>
+                                <td> <img class="rounded-circleVer user-avatarVer" src="data:image/png;base64,@foto" alt="Imagen de Usuario"></td>
+                                <td>@usuarioVer.Correo_usuario</td>
+                                <td>@usuarioVer.Nombre_usuario</td>
+                                <td>@usuarioVer.Telefono_usuario</td>
+                                <td>@usuarioVer.Id_acceso</td>
                                 <td>
                                     <form action="/ruta/de/borrado" method="post">
-                                        <input type="hidden" name="id" value="<%=usuarioVer.getIdUsuario()%>">
+                                        <input type="hidden" name="id" value="@usuarioVer.Id_usuario">
                                     </form>
-                                    <button class="boton-redondo boton-rojo" onclick="confirmarBorrado('<%=usuarioVer.getIdUsuario()%>')">Borrar Usuario</button>
-                                    <a href="https://www.youtube.com/" target="_blank">
-                                        <button class="boton-redondo boton-verde" type="button">Modificar Usuario</button>
-                                    </a>
+                                   <button class="btn btn-danger"  onclick="confirmarBorrado('<%=usuarioVer.getIdUsuario()%>')">Borrar Usuario</button>
+					               <a href="modificarUsuario.jsp?id=@usuarioVer.Id_acceso">
+					        	        <button  class="btn btn-success" type="button">Modificar Usuario</button>
+					      	        </a>	
                                 </td>
                             </tr>
-                            <%
-                            }
-                            %>
-                        </tbody>
+                        }
+                    </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <script src="js/plugins.js"></script>
+        <script src="/js/plugins.js"></script>
         <script>
             $(window).on("load", function () {
                 $('body').addClass('loaded');
             });
         </script>
 
+       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
         <script>
-            function confirmarBorrado(idUsuario) {
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: 'Esta acción no se puede deshacer.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, borrar usuario'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Si el usuario confirma, entonces enviamos el formulario
-                        document.getElementById('formBorrarUsuario').submit();
-                    }
-                });
-            }
+          function confirmarBorrado(idUsuario) {
+	          console.log('formBorrarUsuario'+idUsuario);
+            Swal.fire({
+              title: '¿Estás seguro?',
+              text: 'Esta acción no se puede deshacer.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí, borrar usuario'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Si el usuario confirma, entonces enviamos el formulario
+                document.getElementById('formBorrarUsuario'+idUsuario).submit();
+              }
+            });
+          }
         </script>
 </body>
 </html>

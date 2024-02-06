@@ -35,14 +35,14 @@ namespace proyectoCCharPropio.Controllers
 
 
         [HttpGet]
-        public IActionResult AdminsitracionUsuarios()
+        public IActionResult AdministracionUsuarios()
         {
             UsuarioDTO usuario;
+            accionesCRUD acciones = new accionesCRUD();
             try
             {
                 // AQUÍ VA EL CONTROL DE SESIÓN
                 string acceso = String.Empty;
-                accionesCRUD acciones = new accionesCRUD();
                 acceso = HttpContext.Session.GetString("acceso");
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
@@ -59,10 +59,19 @@ namespace proyectoCCharPropio.Controllers
                 MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
                 return RedirectToAction("Index");
             }
-
+            List<UsuarioDTO> usuarios =acciones.HacerGetLista<UsuarioDTO>("api/Usuario");
+            for (int i = 0; i < usuarios.Count; i++)
+            {
+                if (usuarios[i].Id_usuario == usuario.Id_usuario)
+                {
+                    usuarios.Remove(usuarios[i]);
+                    break;
+                }
+            }
             var modelo = new ModeloAdministracion
             {
-                Usuario= usuario,
+                Usuario = usuario,
+                ListaUsuarios = usuarios
             };
 
             Util.EscribirEnElFichero("Se le llevo a la administracion de usuarios");
@@ -73,6 +82,7 @@ namespace proyectoCCharPropio.Controllers
         [HttpPost]
         public ActionResult BorrarUsuario(UsuarioDTO usuarioDTO)
         {
+
            return View(usuarioDTO);
         }
 
