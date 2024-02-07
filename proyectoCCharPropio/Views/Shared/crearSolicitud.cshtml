@@ -1,0 +1,179 @@
+﻿@model proyectoCCharPropio.Controllers.ControladorIncidencias.ModeloUsuario
+@{
+    ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog-Z Photo Detail Page</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/ccs/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/templatemo-style.css">
+
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <!--Script Para la alerta-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+        var mensajeAlerta = '@TempData["MensajeAlerta"]';
+        var tipo = '@TempData["Tipo"]';
+        var icono = '@TempData["Icono"]';
+        var titulo = '@TempData["Titulo"]';
+
+        function mostrarAlertaPersonalizada() {
+            if (icono == "check") {
+                icono = '<i class="fas fa-check" style="font-size: 1em;"></i>';
+            }
+            else {
+                icono = '<i class="fas fa-times" style="font-size: 1em;"></i>'
+            }
+            Swal.fire({
+                icon: tipo,
+                title: titulo,
+                text: mensajeAlerta,
+                showCancelButton: false,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+                iconHtml: icono,  // Ajusta el tamaño según sea necesario
+            });
+        }
+    </script>
+    <script>
+        var mostrarAlerta = '@TempData["MostrarAlerta"]';
+        console.log('Valor de mostrarAlerta:', mostrarAlerta);
+
+        if (mostrarAlerta && mostrarAlerta.toLowerCase() === 'true') {
+            console.log('Mostrando la alerta');
+            mostrarAlertaPersonalizada();
+        }
+    </script>
+    <!---->
+    <!-- Page Loader -->
+    <div id="loader-wrapper">
+        <div id="loader"></div>
+
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="@Url.Action("home", "RegistroControlador")">
+                <img class="logo" src="/img/logo.png" alt="Imagen de Usuario">
+                <span class="text-white">SystemRevive</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-1" aria-current="page" href="@Url.Action("home", "RegistroControlador")">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-2 active" href="@Url.Action("modificarPerfil", "RegistroControlador")">
+                            <div class="user-info-container d-flex align-items-center">
+                                @if (Model.Usuario.Foto_usuario != null && Model.Usuario.Foto_usuario.Length > 0)
+                                {
+                                    // Convertir el array de bytes a cadena Base64
+                                    var imagenBase64 = Convert.ToBase64String(Model.Usuario.Foto_usuario);
+
+                                    // Mostrar la imagen usando la cadena Base64 en la etiqueta <img>
+                                    <img class="rounded-circle user-avatar" src="data:image/png;base64,@imagenBase64" alt="Imagen de Usuario">
+                                }
+                                else
+                                {
+                                    // Mostrar una imagen predeterminada si el array de bytes es nulo o vacío
+                                    <img class="rounded-circle user-avatar" src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" alt="Imagen de Usuario">
+                                }
+                                <span class="ml-2 text-white">Perfil</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
+        <form class="d-flex tm-search-form">
+            <h2 class="text-white">Crear Solicitud De Incidencia</h2>
+        </form>
+    </div>
+
+    <div class="container-fluid tm-container-content tm-mt-60">
+        <div class="row mb-4">
+            <h2 class="col-6 tm-text-primary text-white">
+                Cree la Solicitud
+            </h2>
+        </div>
+        <div class="row tm-mb-90">
+            <div class="col-xl-8 col-lg-7 col-md-6 col-sm-12 text-center">
+                <img src="https://aprendepsicologia.com/wp-content/uploads/2020/08/01-how-questions-never-ask-job-interview-shironosov-1-1080x675.jpg" alt="Image" class="img-fluid rounded">
+            </div>
+            <div class="col-xl-4 col-lg-5 col-md-6 col-sm-12">
+                <div class="tm-bg-gray tm-video-details">
+                    <form method="post" asp-controller="ControladorIncidencias" asp-action="CrearSolicitud" id="formulario">
+                        <div class="container mt-4">
+                            <label for="exampleTextarea" class="form-label">Describenos lo que te ocurre:</label>
+                            <textarea class="form-control" id="exampleTextarea" rows="4" name="DescripcionSolicitud"></textarea>
+                        </div>
+                        <div class="mb-4 text-center" style="margin-top:10px;">
+                            <button class="btn btn-primary tm-btn-big" type="submit">Crear Solicitud</button>
+                        </div>
+                        <input type="text" id="IdUsuario" name="id" value="@Model.Usuario.Id_usuario" style="display: none;">
+                    </form>
+
+                    <a href="@Url.Action("CrearSolicitud", "ControladorIncidencias")">
+                        <button class="btn btn-primary" type="button">Volver</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- container-fluid, tm-container-content -->
+
+
+    <script src="/js/plugins.js"></script>
+    <script>
+        $(window).on("load", function () {
+            $('body').addClass('loaded');
+        });
+    </script>
+    <script>
+        var formModified = false;
+
+        function setFormModified(modified) {
+            formModified = modified;
+        }
+
+        function showConfirmation() {
+            if (formModified) {
+                Swal.fire({
+                    title: 'Si Modifica el correo tendrá que volver a verificar el correo. ¿Está seguro?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, enviar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Envía el formulario si la confirmación es positiva
+                        document.getElementById("formulario").submit();
+                    } else {
+                        // No hace nada si la confirmación es cancelada
+                        Swal.fire('Envío cancelado', '', 'info');
+                    }
+                });
+            } else {
+                // El formulario no ha sido modificado, no se muestra la alerta
+                document.getElementById("formulario").submit();
+            }
+        }
+    </script>
+</body>
+</html>

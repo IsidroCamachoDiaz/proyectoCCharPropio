@@ -8,6 +8,7 @@ using System.Web;
 using System;
 using proyectoCCharPropio.Recursos;
 using pruebaRazor.DTOs;
+using proyectoCCharPropio.Servicios;
 
 namespace proyectoCCharPropio.Controllers
 {
@@ -181,12 +182,14 @@ namespace proyectoCCharPropio.Controllers
 			DateTime ahora = DateTime.Now;
             if(ahora>token.Fecha_limite_token)
 			{
+				implementacionAdminsitracion implAdm = new implementacionAdminsitracion();
 				//Si paso el tiempo se elimina la cuenta para que vuelva a crearla
-				acciones.EliminarToken(token.Id_token_tabla.ToString());
-				acciones.EliminarUsuario(usuario.Id_usuario.ToString());
-                MostrarAlerta("Tiempo Agotado", "Se le agoto el tiempo para verificar se elimino la cuenta vuelva a registrarse", "error");
-                Util.EscribirEnElFichero("Una persona hizo el alta tarde y se borro la cuenta y el token :"+usuario.Nombre_usuario);
-                return RedirectToAction("index");
+				if (implAdm.eliminarUsuario(usuario))
+				{
+                    MostrarAlerta("Tiempo Agotado", "Se le agoto el tiempo para verificar se elimino la cuenta vuelva a registrarse", "error");
+                    Util.EscribirEnElFichero("Una persona hizo el alta tarde y se borro la cuenta y el token :" + usuario.Nombre_usuario);
+                    return RedirectToAction("index");
+                }  
             }
 			else
 			{
@@ -251,12 +254,13 @@ namespace proyectoCCharPropio.Controllers
 				}
 				else
 				{
+					//Declaramos loq ue necesitamos
 					ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
 					accionesCRUD acciones = new accionesCRUD();
+					//Usamos el metodo para logearnos y comprobamos si lo hizo bien
 					bool ok = implInteraccionUsuario.LoginUsuario(usuarioDTO, HttpContext).Result;
 					if (ok)
 					{
-
 						// Aquí usamos ViewBag para pasar el modelo a la vista
 						ViewBag.UsuarioDTO = usuarioDTO;
 						usuarioDTO = acciones.SeleccionarUsuario("Correo/" + usuarioDTO.Correo_usuario);
@@ -265,13 +269,15 @@ namespace proyectoCCharPropio.Controllers
 					}
 					else
 					{
+						//No hizo bien y comprobamos si el porblemas es porque no esta dado de alta
+
                         string verificado = HttpContext.Session.GetString("verificado");
                         if (verificado=="false")
 						{
                             MostrarAlerta("¡No esta dado de alta!", "Tiene que darse de alta en la aplicacion", "error");
                             return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
                         }
-
+						//Si no es el problema el alta es porque el usuario no puso bien los datos
 						MostrarAlerta("¡Datos Incorrectos!", "El Correo y/o Clave son incorrectos", "error");
 						return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
 					}
@@ -286,8 +292,10 @@ namespace proyectoCCharPropio.Controllers
 		[HttpPost]
 		public async Task<ActionResult> RecuperarContrasenya(UsuarioDTO usuarioDTO)
 		{
+			//Declaramos los que encesitemos
 			accionesCRUD acciones = new accionesCRUD(); 
-			Console.WriteLine(usuarioDTO.Correo_usuario);
+
+			//Comprobamos que si puso algo
 			if (usuarioDTO.Correo_usuario == null)
 			{
 				return RedirectToAction("Index", new { error = "parametroVacio" });
@@ -299,6 +307,7 @@ namespace proyectoCCharPropio.Controllers
 				UsuarioDTO usu = null;
 				try
 				{
+					//Cogemos el usuario
 					usu = acciones.SeleccionarUsuario("correo/"+usuarioDTO.Correo_usuario);
 				}
 				catch (Exception e)
@@ -306,22 +315,26 @@ namespace proyectoCCharPropio.Controllers
 					Console.WriteLine("[ERROR-RegistroControlador-RecuperarContrasenya] Error: " + e.Message);
 				}
 				
+				//El usuario se encontro
 				if (usu != null)
 				{
-					// Si tenemos el usuario tendremos que coger el id del usuario y enviar a la tabla token_tabla
-					// El token generado, una fecha limite de 10 minutos y el id del usuario
+					//Usamos el metodo para cambiar la contraseña
 					bool ok = implInteraccionUsuario.RecuperarContrasenya(usu);
+
+					//Si se hizo bien
 					if (ok)
 					{
 						MostrarAlerta("¡Revise su Bandeja!","Se le ha enviado un correo para cambiar la clave", "success");
 						return RedirectToAction("Index", new { bien = "emailExiste" });
 					}
+					//Si no se avisa al usuario
 					else
 					{
 						MostrarAlerta("¡Hubo Un Error!","Ha habido un error Por Favor Intentelo En Otro Momento", "error");
 						return RedirectToAction("Index", new { error = "errorNoSeHaHechoPost" });
 					}
 				} 
+				//No se encontro ninguna cuenta asociada con ese usuario
 				else
 				{
 					MostrarAlerta("¡Correo No Existe!","El email Proporcionado no existe", "error");
@@ -355,13 +368,15 @@ namespace proyectoCCharPropio.Controllers
 			// Si es mayor que la hora actual, quiere decir que el token ha caducado.
 			try
 			{
-
+				//Cogemos la fecha actual y la del token para comprobar el limite
 				DateTime horaActual = DateTime.Now;
 				DateTime fechaToken = token.Fecha_limite_token;
 
 				bool ok = false;
+				//Comprobamos
 				if (fechaToken > horaActual)
 				{
+					//Comprobamos que hay puesto bien las 2 contraseñas
 					if (contrasenia1 != contrasenia2)
 					{
 
@@ -372,6 +387,7 @@ namespace proyectoCCharPropio.Controllers
 					// El token sigue siendo válido
 					ok = await implInteraccionUsuario.CambiarContrasenia(contrasenia1, token);
                 }
+				//La persona se paso del limite
 				else
 				{
                     Util.EscribirEnElFichero("Una persona persona se paso de la fecha limite de cambiar contraseña");
@@ -380,11 +396,14 @@ namespace proyectoCCharPropio.Controllers
 					return RedirectToAction("Index", new { error = "tokenCaducado" });
 				}
 
+				//Si se cambio bien la contraseña
+
 				if (ok)
 				{
                     MostrarAlerta("¡Clave Cambiada!", "La clave se Modifico Correctamente", "success");
 					return RedirectToAction("Index", new { bien = "claveCambiada" });
 				}
+				//Si no se le avisa al usuario
 				else
 				{
                     MostrarAlerta("¡Hubo Un Error!", "Ha habido un error Por Favor Intentelo En Otro Momento", "error");

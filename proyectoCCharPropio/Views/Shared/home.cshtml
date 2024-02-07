@@ -15,6 +15,42 @@
     <link rel="stylesheet" href="/css/templatemo-style.css">
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+        var mensajeAlerta = '@TempData["MensajeAlerta"]';
+        var tipo = '@TempData["Tipo"]';
+        var icono = '@TempData["Icono"]';
+        var titulo = '@TempData["Titulo"]';
+
+        function mostrarAlertaPersonalizada() {
+            if (icono == "check") {
+                icono = '<i class="fas fa-check" style="font-size: 1em;"></i>';
+            }
+            else {
+                icono = '<i class="fas fa-times" style="font-size: 1em;"></i>'
+            }
+            Swal.fire({
+                icon: tipo,
+                title: titulo,
+                text: mensajeAlerta,
+                showCancelButton: false,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+                iconHtml: icono,  // Ajusta el tamaño según sea necesario
+            });
+        }
+    </script>
+    <script>
+        var mostrarAlerta = '@TempData["MostrarAlerta"]';
+        console.log('Valor de mostrarAlerta:', mostrarAlerta);
+
+        if (mostrarAlerta && mostrarAlerta.toLowerCase() === 'true') {
+            console.log('Mostrando la alerta');
+            mostrarAlertaPersonalizada();
+            mostrarAlerta = "false";
+        }
+    </script>
     <!-- Page Loader-->
     <div id="loader-wrapper">
         <div id="loader"></div>
@@ -101,7 +137,7 @@
                     <img src="/img/img-03.jpg" alt="Image" class="img-fluid">
                     <figcaption class="d-flex align-items-center justify-content-center">
                         <h2>Solicitudes</h2>
-                        <a href="photo-detail.html"></a>
+                            <a href="@Url.Action("ListaIncidencias", "ControladorIncidencias")"></a>
                     </figcaption>
                 </figure>
             </div>

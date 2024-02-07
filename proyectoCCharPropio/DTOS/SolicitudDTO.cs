@@ -20,9 +20,9 @@ namespace proyectoCCharPropio.DTOS
         public int IdUsuario { get; set; }
 
         [JsonProperty("Incidencia")]
-        public int Incidencia { get; set; }
+        public IncidenciaDTO Incidencia { get; set; }
 
-        public SolicitudDTO(int idSolicitud, string descripcionSolicitud, bool estado, DateTime fechaLimite, int idUsuario, int incidencia)
+        public SolicitudDTO(int idSolicitud, string descripcionSolicitud, bool estado, DateTime fechaLimite, int idUsuario, IncidenciaDTO incidencia)
         {
             IdSolicitud = idSolicitud;
             DescripcionSolicitud = descripcionSolicitud;
@@ -40,6 +40,9 @@ namespace proyectoCCharPropio.DTOS
             IdUsuario = idUsuario;
         }
 
+        public SolicitudDTO()
+        {
+        }
 
 
     }

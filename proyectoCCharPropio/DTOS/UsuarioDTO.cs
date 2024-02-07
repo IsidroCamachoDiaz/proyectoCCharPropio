@@ -23,7 +23,7 @@ namespace proyectoCCharPropio.DTOS
         [JsonProperty("FotoUsuario")]
         private byte[] foto_usuario;
         [JsonProperty("FechaBaja")]
-        private DateTime fecha_baja;
+        private DateTime? fecha_baja;
 
 
         // Constructores
@@ -60,7 +60,7 @@ namespace proyectoCCharPropio.DTOS
 		public int Id_acceso { get => id_acceso; set => id_acceso = value;}
         public byte[] Foto_usuario { get => foto_usuario; set => foto_usuario = value; }
         public bool Alta_usuario { get => alta_usuario; set => alta_usuario = value; }
-        public DateTime Fecha_baja { get => fecha_baja; set => fecha_baja = value; }
+        public DateTime? Fecha_baja { get => (DateTime?)fecha_baja; set => fecha_baja = value; }
 
         // toString
     }

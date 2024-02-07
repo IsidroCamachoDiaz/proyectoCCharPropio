@@ -11,11 +11,13 @@ namespace proyectoCCharPropio.Controllers
     [Controller]
     public class AdministracionControlador : Controller
     {
+        //Modelo de administracion
         public class ModeloAdministracion
         {
             public List<UsuarioDTO> ListaUsuarios { get; set; }
             public UsuarioDTO Usuario { get; set; }
         }
+
         //Metodo Para Mostrar Alerta
         public IActionResult MostrarAlerta(string titulo, string texto, string tipoDeNotificacion)
         {
@@ -35,10 +37,11 @@ namespace proyectoCCharPropio.Controllers
             return RedirectToAction("Index");
         }
 
-
+        
         [HttpGet]
         public IActionResult AdministracionUsuarios()
         {
+            //Declaramos lo que necesitemos
             UsuarioDTO usuario;
             accionesCRUD acciones = new accionesCRUD();
             try
@@ -51,17 +54,19 @@ namespace proyectoCCharPropio.Controllers
 
                 if (acceso != "4")
                 {
-                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
-                    return RedirectToAction("home");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted no tiene acceso para entrar aqui", "error");
+                    return RedirectToAction("Home", "RegistroControlador");
                 }
             }
             catch (Exception e)
             {
                 Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
                 MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "RegistroControlador");
             }
+            //Cogemos todos los usuario y eliminamos de la lista el propio usuario paarq ue no se pueda modificar solo
             List<UsuarioDTO> usuarios =acciones.HacerGetLista<UsuarioDTO>("api/Usuario");
+
             for (int i = 0; i < usuarios.Count; i++)
             {
                 if (usuarios[i].Id_usuario == usuario.Id_usuario)
@@ -70,6 +75,7 @@ namespace proyectoCCharPropio.Controllers
                     break;
                 }
             }
+            //Metemos todo en el modelo
             var modelo = new ModeloAdministracion
             {
                 Usuario = usuario,
@@ -84,25 +90,27 @@ namespace proyectoCCharPropio.Controllers
         [HttpPost]
         public ActionResult BorrarUsuario(UsuarioDTO usuarioDTO)
         {
+            //Declaramos lo que encesitemos
             accionesCRUD acciones= new accionesCRUD();
-            //Cojo la url del navegador
-            string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
-            Uri uri = new Uri(urlCompleta);
-            //Cojo el valor id
-            string valorId = HttpUtility.ParseQueryString(uri.Query)["id"];
-            usuarioDTO=acciones.SeleccionarUsuario(valorId);
+
+            //Cogemos el usuario a borrar
+            usuarioDTO=acciones.SeleccionarUsuario(usuarioDTO.Id_usuario.ToString());
+
             implementacionAdminsitracion impl = new implementacionAdminsitracion();
+            //Usamos el metodo para borrar
             if (impl.eliminarUsuario(usuarioDTO))
             {
                 MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
+                return RedirectToAction("AdministracionUsuarios");
             }
+            //Si no se pudo se avisa al usuario
             else
             {
                 MostrarAlerta("Error", "No se pudo borrar el usuario", "error");
+                return RedirectToAction("AdministracionUsuarios");
             }
 
-            return RedirectToAction("index");
-            return View(usuarioDTO);
+            
         }
 
     }

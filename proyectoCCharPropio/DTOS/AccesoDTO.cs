@@ -5,61 +5,43 @@ namespace proyectoCCharPropio.DTOS
 	public class AccesoDTO
 	{
 		[JsonProperty("IdAcceso")]
-		private long IdAccesoDto;
+		private int IdAcceso;
 
 		[JsonProperty("CodigoAcceso")]
-		private string CodigoAccesoDto;
+		private string CodigoAcceso;
 
 		[JsonProperty("DescripcionAcceso")]
-		private string DescripcionAccesoDto;
+		private string DescripcionAcceso;
 
 		[JsonProperty("Usuarios")]
-		private List<UsuarioDTO> ListaUsuariosConAccesoDto;
+		private List<UsuarioDTO> ListaUsuariosConAcceso;
 
 		public AccesoDTO()
 		{
 		}
 
-		public AccesoDTO(long idAccesoDto, string codigoAccesoDto, string descripcionAccesoDto)
+		public AccesoDTO(int idAcceso, string codigoAcceso, string descripcionAcceso)
 		{
-			IdAccesoDto = idAccesoDto;
-			CodigoAccesoDto = codigoAccesoDto;
-			DescripcionAccesoDto = descripcionAccesoDto;
+			IdAcceso = idAcceso;
+			this.CodigoAcceso1 = codigoAcceso;
+			DescripcionAcceso1 = descripcionAcceso;
 		}
 
 		public AccesoDTO(string codigoAcceso, string descripcionAcceso)
 		{
-			CodigoAccesoDto = codigoAcceso;
-			DescripcionAccesoDto = descripcionAcceso;
+			CodigoAcceso1 = codigoAcceso;
+			DescripcionAcceso1 = descripcionAcceso;
 		}
 
-		public long IdAcceso
-		{
-			get { return IdAccesoDto; }
-			set { IdAccesoDto = value; }
-		}
 
-		public string CodigoAcceso
-		{
-			get { return CodigoAccesoDto; }
-			set { CodigoAccesoDto = value; }
-		}
+        public int IdAcceso1 { get => IdAcceso; set => IdAcceso = value; }
+        public List<UsuarioDTO> ListaUsuariosConAcceso1 { get => ListaUsuariosConAcceso; set => ListaUsuariosConAcceso = value; }
+        public string DescripcionAcceso1 { get => DescripcionAcceso; set => DescripcionAcceso = value; }
+        public string CodigoAcceso1 { get => CodigoAcceso; set => CodigoAcceso = value; }
 
-		public string DescripcionAcceso
+        public override string ToString()
 		{
-			get { return DescripcionAccesoDto; }
-			set { DescripcionAccesoDto = value; }
-		}
-
-		public List<UsuarioDTO> ListaUsuariosConAcceso
-		{
-			get { return ListaUsuariosConAccesoDto; }
-			set { ListaUsuariosConAccesoDto = value; }
-		}
-
-		public override string ToString()
-		{
-			return $"--- Datos Acceso ---\nIdAcceso: {IdAccesoDto}\nCodigoAcceso: {CodigoAccesoDto}\nDescripcionAcceso: {DescripcionAccesoDto}\nLista Usuarios con Acceso: {ListaUsuariosConAccesoDto?.ToString()}";
+			return $"--- Datos Acceso ---\nIdAcceso: {IdAcceso}\nCodigoAcceso: {CodigoAcceso1}\nDescripcionAcceso: {DescripcionAcceso}\nLista Usuarios con Acceso: {ListaUsuariosConAcceso1?.ToString()}";
 		}
 	}
 }

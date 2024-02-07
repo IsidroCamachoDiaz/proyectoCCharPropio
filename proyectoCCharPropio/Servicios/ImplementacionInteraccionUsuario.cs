@@ -47,12 +47,14 @@ namespace pruebaRazor.DTOs
 						acciones.InsertarToken(tokenDto);
 						return true;
 					}
+					//No se pudo enviar el correo
 					else
 					{
 						Util.EscribirEnElFichero("Hubo problemas para enviar el correo");
 						return false;
 					}
 				}
+				//No se puede insertar el usuario
 				else
 				{
 					Util.EscribirEnElFichero("Hubo problemas para insertar al usuario");
@@ -118,11 +120,18 @@ namespace pruebaRazor.DTOs
 				}
 				else
 				{
+                    DateTime fecha = new DateTime(1, 1, 1, 0, 0, 0);
                     if (!usuarioBD.Alta_usuario)
                     {
                         Util.EscribirEnElFichero("Un usuario intento logearse sin haber dado de alta la cuenta");
 						//Ponemos la variable a false
                         httpContext.Session.SetString("verificado", "false");
+                        return false;
+                    }
+					if (usuarioBD.Fecha_baja!=null)
+					{
+                        Util.EscribirEnElFichero("Un usuario intento logearse pero esta dado de baja");
+                        //Ponemos la variable a false
                         return false;
                     }
                     Util.EscribirEnElFichero("Un usuario accedio correctamente a la web: "+usuarioBD.Nombre_usuario);

@@ -1,5 +1,5 @@
 ﻿@using proyectoCCharPropio.DTOS;
-@model proyectoCCharPropio.Controllers.AdministracionControlador.ModeloAdministracion
+@model proyectoCCharPropio.Controllers.ControladorIncidencias.ModeloIncidencias;
 @{
     ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
 }
@@ -9,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>SystemRevive</title>
     <link rel="icon" href="/img/logoPNG.png" type="image/jpg">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/fontawesome/css/all.min.css">
@@ -54,10 +54,17 @@
             mostrarAlerta = "false";
         }
     </script>
+    <!-- Page Loader -->
+    <div id="loader-wrapper">
+        <div id="loader"></div>
 
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+
+    </div>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="@Url.Action("home", "RegistroControlador")">
+            <a class="navbar-brand" href="#">
                 <img class="logo" src="/img/logo.png" alt="Imagen de Usuario">
                 <span class="text-white">Menu</span>
             </a>
@@ -72,6 +79,7 @@
                     <li class="nav-item">
                         <a class="nav-link nav-link-2" href="@Url.Action("modificarPerfil", "RegistroControlador")">
                             <div class="user-info-container d-flex align-items-center">
+
                                 @if (Model.Usuario.Foto_usuario != null && Model.Usuario.Foto_usuario.Length > 0)
                                 {
                                     // Convertir el array de bytes a cadena Base64
@@ -82,9 +90,10 @@
                                 }
                                 else
                                 {
-                                    // Mostrar una imagen predeterminada si el array de bytes es nulo o vacío
+                                // Mostrar una imagen predeterminada si el array de bytes es nulo o vacío
                                     <img class="rounded-circle user-avatar" src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" alt="Imagen de Usuario">
                                 }
+
                                 <span class="ml-2 text-white">Perfil</span>
                             </div>
                         </a>
@@ -96,78 +105,109 @@
 
     <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
         <form class="d-flex tm-search-form">
-            <div class="user-info-container2 d-flex align-items-center">            
-                <h2 class="text-white">Administracion de Usuarios</h2>
+            <div class="user-info-container2 d-flex align-items-center">
+                <h2 class="text-white">Solicitudes De @Model.Usuario.Nombre_usuario</h2>
             </div>
         </form>
     </div>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Foto</th>
-                                <th>Correo</th>
-                                <th>Nombre de Usuario</th>
-                                <th>Telefono</th>
-                                <th>Nivel de Acceso</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (UsuarioDTO usuarioVer in Model.ListaUsuarios){
-                                var foto= Convert.ToBase64String(usuarioVer.Foto_usuario);                       
 
-                            <tr>
-                                <td> <img class="rounded-circleVer user-avatarVer" src="data:image/png;base64,@foto" alt="Imagen de Usuario"></td>
-                                <td>@usuarioVer.Correo_usuario</td>
-                                <td>@usuarioVer.Nombre_usuario</td>
-                                <td>@usuarioVer.Telefono_usuario</td>
-                                <td>@usuarioVer.Id_acceso</td>
-                                <td>
-                                    <form method="post" asp-controller="AdministracionControlador" asp-action="BorrarUsuario" id="formulario @usuarioVer.Id_usuario">
-                                        <input type="hidden" name="id_usuario" value="@usuarioVer.Id_usuario">
-                                    </form>
-                                    <button class="btn btn-danger" onclick="confirmarBorrado('@usuarioVer.Id_usuario')">Borrar Usuario</button>
-					               <a href="modificarUsuario.jsp?id=@usuarioVer.Id_acceso">
-					        	        <button  class="btn btn-success" type="button">Modificar Usuario</button>
-					      	        </a>	
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                    </table>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="mostrarTabla('tabla1')">Solicitudes Pendientes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="mostrarTabla('tabla2')">Solicitudes Finalizadas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("CrearSolicitud", "ControladorIncidencias")">Crear Solicitud</a>
+                        </li>
+                    </ul>
                 </div>
-            </div>
+            </nav>
         </div>
 
-        <script src="/js/plugins.js"></script>
-        <script>
-            $(window).on("load", function () {
-                $('body').addClass('loaded');
-            });
-        </script>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 table-container">
+                <table id="tabla1" class="table">
+                    <caption class="text-center text-light">Solicitudes Pendientes</caption>
+                    <thead>
+                        <tr>
+                            <th>Descripcion</th>
+                            <th>Fecha De Solicitud</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(SolicitudDTO s in Model.ListaSolicitudesPendientes ){
+                        <tr>
+                            <td class="text-center">@s.DescripcionSolicitud</td>
+                                <td class="text-center">@s.FechaLimite</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
 
-       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-        <script>
-          function confirmarBorrado(idUsuario) {
-	          console.log('formBorrarUsuario'+idUsuario);
-            Swal.fire({
-              title: '¿Estás seguro?',
-              text: 'Esta acción no se puede deshacer.',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Sí, borrar usuario'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                // Si el usuario confirma, entonces enviamos el formulario
-                document.getElementById('formulario '+idUsuario).submit();
-              }
+                <table id="tabla2" class="table" style="display: none;">
+                    <caption class="text-center text-light">Solicitudes Finalizadas</caption>
+                    <thead>
+                        <tr>
+                            <th>Descripcion</th>
+                            <th>Fecha De Solicitud</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            @foreach(SolicitudDTO s in Model.ListaSolicitudesFinalizadas ){
+                            <td class="text-center">@s.DescripcionSolicitud</td>
+                            <td class="text-center">@s.FechaLimite</td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarTabla(tablaId) {
+            // Oculta todas las tablas
+            document.querySelectorAll('table').forEach(function (tabla) {
+                tabla.style.display = 'none';
             });
-          }
-        </script>
+
+            // Muestra la tabla seleccionada
+            document.getElementById(tablaId).style.display = 'table';
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        function confirmarBorrado(idUsuario) {
+            console.log('formBorrarUsuario' + idUsuario);
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: 'Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, borrar usuario'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, entonces enviamos el formulario
+                    document.getElementById('formBorrarUsuario' + idUsuario).submit();
+                }
+            });
+        }
+    </script>
+
+    <script src="/js/plugins.js"></script>
+    <script>
+        $(window).on("load", function () {
+            $('body').addClass('loaded');
+        });
+    </script>
 </body>
 </html>
