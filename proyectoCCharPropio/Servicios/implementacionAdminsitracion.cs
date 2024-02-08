@@ -14,7 +14,7 @@ namespace proyectoCCharPropio.Servicios
             AccesoDTO accesoPropio = acciones.SeleccionarAcceso(usu.Id_acceso.ToString());
 
             //Comprobamos que tipo de usuario es
-            if (accesoPropio.CodigoAcceso1==("Administrador")|| accesoPropio.CodigoAcceso1 == ("Empleado"))
+            if (accesoPropio.CodigoAcceso1 == ("Administrador") || accesoPropio.CodigoAcceso1 == ("Empleado"))
             {
                 //Cogemos todas las incidencias
                 List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
@@ -23,7 +23,7 @@ namespace proyectoCCharPropio.Servicios
                 //Cogemos los tokens del usuario
                 tokens = tokens.Where(x => x.Id_usuario == usu.Id_usuario).ToList();
                 //Cogemos las incidencias del usuario
-                incidencias=incidencias.Where(x => x.IdSolicitud1.IdSolicitud2 == usu.Id_usuario).ToList();
+                incidencias = incidencias.Where(x => x.Solicitud.IdSolicitud2 == usu.Id_usuario).ToList();
                 //Si no tiene borramos todo lo que tenemos del usuario 
                 if (incidencias.Count == 0)
                 {
@@ -54,9 +54,10 @@ namespace proyectoCCharPropio.Servicios
                 List<TokenDTO> tokens = acciones.HacerGetLista<TokenDTO>("api/Token");
                 //Cogemos lo del usuario
                 tokens = tokens.Where(x => x.Id_usuario == usu.Id_usuario).ToList();
-                solicitudes = solicitudes.Where(x=> x.IdUsuario2.Id_usuario==usu.Id_usuario).ToList();
+                solicitudes = solicitudes.Where(x => x.IdUsuario2.Id_usuario == usu.Id_usuario).ToList();
                 //Si no tiene solicitudes borramos el usuario entero
-                if(solicitudes.Count==0){
+                if (solicitudes.Count == 0)
+                {
                     for (int i = 0; i < tokens.Count; i++)
                     {
                         acciones.EliminarToken(tokens[i].Id_usuario.ToString());
@@ -69,13 +70,99 @@ namespace proyectoCCharPropio.Servicios
                 //Si tiene solicitudes lo damos de baja
                 else
                 {
-                    usu.Fecha_baja=DateTime.Now;
+                    usu.Fecha_baja = DateTime.Now;
                     acciones.ActualizarUsuario(usu);
                     Util.EscribirEnElFichero("Un usuario se dio de baja en la web " + usu.Nombre_usuario);
                     return true;
                 }
             }
             return false;
+        }
+
+        public bool CambiarAcceso(UsuarioDTO usuario, string idAcceso)
+        {
+            //Declaramos lo que necesitemos
+            accionesCRUD acciones = new accionesCRUD();
+
+            //Buscamos el acceszo que se le quiere dar
+            AccesoDTO accesoDar = acciones.SeleccionarAcceso(idAcceso);
+            AccesoDTO accesoTiene = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
+
+            //Cogemso todas las solicitudes
+            List<SolicitudDTO> solicitudes = acciones.HacerGetLista<SolicitudDTO>("api/Solicitud");
+
+            //Las filtramos por la del usuario
+            solicitudes = solicitudes.Where(x => x.IdUsuario2.Id_usuario == usuario.Id_usuario).ToList();
+
+            //Comprobamos que usuario se le va a dar
+            if (accesoDar.CodigoAcceso1 == "Administrador")
+            {
+                //Si es el empleado se le da porque solo se le añade la gestion de usaurios
+                if (accesoTiene.CodigoAcceso1 == "Empleado")
+                {
+                    usuario.Id_acceso = accesoDar.IdAcceso1;
+                    Util.EscribirEnElFichero("Se le cambio el acceso a un usuario " + usuario.Nombre_usuario);
+                    return true;
+                }
+                //Si es un usuario se comprueba si tiene solicitudes activas
+                else
+                {
+                    //Si no tiene se le da
+                    if (solicitudes.Count == 0)
+                    {
+                        usuario.Id_acceso = accesoDar.IdAcceso1;
+                        Util.EscribirEnElFichero("Se le cambio el acceso a un usuario " + usuario.Nombre_usuario);
+                        return true;
+                    }
+                    //Si tiene solicitudes no se le da
+                    Util.EscribirEnElFichero("No se puede cambiar un usuario que tienen solicitudes de atencion al cliente");
+                    return false;
+                }
+            }
+            //Si se quiere dar empleado
+            else if (accesoTiene.CodigoAcceso1 == "Empleado")
+            {
+                //Si es administrador se le da directamente porque el adminsitracion tiene el plus de gestion de ussuarios
+                if (accesoTiene.CodigoAcceso1 == "Administrador")
+                {
+                    usuario.Id_acceso = accesoDar.IdAcceso1;
+                    Util.EscribirEnElFichero("Se le cambio el acceso a un usuario " + usuario.Nombre_usuario);
+                    return true;
+                }
+                //Si es un usuario se comprueba si tiene solicitudes
+                else
+                {
+                    //Si no tiene solicitudes se le da el rol
+                    if (solicitudes.Count == 0)
+                    {
+                        usuario.Id_acceso = accesoDar.IdAcceso1;
+                        Util.EscribirEnElFichero("Se le cambio el acceso a un usuario " + usuario.Nombre_usuario);
+                        return true;
+                    }
+                    //Si tiene solicitudes activas no se le da                  
+                    Util.EscribirEnElFichero("No se puede cambiar un usuario que tienen solicitudes de atencion al cliente " + usuario.Nombre_usuario);
+                    return false;
+                }
+
+            }
+            //Si quiere ser usuario
+            else
+            {
+                //Cogemos las incidencias y se filtran por las del el usuario
+                List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
+
+                incidencias = incidencias.Where(x => x.Usuario.Id_usuario == usuario.Id_usuario).ToList();
+                //Si no tiene ninguna incidencia se le da el rol de usuario
+                if (incidencias.Count == 0)
+                {
+                    usuario.Id_acceso = accesoDar.IdAcceso1;
+                    Util.EscribirEnElFichero("Se le cambio el acceso a un usuario " + usuario.Nombre_usuario);
+                    return true;
+                }
+                //Si tiene incidencia no se le da              
+                Util.EscribirEnElFichero("No se puede cambiar un usuario que tienen solicitudes de atencion al cliente " + usuario.Nombre_usuario);
+                return false;
+            }
         }
     }
 }

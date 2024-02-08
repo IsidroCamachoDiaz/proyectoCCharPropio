@@ -36,13 +36,14 @@ namespace proyectoCCharPropio.DTOS
         private SolicitudDTO solicitud;
 
         [JsonIgnore]
-        public SolicitudDTO IdSolicitud1 { get => solicitud; set => solicitud = value; }
+        public SolicitudDTO Solicitud { get => solicitud; set => solicitud = value; }
+        public UsuarioDTO Usuario { get => IdUsuario; set => IdUsuario = value; }
 
         public IncidenciaDTO(string descripcionUsuario, bool estadoIncidencia, SolicitudDTO idSolicitud)
         {
             DescripcionUsuario = descripcionUsuario;
             EstadoIncidencia = estadoIncidencia;
-            IdSolicitud1 = idSolicitud;
+            Solicitud = idSolicitud;
         }
 
         public IncidenciaDTO()
@@ -59,8 +60,8 @@ namespace proyectoCCharPropio.DTOS
             FechaFin = fechaFin;
             FechaInicio = fechaInicio;
             HorasIncidencia = horasIncidencia;
-            IdUsuario = idUsuario;
-            IdSolicitud1 = idSolicitud;
+            Usuario = idUsuario;
+            Solicitud = idSolicitud;
         }
 
 
