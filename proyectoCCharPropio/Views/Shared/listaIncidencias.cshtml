@@ -143,8 +143,8 @@
                     <tbody>
                         @foreach(SolicitudDTO s in Model.ListaSolicitudesPendientes ){
                         <tr>
-                            <td class="text-center">@s.DescripcionSolicitud</td>
-                                <td class="text-center">@s.FechaLimite</td>
+                            <td class="text-center">@s.DescripcionSolicitud2</td>
+                                <td class="text-center">@s.FechaLimite2</td>
                         </tr>
                         }
                     </tbody>
@@ -161,8 +161,8 @@
                     <tbody>
                         <tr>
                             @foreach(SolicitudDTO s in Model.ListaSolicitudesFinalizadas ){
-                            <td class="text-center">@s.DescripcionSolicitud</td>
-                            <td class="text-center">@s.FechaLimite</td>
+                            <td class="text-center">@s.DescripcionSolicitud2</td>
+                            <td class="text-center">@s.FechaLimite2</td>
                             }
                         </tr>
                     </tbody>

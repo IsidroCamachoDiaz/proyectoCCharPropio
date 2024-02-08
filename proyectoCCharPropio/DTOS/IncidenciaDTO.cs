@@ -29,14 +29,14 @@ namespace proyectoCCharPropio.DTOS
         [JsonProperty("HorasIncidencia")]
         private int HorasIncidencia { get; set; }
 
-        [JsonProperty("IdUsuario")]
-        private int IdUsuario;
+        [JsonProperty("IdUsuarioNavigation")]
+        private UsuarioDTO IdUsuario;
 
-        [JsonProperty("IdSolicitud")]
-        private SolicitudDTO IdSolicitud;
+        [JsonProperty("IdSolicitudNavigation")]
+        private SolicitudDTO solicitud;
 
-        public int IdUsuario1 { get => IdUsuario; set => IdUsuario = value; }
-        public SolicitudDTO IdSolicitud1 { get => IdSolicitud; set => IdSolicitud = value; }
+        [JsonIgnore]
+        public SolicitudDTO IdSolicitud1 { get => solicitud; set => solicitud = value; }
 
         public IncidenciaDTO(string descripcionUsuario, bool estadoIncidencia, SolicitudDTO idSolicitud)
         {
@@ -49,7 +49,7 @@ namespace proyectoCCharPropio.DTOS
         {
         }
 
-        public IncidenciaDTO(int idIncidencia, float costeIncidencia, string descripcionTecnica, string descripcionUsuario, bool estadoIncidencia, DateTime fechaFin, DateTime fechaInicio, int horasIncidencia, int idUsuario, SolicitudDTO idSolicitud)
+        public IncidenciaDTO(int idIncidencia, float costeIncidencia, string descripcionTecnica, string descripcionUsuario, bool estadoIncidencia, DateTime fechaFin, DateTime fechaInicio, int horasIncidencia, UsuarioDTO idUsuario, SolicitudDTO idSolicitud)
         {
             IdIncidencia = idIncidencia;
             CosteIncidencia = costeIncidencia;
@@ -59,7 +59,7 @@ namespace proyectoCCharPropio.DTOS
             FechaFin = fechaFin;
             FechaInicio = fechaInicio;
             HorasIncidencia = horasIncidencia;
-            IdUsuario1 = idUsuario;
+            IdUsuario = idUsuario;
             IdSolicitud1 = idSolicitud;
         }
 

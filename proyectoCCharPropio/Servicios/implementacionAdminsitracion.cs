@@ -23,7 +23,7 @@ namespace proyectoCCharPropio.Servicios
                 //Cogemos los tokens del usuario
                 tokens = tokens.Where(x => x.Id_usuario == usu.Id_usuario).ToList();
                 //Cogemos las incidencias del usuario
-                incidencias=incidencias.Where(x => x.IdUsuario1 == usu.Id_usuario).ToList();
+                incidencias=incidencias.Where(x => x.IdSolicitud1.IdSolicitud2 == usu.Id_usuario).ToList();
                 //Si no tiene borramos todo lo que tenemos del usuario 
                 if (incidencias.Count == 0)
                 {
@@ -54,7 +54,7 @@ namespace proyectoCCharPropio.Servicios
                 List<TokenDTO> tokens = acciones.HacerGetLista<TokenDTO>("api/Token");
                 //Cogemos lo del usuario
                 tokens = tokens.Where(x => x.Id_usuario == usu.Id_usuario).ToList();
-                solicitudes = solicitudes.Where(x=> x.IdUsuario==usu.Id_usuario).ToList();
+                solicitudes = solicitudes.Where(x=> x.IdUsuario2.Id_usuario==usu.Id_usuario).ToList();
                 //Si no tiene solicitudes borramos el usuario entero
                 if(solicitudes.Count==0){
                     for (int i = 0; i < tokens.Count; i++)

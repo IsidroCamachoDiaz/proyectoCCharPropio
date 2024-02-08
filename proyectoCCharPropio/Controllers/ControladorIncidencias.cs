@@ -73,12 +73,12 @@ namespace proyectoCCharPropio.Controllers
                 return RedirectToAction("Index", "RegistroControlador");
             }
             //Cogemos la lista de todas las solicitudes y la filtramos por las del usuario
-            List<SolicitudDTO> solicitudes = acciones.HacerGetLista<SolicitudDTO>("Solicitud");
-            solicitudes = solicitudes.Where(x=>x.IdUsuario==usuario.Id_usuario).ToList();
+            List<SolicitudDTO> solicitudes = acciones.HacerGetLista<SolicitudDTO>("api/Solicitu");
+            solicitudes = solicitudes.Where(x=>x.IdUsuario2.Id_usuario ==usuario.Id_usuario).ToList();
 
             //Filtramos por si estan terminadas o no
-            List<SolicitudDTO> solicitudesHechas =solicitudes.Where(x => x.Estado == true).ToList();
-            List<SolicitudDTO> solicitudesPendientes=solicitudes.Where(x => x.Estado == false).ToList();
+            List<SolicitudDTO> solicitudesHechas =solicitudes.Where(x => x.Estado2 == true).ToList();
+            List<SolicitudDTO> solicitudesPendientes=solicitudes.Where(x => x.Estado2 == false).ToList();
 
             //Las metemos en el modelo
             var modelo = new ModeloIncidencias
@@ -137,8 +137,8 @@ namespace proyectoCCharPropio.Controllers
             //Declaramos lo que encesitemos
             accionesCRUD acciones = new accionesCRUD();
 
-            solicitud.Estado = false;
-            solicitud.FechaLimite=DateTime.Now;
+            solicitud.Estado2 = false;
+            solicitud.FechaLimite2=DateTime.Now;
 
             implementacionIncidencias implInci = new implementacionIncidencias();
             //Usamos el metodo para borrar
