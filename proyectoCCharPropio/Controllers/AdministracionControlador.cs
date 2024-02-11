@@ -17,6 +17,8 @@ namespace proyectoCCharPropio.Controllers
         {
             public List<UsuarioDTO> ListaUsuarios { get; set; }
             public UsuarioDTO Usuario { get; set; }
+
+            public List<AccesoDTO> Acessos { get; set; }
         }
 
         //Modelo para la creacion de usuarios
@@ -132,11 +134,16 @@ namespace proyectoCCharPropio.Controllers
                     break;
                 }
             }
+
+            //Cogemos todos los acceso paar mostar cada aceeso de usuario
+            List<AccesoDTO> accesos = acciones.HacerGetLista<AccesoDTO>("api/Acceso");
+
             //Metemos todo en el modelo
             var modelo = new ModeloAdministracion
             {
                 Usuario = usuario,
-                ListaUsuarios = usuarios
+                ListaUsuarios = usuarios,
+                Acessos=accesos
             };
 
             Util.EscribirEnElFichero("Se le llevo a la administracion de usuarios");

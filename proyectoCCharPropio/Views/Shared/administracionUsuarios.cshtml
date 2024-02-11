@@ -59,7 +59,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="@Url.Action("home", "RegistroControlador")">
                 <img class="logo" src="/img/logo.png" alt="Imagen de Usuario">
-                <span class="text-white">Menu</span>
+                <span class="text-white">SystemRevive</span>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
@@ -124,7 +124,13 @@
                                 <td>@usuarioVer.Correo_usuario</td>
                                 <td>@usuarioVer.Nombre_usuario</td>
                                 <td>@usuarioVer.Telefono_usuario</td>
-                                <td>@usuarioVer.Id_acceso</td>
+                                @foreach (AccesoDTO acess in Model.Acessos)
+                                {
+                                    if (acess.IdAcceso1 == usuarioVer.Id_acceso)
+                                    {
+                                        <td>@acess.CodigoAcceso1</td>
+                                    }
+                                }        
                                 <td>
                                     <form method="post" asp-controller="AdministracionControlador" asp-action="BorrarUsuario" id="formulario @usuarioVer.Id_usuario">
                                         <input type="hidden" name="id_usuario" value="@usuarioVer.Id_usuario">
