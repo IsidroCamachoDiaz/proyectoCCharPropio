@@ -4,6 +4,12 @@ using System.Net;
 
 namespace proyectoCCharPropio.Recursos
 {
+    /// <summary>
+    /// Metodos para la conexion CRUD con la api 
+    /// </summary>
+    ///<autor>
+    /// Isidro Camacho Diaz
+    /// </autor>
     public class accionesCRUD
     {
         private const string BASE_URL = "http://localhost:5299/";

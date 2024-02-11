@@ -19,7 +19,14 @@ namespace proyectoCCharPropio.Controllers
             public UsuarioDTO Usuario { get; set; }
         }
 
-        //Modelo de administracion
+        //Modelo para la creacion de usuarios
+        public class ModeloCreacion
+        {
+            public UsuarioDTO Usuario { get; set; }
+            public List <AccesoDTO> accesos { get; set; }
+        }
+
+        //Modelo de modificacion de usuarios
         public class ModeloModificar
         {
             public UsuarioDTO Usuario { get; set; }
@@ -47,7 +54,47 @@ namespace proyectoCCharPropio.Controllers
             return RedirectToAction("Index");
         }
 
-        
+        [HttpGet]
+        public IActionResult CrearUsuario()
+        {
+            //Declaramos lo que necesitemos
+            UsuarioDTO usuario;
+            accionesCRUD acciones = new accionesCRUD();
+            try
+            {
+                // AQUÍ VA EL CONTROL DE SESIÓN
+                string acceso = String.Empty;
+                acceso = HttpContext.Session.GetString("acceso");
+                string idUsuario = HttpContext.Session.GetString("usuario");
+                usuario = acciones.SeleccionarUsuario(idUsuario);
+
+                if (acceso != "3")
+                {
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted no tiene acceso para entrar aqui", "error");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+            }
+            catch (Exception e)
+            {
+                Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                return RedirectToAction("Index", "RegistroControlador");
+            }
+            //Cogemos todos los accesos para que el administrador añada al usuario el que quiera
+            List<AccesoDTO> accesos = acciones.HacerGetLista<AccesoDTO>("api/Acceso");
+
+            //Metemos todo en el modelo
+            var modelo = new ModeloCreacion
+            {
+                Usuario= usuario,
+                accesos = accesos
+            };
+
+            Util.EscribirEnElFichero("Se le llevo a la creacion de usuarios");
+            return View(modelo);
+        }
+
+
         [HttpGet]
         public IActionResult AdministracionUsuarios()
         {
@@ -180,34 +227,41 @@ namespace proyectoCCharPropio.Controllers
             //Declaramos lo que encesitemos
             accionesCRUD acciones = new accionesCRUD();
             implementacionAdminsitracion inter = new implementacionAdminsitracion();
+            //Creamos una variable booleana para comprobar
             bool cambio = false;
 
             try
             {
-
+                //Cogemos el usuario de la base de datos
                 UsuarioDTO usuarioCambiar = acciones.SeleccionarUsuario(usuarioDTO.Id_usuario.ToString());
 
+                 //Comprobamos si lo encontro si no se avisa al usuario
                 if (usuarioCambiar == null)
                 {
                     MostrarAlerta("No pudimos encontrar el Usuario", "No se encontro al usuario", "error");
                     return RedirectToAction("Index", "RegistroControlador");
                 }
 
+                //Comprobamos si alguna campo es distinto con los modificados
                 if (usuarioDTO.Nombre_usuario!=usuarioCambiar.Nombre_usuario || 
                     usuarioDTO.Telefono_usuario!=usuarioCambiar.Telefono_usuario ||
                     usuarioDTO.Id_acceso!=usuarioCambiar.Id_acceso)
                 {
+                    //Comprobamos si quiera cambiar el acceso
                     if (usuarioDTO.Id_acceso!=usuarioCambiar.Id_acceso)
                     {
+                        //Si lo quiera cambiar comprobamos si lo hace bien
                         if (inter.CambiarAcceso(usuarioCambiar, usuarioDTO.Id_acceso.ToString()))
                         {
                         }
+                        //Si no se le avisa al usuario
                         else
                         {
                             MostrarAlerta("Error De Acceso", "El usuario tiene asignados solicitudes o incidencias y no se puede asignar el acceso", "error");
                             return RedirectToAction("Index", "RegistroControlador");
                         }
                     }
+                    //Cambiamos lo campos y ponemos a true el cambio
                     usuarioCambiar.Nombre_usuario = usuarioDTO.Nombre_usuario;
                     usuarioCambiar.Telefono_usuario = usuarioDTO.Telefono_usuario;
                     cambio = true;
@@ -216,17 +270,16 @@ namespace proyectoCCharPropio.Controllers
                 // Cojo la imagen
                 if (archivo!=null)
                 {
-                    //Convierto el archivo en array de byte
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        archivo.CopyTo(memoryStream);
-                        usuarioCambiar.Foto_usuario = memoryStream.ToArray();
-                    }
+                    //Usamos la clase para convertir el archivo en u array de bytes
+                    ComprobacionImagen ci = new ComprobacionImagen();
+                    usuarioCambiar.Foto_usuario = ci.ConvertirImagenEnBytes(archivo);
                     cambio = true;
                 }
 
+                //Comprobamos si cambio algo
                 if (cambio)
                 {
+                    //Actualizamos el usuario y avisamos al usuario
                     acciones.ActualizarUsuario(usuarioCambiar);
                     MostrarAlerta("Se cambiio el usuario Correctamente", "Se modifico correctamente el usuario " + usuarioCambiar.Nombre_usuario, "success");
                     return RedirectToAction("Index", "RegistroControlador");
@@ -243,6 +296,52 @@ namespace proyectoCCharPropio.Controllers
 
             return RedirectToAction("Index", "RegistroControlador");
 
+        }
+
+        // Acción HTTP POST para el registro de usuarios
+        [HttpPost]
+        public ActionResult CrearUsuario(UsuarioDTO usuarioDTO, IFormFile archivo)
+        {
+            // Verificar si algún parámetro requerido está vacío
+            if (usuarioDTO.Nombre_usuario == null || usuarioDTO.Telefono_usuario == null || usuarioDTO.Correo_usuario == null || usuarioDTO.Contrasenia_usuario == null)
+            {
+                MostrarAlerta("¡Campos Incompletos!", "Hay Campos Vacios", "error");
+                return RedirectToAction("CrearUsuario", "AdministracionControlador");
+            }
+            else
+            {
+                //Creamos un usuario para comprobar que el correo introducido esta disponible
+                accionesCRUD acciones = new accionesCRUD();
+                UsuarioDTO usuarioSiHay = acciones.SeleccionarUsuario("correo/" + usuarioDTO.Correo_usuario);
+
+                //Comprobamos si esta sociada a una cuenta
+                if (usuarioSiHay != null)
+                {
+                    MostrarAlerta("¡Ya existe una cuenta con ese correo!", "El correo especificado ya esta asociada a una cuenta", "error");
+                    return RedirectToAction("CrearUsuario", "AdministracionControlador");
+                }
+
+                //Usamos la clase para convertir el archivo en u array de bytes
+                ComprobacionImagen ci= new ComprobacionImagen();
+                usuarioDTO.Foto_usuario = ci.ConvertirImagenEnBytes(archivo);
+
+                // Crear instancia de la implementación de Administracion
+                implementacionAdminsitracion implAd = new implementacionAdminsitracion();
+
+
+                // Llamar al método para crear el usuario
+                if (implAd.CrearUsuario(usuarioDTO))
+                {
+                    MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
+                }
+                else
+                {
+                    MostrarAlerta("Error", "Hubo un error intentelo mas tarde", "error");
+                }
+
+                // Redireccionar a la vista de index
+                return RedirectToAction("CrearUsuario", "AdministracionControlador");
+            }
         }
 
     }

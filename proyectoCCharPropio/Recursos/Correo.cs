@@ -3,22 +3,28 @@ using System.Net;
 
 namespace proyectoCCharPropio.Recursos
 {
+    /// <summary>
+    /// Clase para el envio y creacion de correos
+    /// </summary>
+    ///<autor>
+    /// Isidro Camacho Diaz
+    /// </autor>
     public class Correo
     {
         public Correo()
         {
         }
 
-        /**
-* Método para enviar correo al usuario introducido
-* @param body
-* @param to
-* @param html
-* @param subject
-* @param frommail
-* @param cco
-* @return bool
-*/
+                /**
+        * Método para enviar correo al usuario introducido
+        * @param body
+        * @param to
+        * @param html
+        * @param subject
+        * @param frommail
+        * @param cco
+        * @return bool
+        */
         public bool EnviarMensaje(string body, string to, bool html, string subject, string frommail, bool cco)
         {
             bool resultado = true;
@@ -135,6 +141,16 @@ namespace proyectoCCharPropio.Recursos
         </div>
     </div>
 ";
+        }
+
+        public string MensajeCorreoConfirmacionAlta(string nombreUsuario)
+        {
+            // Cuerpo del correo en formato HTML
+            return @"<div style=""text-align: center; background-color: #3498db; padding: 20px;"">
+                <p style=""color: white;"">¡Hola " + nombreUsuario + @", tu cuenta ha sido confirmada por uno de nuestros administradores!</p>
+                <p style=""color: white;"">Ya puedes comenzar a utilizar nuestros servicios.</p>
+                <p style=""color: white;"">Gracias por ser parte de nuestra plataforma.</p>
+            </div>";
         }
 
 

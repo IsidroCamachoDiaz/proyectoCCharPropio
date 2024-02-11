@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Security;
 using proyectoCCharPropio.DTOS;
 using proyectoCCharPropio.Recursos;
 
@@ -163,6 +164,69 @@ namespace proyectoCCharPropio.Servicios
                 Util.EscribirEnElFichero("No se puede cambiar un usuario que tienen solicitudes de atencion al cliente " + usuario.Nombre_usuario);
                 return false;
             }
+        }
+
+        public bool CrearUsuario(UsuarioDTO usu)
+        {
+            try
+            {
+                accionesCRUD acciones = new accionesCRUD();
+                usu.Contrasenia_usuario = Util.EncriptarContra(usu.Contrasenia_usuario);
+                usu.Alta_usuario = true;
+                if (acciones.InsertarUsuario(usu))
+                {
+                    Correo c = new Correo();
+
+                    String mensaje = c.MensajeCorreoConfirmacionAlta(usu.Nombre_usuario);
+
+                    //Comprobamos si se ha enviado bien el correo
+                    if (c.EnviarMensaje(mensaje, usu.Correo_usuario, true, "Bienvenido a nuestra web", "isidro@isidrocamachodiaz.es", true))
+                    {
+                        //Insertamos en el token
+                        Util.EscribirEnElFichero("Se ha creado un usuario correctamente");
+                        return true;
+                    }
+                    //No se pudo enviar el correo
+                    else
+                    {
+                        Util.EscribirEnElFichero("Hubo problemas para enviar el correo");
+                        return false;
+                    }
+                }
+                //No se puede insertar el usuario
+                else
+                {
+                    Util.EscribirEnElFichero("Hubo problemas para insertar al usuario");
+                    return false;
+                }
+
+            }
+            catch (IOException e)
+            {
+                Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] Se produjo un error al crear el flujo de salida. |" + e);
+                Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] Se produjo un error al crear el flujo de salida. |" + e);
+            }
+            catch (InvalidOperationException e)
+            {
+                Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] Ya se ha utilizado el método para insertar el usuario. |" + e);
+                Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] Ya se ha utilizado el método para insertar el usuario. |" + e);
+            }
+            catch (ArgumentNullException e)
+            {
+                Util.EscribirEnElFichero("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] " + e.Message);
+                Console.Error.WriteLine("[ERROR-ImplentacionIntereaccionUsuario-RegistrarUsuario] " + e.Message);
+            }
+            catch (SecurityException s)
+            {
+                Util.EscribirEnElFichero(s.Message);
+                Console.Error.WriteLine(s.Message);
+            }
+            catch (IndexOutOfRangeException io)
+            {
+                Util.EscribirEnElFichero(io.Message);
+                Console.Error.WriteLine(io.Message);
+            }
+            return false;
         }
     }
 }

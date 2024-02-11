@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace ejercicioRepaso.Modelo
 {
+    /// <summary>
+    /// Clase para la escritura de fichero log
+    /// </summary>
+    ///<autor>
+    /// Isidro Camacho Diaz
+    /// </autor>
     public class implementacionEscritura : interfazEscritura
     {
         StreamWriter interfazEscritura.AbrirOCrearFichero(string ruta, bool sobreEscribir)

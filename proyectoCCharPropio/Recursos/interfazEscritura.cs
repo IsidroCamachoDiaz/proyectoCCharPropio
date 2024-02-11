@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace ejercicioRepaso.Modelo
 {
+    /// <summary>
+    /// Interfaz de acciones de ficheros
+    /// </summary>
+    ///<autor>
+    /// Isidro Camacho Diaz
+    /// </autor>
     public interface interfazEscritura
     {
         /*

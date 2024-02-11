@@ -214,21 +214,30 @@ namespace proyectoCCharPropio.Controllers
             } 
 			else
 			{
-				//Convierto el archivo en array de byte
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    archivo.CopyTo(memoryStream);
-                    usuarioDTO.Foto_usuario = memoryStream.ToArray();
+				//Creamos un usuario para comprobar que el correo introducido esta disponible
+				accionesCRUD acciones=new accionesCRUD();
+				UsuarioDTO usuarioSiHay = acciones.SeleccionarUsuario("correo/"+usuarioDTO.Correo_usuario);
+
+				//Comprobamos si esta sociada a una cuenta
+				if (usuarioSiHay != null)
+				{
+                    MostrarAlerta("¡Ya existe una cuenta con ese correo!", "El correo especificado ya esta asociada a una cuenta", "error");
+                    return RedirectToAction("Index", new { error = "parametroVacio" });
                 }
+
+                //Usamos la clase para convertir el archivo en u array de bytes
+                ComprobacionImagen ci = new ComprobacionImagen();
+                usuarioDTO.Foto_usuario = ci.ConvertirImagenEnBytes(archivo);
+
                 // Crear instancia de la implementación de interacción con el usuario
                 ImplementacionInteraccionUsuario implInteraccionUsuario = new ImplementacionInteraccionUsuario();
 
-				// Llamar al método para registrar el usuario
-				if (implInteraccionUsuario.RegistrarUsuario(usuarioDTO))
-				{
-					MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
-				}
-				else
+                // Llamar al método para registrar el usuario
+                if (implInteraccionUsuario.RegistrarUsuario(usuarioDTO))
+                {
+                    MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
+                }
+                else
 				{
                     MostrarAlerta("Error", "Hubo un error intentelo mas tarde", "error");
                 }

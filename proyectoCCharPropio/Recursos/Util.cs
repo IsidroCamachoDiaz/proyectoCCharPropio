@@ -6,7 +6,13 @@ using System.Text;
 
 namespace proyectoCCharPropio.Recursos
 {
-	public static class Util
+    /// <summary>
+    /// Clase estatica para utilidades comunes de la web
+    /// </summary>
+    ///<autor>
+    /// Isidro Camacho Diaz
+    /// </autor>
+    public static class Util
 	{
 		public static string EncriptarContra(string password)
 		{
