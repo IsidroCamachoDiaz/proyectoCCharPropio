@@ -47,7 +47,7 @@ namespace proyectoCCharPropio.Controllers
 
 
         [HttpGet]
-        public IActionResult ListaIncidencias()
+        public IActionResult ListaSolicitudes()
         {
             //Declaramos loq ue necesitamos
             UsuarioDTO usuario;
@@ -59,8 +59,9 @@ namespace proyectoCCharPropio.Controllers
                 acceso = HttpContext.Session.GetString("acceso");
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
+                AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
 
-                if (acceso != "3")
+                if (accesoO.CodigoAcceso1!="Usuario")
                 {
                     MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
                     return RedirectToAction("Home", "RegistroControlador");
@@ -73,7 +74,7 @@ namespace proyectoCCharPropio.Controllers
                 return RedirectToAction("Index", "RegistroControlador");
             }
             //Cogemos la lista de todas las solicitudes y la filtramos por las del usuario
-            List<SolicitudDTO> solicitudes = acciones.HacerGetLista<SolicitudDTO>("api/Solicitu");
+            List<SolicitudDTO> solicitudes = acciones.HacerGetLista<SolicitudDTO>("api/Solicitud");
             solicitudes = solicitudes.Where(x=>x.IdUsuario2.Id_usuario ==usuario.Id_usuario).ToList();
 
             //Filtramos por si estan terminadas o no
@@ -106,8 +107,9 @@ namespace proyectoCCharPropio.Controllers
                 acceso = HttpContext.Session.GetString("acceso");
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
+                AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
 
-                if (acceso != "3")
+                if (accesoO.CodigoAcceso1 != "Usuario")
                 {
                     Util.EscribirEnElFichero("Un usuario intento acceder a un lugar que no puede de la web");
                     MostrarAlerta("¡Alerta De Seguridad!", "Usted no puede acceder a este lugar de la web", "error");
@@ -137,18 +139,24 @@ namespace proyectoCCharPropio.Controllers
             //Declaramos lo que encesitemos
             accionesCRUD acciones = new accionesCRUD();
 
+            //Le añadimos los valores
             solicitud.Estado2 = false;
             solicitud.FechaLimite2=DateTime.Now;
 
-            implementacionIncidencias implInci = new implementacionIncidencias();
-            //Usamos el metodo para borrar
+            //Cogemos el id del usuario para buscarlo en la base d edatos y asignarle la solicitud
+            string idUsuario = HttpContext.Session.GetString("usuario");
 
+            solicitud.IdUsuario2 = acciones.SeleccionarUsuario(idUsuario);
+
+            implementacionIncidencias implInci = new implementacionIncidencias();
+            
+            //Comprobamos si se inserto bien
             if (implInci.crearSolicitud(solicitud))
             {
                 MostrarAlerta("Solicitud Creada", "Solicitud Generada Correctamente nuestros tecnico se pondran con su solicitud", "success");
                 return RedirectToAction("AdministracionUsuarios");
             }
-            //Si no se pudo se avisa al usuario
+            //Si no se creo bien se avisa al usuario
             else
             {
                 MostrarAlerta("Error", "No se pudo crear su solicitud intentelo de nuevo mas tarde", "error");

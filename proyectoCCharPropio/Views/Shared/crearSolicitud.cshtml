@@ -121,12 +121,11 @@
                     <form method="post" asp-controller="ControladorIncidencias" asp-action="CrearSolicitud" id="formulario">
                         <div class="container mt-4">
                             <label for="exampleTextarea" class="form-label">Describenos lo que te ocurre:</label>
-                            <textarea class="form-control" id="exampleTextarea" rows="4" name="DescripcionSolicitud"></textarea>
+                            <textarea class="form-control" id="exampleTextarea" rows="4" name="DescripcionSolicitud2"></textarea>
                         </div>
                         <div class="mb-4 text-center" style="margin-top:10px;">
                             <button class="btn btn-primary tm-btn-big" type="submit">Crear Solicitud</button>
                         </div>
-                        <input type="text" id="IdUsuario" name="id" value="@Model.Usuario.Id_usuario" style="display: none;">
                     </form>
 
                     <a href="@Url.Action("CrearSolicitud", "ControladorIncidencias")">

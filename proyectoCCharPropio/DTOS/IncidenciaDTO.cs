@@ -45,13 +45,13 @@ namespace proyectoCCharPropio.DTOS
         /// Fecha de fin de la incidencia.
         /// </summary>
         [JsonProperty("FechaFin")]
-        private DateTime FechaFin { get; set; }
+        private DateTime? FechaFin { get; set; }
 
         /// <summary>
         /// Fecha de inicio de la incidencia.
         /// </summary>
         [JsonProperty("FechaInicio")]
-        private DateTime FechaInicio { get; set; }
+        private DateTime? FechaInicio { get; set; }
 
         /// <summary>
         /// Horas dedicadas a la incidencia.
