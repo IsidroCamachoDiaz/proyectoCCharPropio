@@ -1,5 +1,4 @@
-﻿@using proyectoCCharPropio.DTOS;
-@model proyectoCCharPropio.Controllers.AdministracionControlador.ModeloCreacion;
+﻿@model proyectoCCharPropio.Controllers.ControladorIncidencias.ModeloIncidenciasModificar
 @{
     ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
 }
@@ -9,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Usuario</title>
+    <title>Modificar Solicitud</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/ccs/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="/css/templatemo-style.css">
@@ -64,7 +63,7 @@
     </div>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="@Url.Action("Home", "RegistroControlador")">
+            <a class="navbar-brand" href="@Url.Action("home", "RegistroControlador")">
                 <img class="logo" src="/img/logo.png" alt="Imagen de Usuario">
                 <span class="text-white">SystemRevive</span>
             </a>
@@ -74,12 +73,11 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link nav-link-1" aria-current="page" href="@Url.Action("Home", "RegistroControlador")">Home</a>
+                        <a class="nav-link nav-link-1" aria-current="page" href="@Url.Action("home", "RegistroControlador")">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link nav-link-2" href="@Url.Action("modificarPerfil", "RegistroControlador")">
                             <div class="user-info-container d-flex align-items-center">
-
                                 @if (Model.Usuario.Foto_usuario != null && Model.Usuario.Foto_usuario.Length > 0)
                                 {
                                     // Convertir el array de bytes a cadena Base64
@@ -93,7 +91,6 @@
                                     // Mostrar una imagen predeterminada si el array de bytes es nulo o vacío
                                     <img class="rounded-circle user-avatar" src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" alt="Imagen de Usuario">
                                 }
-                                
                                 <span class="ml-2 text-white">Perfil</span>
                             </div>
                         </a>
@@ -105,70 +102,36 @@
 
     <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
         <form class="d-flex tm-search-form">
-            <h2 class="text-white">Crear Usuario</h2>
+            <h2 class="text-white">Crear Solicitud De Incidencia</h2>
         </form>
     </div>
 
     <div class="container-fluid tm-container-content tm-mt-60">
         <div class="row mb-4">
             <h2 class="col-6 tm-text-primary text-white">
-                Ponga los datos del usuario
+                Cree la Solicitud
             </h2>
         </div>
         <div class="row tm-mb-90">
             <div class="col-xl-8 col-lg-7 col-md-6 col-sm-12 text-center">
-                <img src="https://www.equiposytalento.com/upload/talent_noticias/000/796/integracion_nuevos_empleados.jpg" alt="Imagen de Usuario">
-           
+                <img src="https://aprendepsicologia.com/wp-content/uploads/2020/08/01-how-questions-never-ask-job-interview-shironosov-1-1080x675.jpg" alt="Image" class="img-fluid rounded">
             </div>
             <div class="col-xl-4 col-lg-5 col-md-6 col-sm-12">
                 <div class="tm-bg-gray tm-video-details">
-                    <form method="post" asp-controller="AdministracionControlador" asp-action="CrearUsuario" enctype="multipart/form-data">
-
-
-                        <!-- Campo de Correo-->
-                        <div class="form-group">
-                            <label for="nombre">Correo:</label>
-                            <input  class="form-control" type="email" name="correo_usuario" required >
+                    <form method="post" asp-controller="ControladorIncidencias" asp-action="CrearSolicitud" id="formulario">
+                        <div class="container mt-4">
+                            <label for="exampleTextarea" class="form-label">Describenos lo que te ocurre:</label>
+                            <textarea class="form-control" id="exampleTextarea" rows="4" name="DescripcionSolicitud2">@Model.solicitudModificar.DescripcionSolicitud2</textarea>
                         </div>
-
-                        <!-- Campo de Contraseña-->
-                        <div class="form-group">
-                            <label for="nombre">Contraseña:</label>
-                            <input class="form-control" type="password" name="contrasenia_usuario" required>
+                        <div class="mb-4 text-center" style="margin-top:10px;">
+                            <button class="btn btn-primary tm-btn-big" type="submit">Modificar Solicitud</button>
                         </div>
-
-                        <!-- Campo de Nombre-->
-                        <div class="form-group">
-                            <label for="nombre">Nombre:</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre_usuario" required>
-                        </div>
-
-                        <!-- Campo de Número de Teléfono -->
-                        <div class="form-group">
-                            <label for="telefono">Número de Teléfono:</label>
-                            <input type="tel" class="form-control" id="telefono" name="telefono_usuario" pattern="[0-9]{9}" required>
-                        </div>
-
-                        <!-- Campo de Acceso -->
-                        <label for="campo_select" class="form-label">Selecciona el acceso del usuario:</label>
-                       <select class="form-select"  name="id_acceso" required>
-                                accesos=acciones.SeleccionarTodosAccesos();
-                                @foreach(AccesoDTO s in Model.accesos){
-                                    <option value="@s.IdAcceso1">@s.CodigoAcceso1</option>
-                                 }
-                        </select>
-
-                        <!-- Campo de Subir Archivo (Imagen) -->
-                        <div class="form-group">
-                            <label for="imagen">Imagen de Perfil:</label>
-                            <input type="file" class="form-control-file" name="archivo" accept="image/*">
-                        </div>
-
-                        <div class="mb-4 text-center">
-                            <button class="btn btn-primary tm-btn-big" type="submit">Crear Usuario</button>
-                        </div>
+                        <input type="number" id="id" name="id_solicitud" value="@Model.solicitudModificar.IdSolicitud2" style="display: none;">
                     </form>
 
+                    <a href="@Url.Action("ListaSolicitudes", "ControladorIncidencias")">
+                        <button class="btn btn-primary" type="button">Volver</button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -181,6 +144,36 @@
         $(window).on("load", function () {
             $('body').addClass('loaded');
         });
+    </script>
+    <script>
+        var formModified = false;
+
+        function setFormModified(modified) {
+            formModified = modified;
+        }
+
+        function showConfirmation() {
+            if (formModified) {
+                Swal.fire({
+                    title: 'Si Modifica el correo tendrá que volver a verificar el correo. ¿Está seguro?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, enviar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Envía el formulario si la confirmación es positiva
+                        document.getElementById("formulario").submit();
+                    } else {
+                        // No hace nada si la confirmación es cancelada
+                        Swal.fire('Envío cancelado', '', 'info');
+                    }
+                });
+            } else {
+                // El formulario no ha sido modificado, no se muestra la alerta
+                document.getElementById("formulario").submit();
+            }
+        }
     </script>
 </body>
 </html>

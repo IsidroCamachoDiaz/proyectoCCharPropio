@@ -116,7 +116,11 @@ namespace proyectoCCharPropio.Recursos
                 request.Method = "POST";
                 request.ContentType = "application/json";
 
-                var jsonEntidad = JsonConvert.SerializeObject(entidad);
+                JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
+                var jsonEntidad = JsonConvert.SerializeObject(entidad,jsonSerializerSettings);
 
                 using (var streamWriter = new StreamWriter(request.GetRequestStream()))
                 {

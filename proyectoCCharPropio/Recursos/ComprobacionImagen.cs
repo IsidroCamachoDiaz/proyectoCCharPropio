@@ -15,7 +15,7 @@
             if (archivo == null || archivo.Length == 0 || !EsImagen(archivo.FileName))
             {
                 // Si el archivo es nulo, está vacío o no es una imagen, devolver la imagen por defecto
-                string imagenPorDefectoPath = "ruta_de_la_imagen_por_defecto.jpg";
+                string imagenPorDefectoPath = "user.png";
                 //Devuelvo la imagen por defecto convertida en array de butes
                 return File.ReadAllBytes(imagenPorDefectoPath);
             }

@@ -138,6 +138,7 @@
                         <tr>
                             <th>Descripcion</th>
                             <th>Fecha De Solicitud</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -145,6 +146,11 @@
                         <tr>
                             <td class="text-center">@s.DescripcionSolicitud2</td>
                                 <td class="text-center">@s.FechaLimite2</td>
+                                <td class="text-center">
+                                    <a href="https://localhost:7048/ControladorIncidencias/modificarSolicitud?idS=@s.IdSolicitud2">
+                                        <button class="btn btn-info" type="button">Modificar Solicitud</button>
+                                    </a>
+                                </td>
                         </tr>
                         }
                     </tbody>

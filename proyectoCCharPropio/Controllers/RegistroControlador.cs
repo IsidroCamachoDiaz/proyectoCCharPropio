@@ -176,6 +176,13 @@ namespace proyectoCCharPropio.Controllers
             accionesCRUD acciones=new accionesCRUD();
 			//Cojo el token de la base de datos
 			TokenDTO token=acciones.SeleccionarToken("token/"+valorTk);
+			//Comprobamos si se encontro el token
+			if(token == null) 
+			{
+                MostrarAlerta("Hubo un problema", "No se encontro su token o ya ha sido usado", "error");
+                Util.EscribirEnElFichero("Una intento darse de alta en la cuenta pero el token no se encontro o ya fue usado");
+                return RedirectToAction("index");
+            }
 			//Cojemos el usuario a partir del id del usuario del token 
 			UsuarioDTO usuario = acciones.SeleccionarUsuario(token.Id_usuario.ToString());
 			//Cojo la fecha de ahora para ver si ha pasado eol tiempo de espera
@@ -197,6 +204,8 @@ namespace proyectoCCharPropio.Controllers
 				acciones.ActualizarUsuario(usuario);
                 Util.EscribirEnElFichero("Un usuario hizo el alta correctamente: "+usuario.Nombre_usuario);
                 MostrarAlerta("Confirmado", "Su cuenta ha sido Verificada", "success");
+				//Borramos el token para que no se vuelva a usar
+				acciones.EliminarToken(token.Id_usuario.ToString());
 			}
 
             return View();
@@ -453,18 +462,16 @@ namespace proyectoCCharPropio.Controllers
                     MostrarAlerta("No se encontro su usuario", "No se pudo encontrar a su usuario intentelo mas tarde", "error");
                     return RedirectToAction("Index", new { error = "parametroVacio" });
                 }
-				//Comprobamos si metio una imagen
-                if (archivo != null && archivo.Length > 0)
+                //Comprobamos si metio una imagen
+                // Cojo la imagen
+                if (archivo != null)
                 {
-                    //Convierto el archivo en array de byte
-                    using (MemoryStream memoryStream = new MemoryStream())
-                    {
-                        archivo.CopyTo(memoryStream);
-                        usuarioBD.Foto_usuario = memoryStream.ToArray();
-                    }
-					modifico = true;
+                    //Usamos la clase para convertir el archivo en u array de bytes
+                    ComprobacionImagen ci = new ComprobacionImagen();
+                    usuarioBD.Foto_usuario = ci.ConvertirImagenEnBytes(archivo);
+                    modifico = true;
                 }
-				//Comprobamos si cambio algun campo
+                //Comprobamos si cambio algun campo
                 if (usuarioDTO.Correo_usuario!=usuarioBD.Correo_usuario|| usuarioDTO.Nombre_usuario != usuarioBD.Nombre_usuario|| 
 					usuarioDTO.Telefono_usuario != usuarioBD.Telefono_usuario|| usuarioDTO.Contrasenia_usuario != null)
 				{

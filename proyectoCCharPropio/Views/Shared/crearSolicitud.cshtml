@@ -76,7 +76,7 @@
                         <a class="nav-link nav-link-1" aria-current="page" href="@Url.Action("home", "RegistroControlador")">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-2 active" href="@Url.Action("modificarPerfil", "RegistroControlador")">
+                        <a class="nav-link nav-link-2" href="@Url.Action("modificarPerfil", "RegistroControlador")">
                             <div class="user-info-container d-flex align-items-center">
                                 @if (Model.Usuario.Foto_usuario != null && Model.Usuario.Foto_usuario.Length > 0)
                                 {
@@ -128,7 +128,7 @@
                         </div>
                     </form>
 
-                    <a href="@Url.Action("CrearSolicitud", "ControladorIncidencias")">
+                    <a href="@Url.Action("ListaSolicitudes", "ControladorIncidencias")">
                         <button class="btn btn-primary" type="button">Volver</button>
                     </a>
                 </div>

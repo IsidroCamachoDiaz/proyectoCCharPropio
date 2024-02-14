@@ -19,6 +19,14 @@ namespace proyectoCCharPropio.Controllers
             public List<SolicitudDTO> ListaSolicitudesPendientes { get; set; }
         }
 
+        public class ModeloIncidenciasModificar
+        {
+            public UsuarioDTO Usuario { get; set; }
+
+            public SolicitudDTO solicitudModificar { get; set; }
+
+        }
+
         public class ModeloUsuario
         {
             public UsuarioDTO Usuario { get; set; }
@@ -94,6 +102,58 @@ namespace proyectoCCharPropio.Controllers
         }
 
         [HttpGet]
+        public IActionResult ModificarSolicitud()
+        {
+            //Declaramos loq ue necesitamos
+            UsuarioDTO usuario;
+            accionesCRUD acciones = new accionesCRUD();
+            try
+            {
+                // AQUÍ VA EL CONTROL DE SESIÓN
+                string acceso = String.Empty;
+                acceso = HttpContext.Session.GetString("acceso");
+                string idUsuario = HttpContext.Session.GetString("usuario");
+                usuario = acciones.SeleccionarUsuario(idUsuario);
+                AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
+
+                if (accesoO.CodigoAcceso1 != "Usuario")
+                {
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+            }
+            catch (Exception e)
+            {
+                Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                return RedirectToAction("Index", "RegistroControlador");
+            }
+
+            string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
+            Uri uri = new Uri(urlCompleta);
+            //Cojo el valor tk
+            string idSolicitud = HttpUtility.ParseQueryString(uri.Query)["idS"];
+
+            SolicitudDTO solicitudModificar = acciones.SeleccionarSolicitud(idSolicitud);
+
+            if (solicitudModificar == null)
+            {
+                MostrarAlerta("¡Hubo un problema!", "No se encontro su solicitud", "error");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
+            //Las metemos en el modelo
+            var modelo = new ModeloIncidenciasModificar
+            {
+                Usuario = usuario,
+                solicitudModificar=solicitudModificar
+            };
+
+            Util.EscribirEnElFichero("Se le llevo a mostar las solicitudes");
+            return View(modelo);
+        }
+
+        [HttpGet]
         public IActionResult CrearSolicitud()
         {
             //Declaramos lo que necesitemos
@@ -154,12 +214,49 @@ namespace proyectoCCharPropio.Controllers
             if (implInci.crearSolicitud(solicitud))
             {
                 MostrarAlerta("Solicitud Creada", "Solicitud Generada Correctamente nuestros tecnico se pondran con su solicitud", "success");
-                return RedirectToAction("AdministracionUsuarios");
+                return RedirectToAction("Home", "RegistroControlador");
             }
             //Si no se creo bien se avisa al usuario
             else
             {
                 MostrarAlerta("Error", "No se pudo crear su solicitud intentelo de nuevo mas tarde", "error");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
+
+        }
+
+        [HttpPost]
+        public ActionResult ModificarSolicitud(SolicitudDTO solicitud)
+        {
+            //Declaramos lo que encesitemos
+            accionesCRUD acciones = new accionesCRUD();
+            bool cambio = false;
+            //Comprobamso si escribio algo si no escribio se avisa al usuario
+            if (solicitud.DescripcionSolicitud2 == null || solicitud.DescripcionSolicitud2 == "")
+            {
+                MostrarAlerta("Campo Vacio", "No puso nada en la descripcion", "error");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+            SolicitudDTO solicitudBD = acciones.SeleccionarSolicitud(solicitud.IdSolicitud2.ToString());
+            //Comprobamos si es distinta a la anterior
+            if (solicitud.DescripcionSolicitud2 != solicitudBD.DescripcionSolicitud2)
+            {
+                solicitudBD.DescripcionSolicitud2 = solicitud.DescripcionSolicitud2;
+                cambio = true;
+            }
+
+            //Comprobamos si se inserto bien
+            if (cambio)
+            {
+                acciones.ActualizarSolicitud(solicitudBD);
+                MostrarAlerta("Solicitud Modificada", "Solicitud Modificada Correctamente nuestros tecnico se pondran con su solicitud", "success");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+            //Si no cambio la descripcion se avisa al usuario
+            else
+            {
+                MostrarAlerta("Es igual", "No modifico la descripcion", "info");
                 return RedirectToAction("Home", "RegistroControlador");
             }
 
