@@ -33,7 +33,7 @@ namespace proyectoCCharPropio.DTOS
         /// Descripción proporcionada por el usuario de la incidencia.
         /// </summary>
         [JsonProperty("DescripcionUsuario")]
-        private string DescripcionUsuario { get; set; } = null!;
+        private string DescripcionUsuario { get; set; }
 
         /// <summary>
         /// Estado de la incidencia.
@@ -81,6 +81,15 @@ namespace proyectoCCharPropio.DTOS
         /// Objeto UsuarioDTO asociado a la incidencia.
         /// </summary>
         public UsuarioDTO Usuario { get => IdUsuario; set => IdUsuario = value; }
+
+        /// <summary>
+        /// Descripcion del usuario
+        /// </summary>
+        public string Descripcion_Usuario { get => DescripcionUsuario; set => DescripcionUsuario=value; }
+
+
+
+
 
         /// <summary>
         /// Constructor para crear un objeto IncidenciaDTO con algunos atributos.

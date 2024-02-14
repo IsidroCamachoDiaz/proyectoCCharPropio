@@ -9,6 +9,7 @@ using System;
 using proyectoCCharPropio.Recursos;
 using pruebaRazor.DTOs;
 using proyectoCCharPropio.Servicios;
+using static proyectoCCharPropio.Controllers.ControladorIncidencias;
 
 namespace proyectoCCharPropio.Controllers
 {
@@ -20,6 +21,12 @@ namespace proyectoCCharPropio.Controllers
         public class ModificarViewModel
         {
             public string Token { get; set; }
+        }
+
+        public class ModeloHome
+        {
+            public UsuarioDTO Usuario { get; set; }
+			public AccesoDTO acceso { get; set; }
         }
         // Acción para la vista de bienvenida
         public IActionResult Bienvenida()
@@ -139,11 +146,12 @@ namespace proyectoCCharPropio.Controllers
         public IActionResult Home()
         {
 			UsuarioDTO usuario;
+            accionesCRUD acciones = new accionesCRUD();
             try
             {
                 // AQUÍ VA EL CONTROL DE SESIÓN
                 string acceso = String.Empty;
-				accionesCRUD acciones=new accionesCRUD();
+				
                 acceso = HttpContext.Session.GetString("acceso");
 				string idUsuario= HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
@@ -161,7 +169,15 @@ namespace proyectoCCharPropio.Controllers
                 return RedirectToAction("Index");
             }
             Util.EscribirEnElFichero("Se le llevo al home");
-            return View(usuario);
+
+			AccesoDTO accesoO=acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
+
+            var modelo = new ModeloHome
+            {
+                Usuario = usuario,
+                acceso= accesoO
+            };
+            return View(modelo);
         }
 
         // Acción HTTP GET para la vista principal

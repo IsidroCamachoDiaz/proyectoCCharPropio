@@ -102,7 +102,7 @@
 
     <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
         <form class="d-flex tm-search-form">
-            <h2 class="text-white">Crear Solicitud De Incidencia</h2>
+            <h2 class="text-white">Modificar Solicitud De Incidencia</h2>
         </form>
     </div>
 
@@ -118,7 +118,7 @@
             </div>
             <div class="col-xl-4 col-lg-5 col-md-6 col-sm-12">
                 <div class="tm-bg-gray tm-video-details">
-                    <form method="post" asp-controller="ControladorIncidencias" asp-action="CrearSolicitud" id="formulario">
+                    <form method="post" asp-controller="ControladorIncidencias" asp-action="ModificarSolicitud" id="formulario">
                         <div class="container mt-4">
                             <label for="exampleTextarea" class="form-label">Describenos lo que te ocurre:</label>
                             <textarea class="form-control" id="exampleTextarea" rows="4" name="DescripcionSolicitud2">@Model.solicitudModificar.DescripcionSolicitud2</textarea>
@@ -126,7 +126,7 @@
                         <div class="mb-4 text-center" style="margin-top:10px;">
                             <button class="btn btn-primary tm-btn-big" type="submit">Modificar Solicitud</button>
                         </div>
-                        <input type="number" id="id" name="id_solicitud" value="@Model.solicitudModificar.IdSolicitud2" style="display: none;">
+                        <input type="number" id="id" name="IdSolicitud2" value="@Model.solicitudModificar.IdSolicitud2" style="display: none;">
                     </form>
 
                     <a href="@Url.Action("ListaSolicitudes", "ControladorIncidencias")">

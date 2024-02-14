@@ -1,4 +1,4 @@
-﻿@model proyectoCCharPropio.DTOS.UsuarioDTO
+﻿@model proyectoCCharPropio.Controllers.RegistroControlador.ModeloHome
 @{
     ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
 }
@@ -77,10 +77,10 @@
                         <a class="nav-link nav-link-2" href="@Url.Action("modificarPerfil", "RegistroControlador")">
                             <div class="user-info-container d-flex align-items-center">
 
-                                @if (Model.Foto_usuario != null && Model.Foto_usuario.Length > 0)
+                                @if (Model.Usuario.Foto_usuario != null && Model.Usuario.Foto_usuario.Length > 0)
                                 {
                                     // Convertir el array de bytes a cadena Base64
-                                    var imagenBase64 = Convert.ToBase64String(Model.Foto_usuario);
+                                    var imagenBase64 = Convert.ToBase64String(Model.Usuario.Foto_usuario);
 
                                     // Mostrar la imagen usando la cadena Base64 en la etiqueta <img>
                                     <img class="rounded-circle user-avatar" src="data:image/png;base64,@imagenBase64" alt="Imagen de Usuario">
@@ -103,10 +103,10 @@
     <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
         <form class="d-flex tm-search-form">
             <div class="user-info-container2 d-flex align-items-center">
-                @if (Model.Foto_usuario != null && Model.Foto_usuario.Length > 0)
+                @if (Model.Usuario.Foto_usuario != null && Model.Usuario.Foto_usuario.Length > 0)
                 {
                     // Convertir el array de bytes a cadena Base64
-                    var imagenBase64 = Convert.ToBase64String(Model.Foto_usuario);
+                    var imagenBase64 = Convert.ToBase64String(Model.Usuario.Foto_usuario);
 
                     // Mostrar la imagen usando la cadena Base64 en la etiqueta <img>
                     <img class="rounded-circle user-avatar2" src="data:image/png;base64,@imagenBase64" alt="Imagen de Usuario">
@@ -116,7 +116,7 @@
                 // Mostrar una imagen predeterminada si el array de bytes es nulo o vacío
                     <img class="rounded-circle user-avatar2" src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" alt="Imagen de Usuario">
                 }
-                <h2 class="text-white">Bienvenido @Model.Nombre_usuario</h2>
+                <h2 class="text-white">Bienvenido @Model.Usuario.Nombre_usuario</h2>
             </div>
         </form>
     </div>
@@ -130,7 +130,7 @@
             </div>
         </div>
         <div class="row tm-mb-90 tm-gallery">
-             @if (Model.Id_acceso==3)
+             @if (Model.acceso.CodigoAcceso1=="Usuario")
             {
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
                     <figure class="effect-ming tm-video-item">
@@ -142,7 +142,7 @@
                 </figure>
             </div>
             }
-            @if (Model.Id_acceso == 2 || Model.Id_acceso==4)
+            @if (Model.acceso.CodigoAcceso1 == "Empleado" || Model.acceso.CodigoAcceso1 == "Administrador")
             {
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
                     <figure class="effect-ming tm-video-item">
@@ -171,7 +171,7 @@
                         </figcaption>
                     </figure>
                 </div>
-                @if (Model.Id_acceso == 4)
+                @if (Model.acceso.CodigoAcceso1 == "Administrador")
                 {
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
                         <figure class="effect-ming tm-video-item">

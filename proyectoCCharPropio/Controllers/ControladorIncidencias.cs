@@ -239,10 +239,13 @@ namespace proyectoCCharPropio.Controllers
                 return RedirectToAction("Home", "RegistroControlador");
             }
             SolicitudDTO solicitudBD = acciones.SeleccionarSolicitud(solicitud.IdSolicitud2.ToString());
+            
             //Comprobamos si es distinta a la anterior
             if (solicitud.DescripcionSolicitud2 != solicitudBD.DescripcionSolicitud2)
             {
                 solicitudBD.DescripcionSolicitud2 = solicitud.DescripcionSolicitud2;
+                solicitudBD.Incidencia2 = solicitud.Incidencia2;
+                solicitudBD.Incidencia2.Descripcion_Usuario = solicitud.DescripcionSolicitud2;
                 cambio = true;
             }
 

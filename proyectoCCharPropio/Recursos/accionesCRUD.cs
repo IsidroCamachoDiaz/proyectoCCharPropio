@@ -199,7 +199,7 @@ namespace proyectoCCharPropio.Recursos
 
         public bool ActualizarSolicitud(SolicitudDTO nuevaSolicitud)
         {
-            return HacerPut("api/Solicitud/", nuevaSolicitud);
+            return HacerPut("api/Solicitud/"+nuevaSolicitud.IdSolicitud2.ToString(), nuevaSolicitud);
         }
 
         public bool ActualizarTipoDeTrabajo(TipoTrabajoDTO nuevoTipoTrabajo)
