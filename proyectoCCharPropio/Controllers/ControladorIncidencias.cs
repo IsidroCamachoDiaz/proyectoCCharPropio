@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Collections.Generic;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using proyectoCCharPropio.DTOS;
 using proyectoCCharPropio.Recursos;
@@ -17,6 +18,15 @@ namespace proyectoCCharPropio.Controllers
 
             public List<SolicitudDTO> ListaSolicitudesFinalizadas { get; set; }
             public List<SolicitudDTO> ListaSolicitudesPendientes { get; set; }
+        }
+
+        public class ModeloPanelIncidencias
+        {
+            public UsuarioDTO Usuario { get; set; }
+
+            public List<IncidenciaDTO> incidenciasSinAsignar { get; set; }
+            public List<IncidenciaDTO> incidenciasMias { get; set; }
+            public List<IncidenciaDTO> incidenciasFinalizadas { get; set; }
         }
 
         public class ModeloIncidenciasModificar
@@ -102,6 +112,92 @@ namespace proyectoCCharPropio.Controllers
         }
 
         [HttpGet]
+        public IActionResult ListaIncidencia()
+        {
+            //Declaramos loq ue necesitamos
+            UsuarioDTO usuario;
+            accionesCRUD acciones = new accionesCRUD();
+            try
+            {
+                // AQUÍ VA EL CONTROL DE SESIÓN
+                string acceso = String.Empty;
+                acceso = HttpContext.Session.GetString("acceso");
+
+                if(acceso==null) {
+                    Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index", "RegistroControlador");
+                }
+
+                string idUsuario = HttpContext.Session.GetString("usuario");
+                usuario = acciones.SeleccionarUsuario(idUsuario);
+                AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
+
+                if (accesoO.CodigoAcceso1 != "Empleado"&& accesoO.CodigoAcceso1 != "Administrador")
+                {
+                    Util.EscribirEnElFichero("Un usuario intento acceder a las incidencias");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+            }
+            catch (Exception e)
+            {
+                Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                return RedirectToAction("Index", "RegistroControlador");
+            }
+            //Cogemos la lista de todas las incidencias y la filtramos por las del usuario
+            List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
+            List<IncidenciaDTO> incidenciasSinAsignar= new List<IncidenciaDTO>();
+            List<IncidenciaDTO> incidenciasMias= new List<IncidenciaDTO>();
+            List < IncidenciaDTO > incidenciasAcabadas= new List<IncidenciaDTO>();
+
+            foreach (IncidenciaDTO inc in incidencias)
+            {
+                if (inc.Usuario == null)
+                {
+                    incidenciasSinAsignar.Add(inc);
+                }
+                else if (inc.Usuario.Id_usuario == usuario.Id_usuario&&inc.Estado==false)
+                {
+                    incidenciasMias.Add(inc);
+                }
+                else if(inc.Estado == true)
+                {
+                    incidenciasAcabadas.Add(inc);
+                }
+            }
+
+            //Incidencias Sin Asignar
+           // List<IncidenciaDTO> incidenciasSinAsignar = incidencias.Where(x => x.Usuario == null).ToList();
+
+            //Quitamos los que no tienen usuario
+            //List <IncidenciaDTO> aux= incidencias.Where(x => x.Usuario != null).ToList();
+
+            //Incidencias Propias Acabadas
+            //List <IncidenciaDTO> incidenciasMias = aux.Where(x => x.Usuario.Id_usuario == usuario.Id_usuario).ToList();
+            //incidenciasMias =incidenciasMias.Where(x => x.Estado == false).ToList();
+            
+            //Incidencias Acabadas
+            //List <IncidenciaDTO> incidenciasAcabadas = aux.Where(x => x.Estado==true).ToList();
+
+
+
+            //Las metemos en el modelo
+            var modelo = new ModeloPanelIncidencias
+            {
+                Usuario = usuario,
+                incidenciasSinAsignar = incidenciasSinAsignar,
+                incidenciasMias = incidenciasMias,
+                incidenciasFinalizadas=incidenciasAcabadas
+
+             };
+
+            Util.EscribirEnElFichero("Se le llevo a mostar las incidencias");
+            return View(modelo);
+        }
+
+        [HttpGet]
         public IActionResult ModificarSolicitud()
         {
             //Declaramos loq ue necesitamos
@@ -112,6 +208,12 @@ namespace proyectoCCharPropio.Controllers
                 // AQUÍ VA EL CONTROL DE SESIÓN
                 string acceso = String.Empty;
                 acceso = HttpContext.Session.GetString("acceso");
+                if (acceso == null)
+                {
+                    Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index", "RegistroControlador");
+                }
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
                 AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
@@ -165,6 +267,12 @@ namespace proyectoCCharPropio.Controllers
                 // AQUÍ VA EL CONTROL DE SESIÓN
                 string acceso = String.Empty;
                 acceso = HttpContext.Session.GetString("acceso");
+                if (acceso == null)
+                {
+                    Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index", "RegistroControlador");
+                }
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
                 AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
@@ -239,12 +347,11 @@ namespace proyectoCCharPropio.Controllers
                 return RedirectToAction("Home", "RegistroControlador");
             }
             SolicitudDTO solicitudBD = acciones.SeleccionarSolicitud(solicitud.IdSolicitud2.ToString());
-            
+
             //Comprobamos si es distinta a la anterior
             if (solicitud.DescripcionSolicitud2 != solicitudBD.DescripcionSolicitud2)
             {
                 solicitudBD.DescripcionSolicitud2 = solicitud.DescripcionSolicitud2;
-                solicitudBD.Incidencia2 = solicitud.Incidencia2;
                 solicitudBD.Incidencia2.Descripcion_Usuario = solicitud.DescripcionSolicitud2;
                 cambio = true;
             }

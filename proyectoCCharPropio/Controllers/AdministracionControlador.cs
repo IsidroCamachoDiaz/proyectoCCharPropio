@@ -67,6 +67,12 @@ namespace proyectoCCharPropio.Controllers
                 // AQUÍ VA EL CONTROL DE SESIÓN
                 string acceso = String.Empty;
                 acceso = HttpContext.Session.GetString("acceso");
+                if (acceso == null)
+                {
+                    Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index", "RegistroControlador");
+                }
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
 
@@ -108,6 +114,12 @@ namespace proyectoCCharPropio.Controllers
                 // AQUÍ VA EL CONTROL DE SESIÓN
                 string acceso = String.Empty;
                 acceso = HttpContext.Session.GetString("acceso");
+                if (acceso == null)
+                {
+                    Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index", "RegistroControlador");
+                }
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
 
@@ -161,6 +173,12 @@ namespace proyectoCCharPropio.Controllers
                 // AQUÍ VA EL CONTROL DE SESIÓN
                 string acceso = String.Empty;
                 acceso = HttpContext.Session.GetString("acceso");
+                if (acceso == null)
+                {
+                    Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index", "RegistroControlador");
+                }
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
 

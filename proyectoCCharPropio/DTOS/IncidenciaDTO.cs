@@ -71,6 +71,8 @@ namespace proyectoCCharPropio.DTOS
         [JsonProperty("IdSolicitudNavigation")]
         private SolicitudDTO solicitud;
 
+        
+
         /// <summary>
         /// Objeto SolicitudDTO asociado a la incidencia.
         /// </summary>
@@ -86,6 +88,35 @@ namespace proyectoCCharPropio.DTOS
         /// Descripcion del usuario
         /// </summary>
         public string Descripcion_Usuario { get => DescripcionUsuario; set => DescripcionUsuario=value; }
+        /// <summary>
+        /// Estado de la incidencia true si esta acabado false si no esta acabado
+        /// </summary>
+        public bool Estado { get => EstadoIncidencia;set=>EstadoIncidencia=value; }
+
+        /// <summary>
+        /// Descripcion del empelado
+        /// </summary>
+        public string Descripcion_Tecnica { get => Descripcion_Tecnica; set => Descripcion_Tecnica = value; }
+
+        /// <summary>
+        /// Coste de la incidencia total
+        /// </summary>
+        public float Coste_Incidencia { get => CosteIncidencia; set => CosteIncidencia = value; }
+
+        /// <summary>
+        /// Horas totales de la incidencia
+        /// </summary>
+        public int Horas_Incidencia { get => HorasIncidencia; set => HorasIncidencia = value; }
+
+        /// <summary>
+        /// Fecha del inicio de la incidencia
+        /// </summary>
+        public DateTime? Fecha_Inicio_Incidencia { get => FechaInicio; set => FechaInicio = value; }
+
+        /// <summary>
+        /// Fecha de fin de la incidencia
+        /// </summary>
+        public DateTime? Fecha_Fin_Incidencia { get => FechaFin; set => FechaFin = value; }
 
 
 
@@ -137,5 +168,6 @@ namespace proyectoCCharPropio.DTOS
             Usuario = idUsuario;
             Solicitud = idSolicitud;
         }
+
     }
 }

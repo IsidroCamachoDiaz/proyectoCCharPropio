@@ -42,6 +42,9 @@ namespace proyectoCCharPropio.DTOS
         [JsonProperty("IdUsuarioNavigation")]
         private UsuarioDTO idUsuario;
 
+        [JsonProperty("IdUsuario")]
+        private int idUsuarioNumero { get; set; }
+
         /// <summary>
         /// Incidencia asociada a la solicitud.
         /// </summary>

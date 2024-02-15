@@ -36,7 +36,7 @@ namespace proyectoCCharPropio.Controllers
 				// AQUÍ VA EL CONTROL DE SESIÓN
 				string dni = String.Empty;
 				string acceso = String.Empty;
-				acceso = HttpContext.Session.GetString("acceso");
+                acceso = HttpContext.Session.GetString("acceso");
 
 				if (acceso != "2"&& acceso != "3"&&acceso != "4")
 				{

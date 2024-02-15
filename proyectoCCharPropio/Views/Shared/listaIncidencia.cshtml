@@ -1,0 +1,290 @@
+﻿@using proyectoCCharPropio.DTOS;
+@model proyectoCCharPropio.Controllers.ControladorIncidencias.ModeloPanelIncidencias;
+@{
+    ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SystemRevive</title>
+    <link rel="icon" href="/img/logoPNG.png" type="image/jpg">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/templatemo-style.css">
+    <link rel="stylesheet" href="/css/tabla.css">
+</head>
+<body>
+    <!-- Lógica de JavaScript para mostrar la alerta -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+        var mensajeAlerta = '@TempData["MensajeAlerta"]';
+        var tipo = '@TempData["Tipo"]';
+        var icono = '@TempData["Icono"]';
+        var titulo = '@TempData["Titulo"]';
+
+        function mostrarAlertaPersonalizada() {
+            if (icono == "check") {
+                icono = '<i class="fas fa-check" style="font-size: 1em;"></i>';
+            }
+            else {
+                icono = '<i class="fas fa-times" style="font-size: 1em;"></i>'
+            }
+            Swal.fire({
+                icon: tipo,
+                title: titulo,
+                text: mensajeAlerta,
+                showCancelButton: false,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+                iconHtml: icono,  // Ajusta el tamaño según sea necesario
+            });
+        }
+    </script>
+    <script>
+        var mostrarAlerta = '@TempData["MostrarAlerta"]';
+        console.log('Valor de mostrarAlerta:', mostrarAlerta);
+
+        if (mostrarAlerta && mostrarAlerta.toLowerCase() === 'true') {
+            console.log('Mostrando la alerta');
+            mostrarAlertaPersonalizada();
+            mostrarAlerta = "false";
+        }
+    </script>
+    <!-- Page Loader -->
+    <div id="loader-wrapper">
+        <div id="loader"></div>
+
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="@Url.Action("Home", "RegistroControlador")">
+                <img class="logo" src="/img/logo.png" alt="Imagen de Usuario">
+                <span class="text-white">SystemRevive</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-1" aria-current="page" href="@Url.Action("home", "RegistroControlador")">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-2" href="@Url.Action("modificarPerfil", "RegistroControlador")">
+                            <div class="user-info-container d-flex align-items-center">
+
+                                @if (Model.Usuario.Foto_usuario != null && Model.Usuario.Foto_usuario.Length > 0)
+                                {
+                                    // Convertir el array de bytes a cadena Base64
+                                    var imagenBase64 = Convert.ToBase64String(Model.Usuario.Foto_usuario);
+
+                                    // Mostrar la imagen usando la cadena Base64 en la etiqueta <img>
+                                    <img class="rounded-circle user-avatar" src="data:image/png;base64,@imagenBase64" alt="Imagen de Usuario">
+                                }
+                                else
+                                {
+                                // Mostrar una imagen predeterminada si el array de bytes es nulo o vacío
+                                    <img class="rounded-circle user-avatar" src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" alt="Imagen de Usuario">
+                                }
+
+                                <span class="ml-2 text-white">Perfil</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
+        <form class="d-flex tm-search-form">
+            <div class="user-info-container2 d-flex align-items-center">
+                <h2 class="text-white">Solicitudes De @Model.Usuario.Nombre_usuario</h2>
+            </div>
+        </form>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="mostrarTabla('tabla1')">Incidencias Propias</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="mostrarTabla('tabla2')">Incidencias Sin Asignar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="mostrarTabla('tabla3')">Incidencias Finalizadas</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="col-12 col-md-12 table-container">
+                <table id="tabla1" class="table">
+                    <caption class="text-center text-light">Incidencias Propias</caption>
+                    <thead>
+                        <tr>
+                            <th>Descripcion Del Cliente</th>
+                            <th>Descripcion Tecnica</th>
+                            <th>Horas Acumuladas</th>
+                            <th>Coste Hasta El Momento</th>
+                            <th>Fecha De Inicio</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(IncidenciaDTO inc in Model.incidenciasMias ){
+                        <tr>
+                            <td class="text-center">@inc.Descripcion_Usuario</td>
+                             @if (inc.Descripcion_Tecnica == null || inc.Descripcion_Tecnica=="")
+                             {
+                            <td class="text-danger text-center">No puso Descripcion Tecnica</td>
+                            }else{
+                            <td class="text-center">@inc.Descripcion_Tecnica</td>
+                            }
+                            <td class="text-center">@inc.Horas_Incidencia</td>
+                                <td class="text-center">@inc.Coste_Incidencia</td>
+                                <td class="text-center">
+                            <td class="text-center">@inc.Fecha_Inicio_Incidencia</td>
+                                <form action="./ControladorFinalizarIncidencia" method="post">
+                                    <input type="hidden" name="id" value="<IdUsuario">
+                                    <input type="hidden" name="idI" value="<Id_incidencia">
+                                    <button type="submit" class="btn btn-info">Finalizar Incidencia</button>
+                                </form>
+
+                                <form action="./ControladorFinalizarIncidencia" method="post">
+                                    <input type="hidden" name="idI" value="Id_incidencia()">
+                                    <button type="submit" class="btn btn-primary">Modificar Incidencia</button>
+                                </form>
+
+                            </td>
+                        </tr>
+                         } 
+                    </tbody>
+                </table>
+
+                <table id="tabla2" class="table" style="display: none;">
+                    <caption class="text-center text-light">Incidencias Sin Asignar</caption>
+                    <thead>
+                        <tr>
+                            <th>Descripcion Del Cliente</th>
+                            <th>Horas Acumuladas</th>
+                            <th>Coste Hasta El Momento</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(IncidenciaDTO inc in Model.incidenciasSinAsignar){
+                        
+                        <tr>
+                            <td class="text-center">@inc.Descripcion_Usuario</td>
+                            <td class="text-center">@inc.Horas_Incidencia</td>
+                            <td class="text-center">@inc.Coste_Incidencia </td>
+                            <td class="text-center">
+                                <form action="./ControladorAsignarIncidencia" method="post">
+                                    <input type="hidden" name="id" value="<IdUsuario">
+                                    <input type="hidden" name="idI" value="Id_incidencia()">
+                                    <button type="submit" class="btn btn-info">Asignar Incidencia</button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <table id="tabla3" class="table" style="display: none;">
+                    <caption class="text-center text-light">Incidencias Finalizadas</caption>
+                    <thead>
+                        <tr>
+                            <th>Descripcion Del Cliente</th>
+                            <th>Descripcion Tecnica</th>
+                            <th>Horas Acumuladas</th>
+                            <th>Coste</th>
+                            <th>Fecha De Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Empleado De La Incidencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(IncidenciaDTO inc in Model.incidenciasFinalizadas){
+                        
+                        <tr>
+                            <td class="text-center">@inc.Descripcion_Usuario</td>
+                            <td class="text-center">@inc.Descripcion_Tecnica</td>
+                            <td class="text-center">@inc.Horas_Incidencia</td>
+                            <td class="text-center">@inc.Coste_Incidencia</td>
+                            <td class="text-center">@inc.Fecha_Inicio_Incidencia</td>
+                            <td class="text-center">@inc.Fecha_Fin_Incidencia</td>
+                            <td class="text-center">@inc.Usuario.Nombre_usuario</td>
+                        </tr>
+                            }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarTabla(tablaId) {
+            // Oculta todas las tablas
+            document.querySelectorAll('table').forEach(function (tabla) {
+                tabla.style.display = 'none';
+            });
+
+            // Muestra la tabla seleccionada
+            document.getElementById(tablaId).style.display = 'table';
+        }
+    </script>
+
+
+
+    <script>
+        function mostrarTabla(tablaId) {
+            // Oculta todas las tablas
+            document.querySelectorAll('table').forEach(function (tabla) {
+                tabla.style.display = 'none';
+            });
+
+            // Muestra la tabla seleccionada
+            document.getElementById(tablaId).style.display = 'table';
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        function confirmarBorrado(idUsuario) {
+            console.log('formBorrarUsuario' + idUsuario);
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: 'Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, borrar usuario'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, entonces enviamos el formulario
+                    document.getElementById('formBorrarUsuario' + idUsuario).submit();
+                }
+            });
+        }
+    </script>
+
+    <script src="/js/plugins.js"></script>
+    <script>
+        $(window).on("load", function () {
+            $('body').addClass('loaded');
+        });
+    </script>
+</body>
+</html>

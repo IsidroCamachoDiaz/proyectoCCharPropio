@@ -1,66 +1,72 @@
 .table-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 table {
-  width: 80%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
-  border: 1px solid #fff;
-  padding: 8px;
-  text-align: left;
-  background-color: #A875E8;
+    border: 1px solid #fff;
+    padding: 8px;
+    text-align: left;
+    background-color: #A875E8;
 }
 
 th {
-  text-align: center;
-  background-color: #f2f2f2;
+    text-align: center;
+    background-color: #f2f2f2;
 }
 
 tr:hover {
-  background-color: rgb(64, 0, 128);
+    background-color: rgb(64, 0, 128);
 }
 
 .rounded-circleVer {
-  border-radius: 50%;
+    border-radius: 50%;
 }
 
 .user-avatarVer {
-  width: 50px; /* Ajusta el tamaño de la imagen según tus necesidades */
-  height: 50px;
-  display: block;
-  margin: 0 auto; /* Centra la imagen dentro de su contenedor */
+    width: 50px; /* Ajusta el tamaño de la imagen según tus necesidades */
+    height: 50px;
+    display: block;
+    margin: 0 auto; /* Centra la imagen dentro de su contenedor */
 }
-.table{
-	 background-color: #A875E8;
+
+.table {
+    background-color: #A875E8;
 }
+
 
 
 
 .navbar {
-            text-align: center; /* Centra los enlaces de navegación */
-        }
-        
-        .navbar a {
-            margin-right: 15px; /* Añade espacio entre los enlaces */
-        }
-        
-        .table-container {
-            margin-top: -80px; /* Añade espacio entre la navegación y las tablas */
-        }
-        
-#tabla1{
-	 margin-top: -400px;
+    text-align: center; /* Centra los enlaces de navegación */
 }
 
-#tabla2{
-	 margin-top: -400px;
+    .navbar a {
+        margin-right: 15px; /* Añade espacio entre los enlaces */
+    }
+
+.table-container {
+    margin-top: -80px; /* Añade espacio entre la navegación y las tablas */
+}
+
+#tabla1 {
+    margin-top: -400px;
+}
+
+#tabla2 {
+    margin-top: -400px;
+}
+
+#tabla3 {
+    margin-top: -400px;
 }
