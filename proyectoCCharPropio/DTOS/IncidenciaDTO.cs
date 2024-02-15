@@ -15,63 +15,63 @@ namespace proyectoCCharPropio.DTOS
         /// Identificador de la incidencia.
         /// </summary>
         [JsonProperty("IdIncidencia")]
-        private int IdIncidencia { get; set; }
+        public int IdIncidencia { get; set; }
 
         /// <summary>
         /// Coste asociado a la incidencia.
         /// </summary>
         [JsonProperty("CosteIncidencia")]
-        private float CosteIncidencia { get; set; }
+        public float CosteIncidencia { get; set; }
 
         /// <summary>
         /// Descripción técnica de la incidencia.
         /// </summary>
         [JsonProperty("DescripcionTecnica")]
-        private string DescripcionTecnica { get; set; }
+        public string DescripcionTecnica { get; set; }
 
         /// <summary>
         /// Descripción proporcionada por el usuario de la incidencia.
         /// </summary>
         [JsonProperty("DescripcionUsuario")]
-        private string DescripcionUsuario { get; set; }
+        public string DescripcionUsuario { get; set; }
 
         /// <summary>
         /// Estado de la incidencia.
         /// </summary>
         [JsonProperty("EstadoIncidencia")]
-        private bool EstadoIncidencia { get; set; }
+        public bool EstadoIncidencia { get; set; }
 
         /// <summary>
         /// Fecha de fin de la incidencia.
         /// </summary>
         [JsonProperty("FechaFin")]
-        private DateTime? FechaFin { get; set; }
+        public DateTime? FechaFin { get; set; }
 
         /// <summary>
         /// Fecha de inicio de la incidencia.
         /// </summary>
         [JsonProperty("FechaInicio")]
-        private DateTime? FechaInicio { get; set; }
+        public DateTime? FechaInicio { get; set; }
 
         /// <summary>
         /// Horas dedicadas a la incidencia.
         /// </summary>
         [JsonProperty("HorasIncidencia")]
-        private int HorasIncidencia { get; set; }
+        public int HorasIncidencia { get; set; }
 
         /// <summary>
         /// Usuario asociado a la incidencia.
         /// </summary>
         [JsonProperty("IdUsuarioNavigation")]
-        private UsuarioDTO IdUsuario;
+        public UsuarioDTO IdUsuario;
 
         /// <summary>
         /// Solicitud asociada a la incidencia.
         /// </summary>
         [JsonProperty("IdSolicitudNavigation")]
-        private SolicitudDTO solicitud;
+        public SolicitudDTO solicitud;
 
-        
+
 
         /// <summary>
         /// Objeto SolicitudDTO asociado a la incidencia.
@@ -83,43 +83,6 @@ namespace proyectoCCharPropio.DTOS
         /// Objeto UsuarioDTO asociado a la incidencia.
         /// </summary>
         public UsuarioDTO Usuario { get => IdUsuario; set => IdUsuario = value; }
-
-        /// <summary>
-        /// Descripcion del usuario
-        /// </summary>
-        public string Descripcion_Usuario { get => DescripcionUsuario; set => DescripcionUsuario=value; }
-        /// <summary>
-        /// Estado de la incidencia true si esta acabado false si no esta acabado
-        /// </summary>
-        public bool Estado { get => EstadoIncidencia;set=>EstadoIncidencia=value; }
-
-        /// <summary>
-        /// Descripcion del empelado
-        /// </summary>
-        public string Descripcion_Tecnica { get => Descripcion_Tecnica; set => Descripcion_Tecnica = value; }
-
-        /// <summary>
-        /// Coste de la incidencia total
-        /// </summary>
-        public float Coste_Incidencia { get => CosteIncidencia; set => CosteIncidencia = value; }
-
-        /// <summary>
-        /// Horas totales de la incidencia
-        /// </summary>
-        public int Horas_Incidencia { get => HorasIncidencia; set => HorasIncidencia = value; }
-
-        /// <summary>
-        /// Fecha del inicio de la incidencia
-        /// </summary>
-        public DateTime? Fecha_Inicio_Incidencia { get => FechaInicio; set => FechaInicio = value; }
-
-        /// <summary>
-        /// Fecha de fin de la incidencia
-        /// </summary>
-        public DateTime? Fecha_Fin_Incidencia { get => FechaFin; set => FechaFin = value; }
-
-
-
 
 
         /// <summary>

@@ -91,6 +91,7 @@ namespace proyectoCCharPropio.Controllers
                 MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
                 return RedirectToAction("Index", "RegistroControlador");
             }
+
             //Cogemos la lista de todas las solicitudes y la filtramos por las del usuario
             List<SolicitudDTO> solicitudes = acciones.HacerGetLista<SolicitudDTO>("api/Solicitud");
             solicitudes = solicitudes.Where(x=>x.IdUsuario2.Id_usuario ==usuario.Id_usuario).ToList();
@@ -152,17 +153,19 @@ namespace proyectoCCharPropio.Controllers
             List<IncidenciaDTO> incidenciasMias= new List<IncidenciaDTO>();
             List < IncidenciaDTO > incidenciasAcabadas= new List<IncidenciaDTO>();
 
+            //Vamos filtrando por cada lista segun el estado y la asignacion de empleados
             foreach (IncidenciaDTO inc in incidencias)
             {
+                
                 if (inc.Usuario == null)
                 {
                     incidenciasSinAsignar.Add(inc);
                 }
-                else if (inc.Usuario.Id_usuario == usuario.Id_usuario&&inc.Estado==false)
+                else if (inc.Usuario.Id_usuario == usuario.Id_usuario&&inc.EstadoIncidencia==false)
                 {
                     incidenciasMias.Add(inc);
                 }
-                else if(inc.Estado == true)
+                else if(inc.EstadoIncidencia == true)
                 {
                     incidenciasAcabadas.Add(inc);
                 }
@@ -231,13 +234,16 @@ namespace proyectoCCharPropio.Controllers
                 return RedirectToAction("Index", "RegistroControlador");
             }
 
+            //Cojemos la url entera
             string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
             Uri uri = new Uri(urlCompleta);
-            //Cojo el valor tk
+            //Cojo el valor del id de la solicitud
             string idSolicitud = HttpUtility.ParseQueryString(uri.Query)["idS"];
 
+            //Cogemos la solicitud
             SolicitudDTO solicitudModificar = acciones.SeleccionarSolicitud(idSolicitud);
 
+            //Comprobamos si lo encontro
             if (solicitudModificar == null)
             {
                 MostrarAlerta("¡Hubo un problema!", "No se encontro su solicitud", "error");
@@ -251,7 +257,7 @@ namespace proyectoCCharPropio.Controllers
                 solicitudModificar=solicitudModificar
             };
 
-            Util.EscribirEnElFichero("Se le llevo a mostar las solicitudes");
+            Util.EscribirEnElFichero("Se le llevo a modificar solicitud");
             return View(modelo);
         }
 
@@ -321,12 +327,14 @@ namespace proyectoCCharPropio.Controllers
             //Comprobamos si se inserto bien
             if (implInci.crearSolicitud(solicitud))
             {
+                Util.EscribirEnElFichero("Un usuario creo una solicitud");
                 MostrarAlerta("Solicitud Creada", "Solicitud Generada Correctamente nuestros tecnico se pondran con su solicitud", "success");
                 return RedirectToAction("Home", "RegistroControlador");
             }
             //Si no se creo bien se avisa al usuario
             else
             {
+                Util.EscribirEnElFichero("Un usuario quizo crear una solicitud pero no se pudo crear");
                 MostrarAlerta("Error", "No se pudo crear su solicitud intentelo de nuevo mas tarde", "error");
                 return RedirectToAction("Home", "RegistroControlador");
             }
@@ -337,10 +345,11 @@ namespace proyectoCCharPropio.Controllers
         [HttpPost]
         public ActionResult ModificarSolicitud(SolicitudDTO solicitud)
         {
-            //Declaramos lo que encesitemos
+            //Declaramos lo que necesitemos
             accionesCRUD acciones = new accionesCRUD();
             bool cambio = false;
-            //Comprobamso si escribio algo si no escribio se avisa al usuario
+
+            //Comprobamos si escribio algo si no escribio se avisa al usuario
             if (solicitud.DescripcionSolicitud2 == null || solicitud.DescripcionSolicitud2 == "")
             {
                 MostrarAlerta("Campo Vacio", "No puso nada en la descripcion", "error");
@@ -352,13 +361,14 @@ namespace proyectoCCharPropio.Controllers
             if (solicitud.DescripcionSolicitud2 != solicitudBD.DescripcionSolicitud2)
             {
                 solicitudBD.DescripcionSolicitud2 = solicitud.DescripcionSolicitud2;
-                solicitudBD.Incidencia2.Descripcion_Usuario = solicitud.DescripcionSolicitud2;
+                solicitudBD.Incidencia2.DescripcionUsuario = solicitud.DescripcionSolicitud2;
                 cambio = true;
             }
 
-            //Comprobamos si se inserto bien
+            //Comprobamos si cambio los valores
             if (cambio)
             {
+                Util.EscribirEnElFichero("Un usuario actualizo una solicitud");
                 acciones.ActualizarSolicitud(solicitudBD);
                 MostrarAlerta("Solicitud Modificada", "Solicitud Modificada Correctamente nuestros tecnico se pondran con su solicitud", "success");
                 return RedirectToAction("Home", "RegistroControlador");
@@ -366,6 +376,7 @@ namespace proyectoCCharPropio.Controllers
             //Si no cambio la descripcion se avisa al usuario
             else
             {
+                Util.EscribirEnElFichero("Un usuario quizo cambiar una solicitud pero no cambio la descripcion");
                 MostrarAlerta("Es igual", "No modifico la descripcion", "info");
                 return RedirectToAction("Home", "RegistroControlador");
             }

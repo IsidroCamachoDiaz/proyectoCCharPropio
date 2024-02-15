@@ -184,6 +184,7 @@ namespace proyectoCCharPropio.Controllers
 
                 if (acceso != "3")
                 {
+                    Util.EscribirEnElFichero("Unusuario intento acceder a la modficacionde un usuario");
                     MostrarAlerta("¡Alerta De Seguridad!", "Usted no tiene acceso para entrar aqui", "error");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
@@ -198,8 +199,9 @@ namespace proyectoCCharPropio.Controllers
             //Cojo la url del navegador
             string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
             Uri uri = new Uri(urlCompleta);
-            //Cojo el valor tk
+            //Cojo el valor id
             string idUsuarioModificar = HttpUtility.ParseQueryString(uri.Query)["id"];
+
             //Cogemos el usuario que queremos modificar
             UsuarioDTO usuarioModificar = acciones.SeleccionarUsuario(idUsuarioModificar);
 
@@ -233,12 +235,14 @@ namespace proyectoCCharPropio.Controllers
             //Usamos el metodo para borrar
             if (impl.eliminarUsuario(usuarioDTO))
             {
+                Util.EscribirEnElFichero("Se booro el usuario: " +usuarioDTO.Nombre_usuario);
                 MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
                 return RedirectToAction("AdministracionUsuarios");
             }
             //Si no se pudo se avisa al usuario
             else
             {
+                Util.EscribirEnElFichero("Se intento borrar un usuario pero no se pudo");
                 MostrarAlerta("Error", "No se pudo borrar el usuario", "error");
                 return RedirectToAction("AdministracionUsuarios");
             }
@@ -263,6 +267,7 @@ namespace proyectoCCharPropio.Controllers
                  //Comprobamos si lo encontro si no se avisa al usuario
                 if (usuarioCambiar == null)
                 {
+                    Util.EscribirEnElFichero("Se intento actualizar un usuario pero no se pudo");
                     MostrarAlerta("No pudimos encontrar el Usuario", "No se encontro al usuario", "error");
                     return RedirectToAction("Index", "RegistroControlador");
                 }
@@ -282,6 +287,7 @@ namespace proyectoCCharPropio.Controllers
                         //Si no se le avisa al usuario
                         else
                         {
+                            Util.EscribirEnElFichero("Se intento cambiar el acceso de un usuario pero no se pudo");
                             MostrarAlerta("Error De Acceso", "El usuario tiene asignados solicitudes o incidencias y no se puede asignar el acceso", "error");
                             return RedirectToAction("Index", "RegistroControlador");
                         }
@@ -306,17 +312,20 @@ namespace proyectoCCharPropio.Controllers
                 {
                     //Actualizamos el usuario y avisamos al usuario
                     acciones.ActualizarUsuario(usuarioCambiar);
+                    Util.EscribirEnElFichero("Se actualizo el usuario: "+usuarioCambiar.Nombre_usuario);
                     MostrarAlerta("Se cambiio el usuario Correctamente", "Se modifico correctamente el usuario " + usuarioCambiar.Nombre_usuario, "success");
                     return RedirectToAction("Index", "RegistroControlador");
                 }
                 // Si no ha cambiado se le avisa
                 else
                 {
+                    Util.EscribirEnElFichero("Se intento actualizar un usuario pero no se pudo");
                     MostrarAlerta("Campos Iguales", "No hizo ninguna modificacion", "warning");
                 }
             }
             catch (Exception e)
             {
+                Util.EscribirEnElFichero("Hubo un error en Actualizar Usuario "+e.Message);
             }
 
             return RedirectToAction("Index", "RegistroControlador");
@@ -330,6 +339,7 @@ namespace proyectoCCharPropio.Controllers
             // Verificar si algún parámetro requerido está vacío
             if (usuarioDTO.Nombre_usuario == null || usuarioDTO.Telefono_usuario == null || usuarioDTO.Correo_usuario == null || usuarioDTO.Contrasenia_usuario == null)
             {
+                Util.EscribirEnElFichero("Un administrador quiso crear un usuario pero puso campos vacios");
                 MostrarAlerta("¡Campos Incompletos!", "Hay Campos Vacios", "error");
                 return RedirectToAction("CrearUsuario", "AdministracionControlador");
             }
@@ -342,6 +352,7 @@ namespace proyectoCCharPropio.Controllers
                 //Comprobamos si esta sociada a una cuenta
                 if (usuarioSiHay != null)
                 {
+                    Util.EscribirEnElFichero("Un administardor quiso crear un usuario pero el correo puesto ya esta asoicada a una cuenta");
                     MostrarAlerta("¡Ya existe una cuenta con ese correo!", "El correo especificado ya esta asociada a una cuenta", "error");
                     return RedirectToAction("CrearUsuario", "AdministracionControlador");
                 }
@@ -357,10 +368,12 @@ namespace proyectoCCharPropio.Controllers
                 // Llamar al método para crear el usuario
                 if (implAd.CrearUsuario(usuarioDTO))
                 {
+                    Util.EscribirEnElFichero("Se creo un usuario: "+usuarioDTO.Nombre_usuario);
                     MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
                 }
                 else
                 {
+                    Util.EscribirEnElFichero("Se intento crear un usuario pero hubo un error en la creacion");
                     MostrarAlerta("Error", "Hubo un error intentelo mas tarde", "error");
                 }
 

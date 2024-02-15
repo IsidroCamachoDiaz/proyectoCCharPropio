@@ -144,17 +144,17 @@
                     <tbody>
                         @foreach(IncidenciaDTO inc in Model.incidenciasMias ){
                         <tr>
-                            <td class="text-center">@inc.Descripcion_Usuario</td>
-                             @if (inc.Descripcion_Tecnica == null || inc.Descripcion_Tecnica=="")
+                            <td class="text-center">@inc.DescripcionUsuario</td>
+                             @if (inc.DescripcionTecnica == null || inc.DescripcionTecnica=="")
                              {
                             <td class="text-danger text-center">No puso Descripcion Tecnica</td>
                             }else{
-                            <td class="text-center">@inc.Descripcion_Tecnica</td>
+                            <td class="text-center">@inc.DescripcionTecnica</td>
                             }
-                            <td class="text-center">@inc.Horas_Incidencia</td>
-                                <td class="text-center">@inc.Coste_Incidencia</td>
-                                <td class="text-center">
-                            <td class="text-center">@inc.Fecha_Inicio_Incidencia</td>
+                            <td class="text-center">@inc.HorasIncidencia</td>
+                            <td class="text-center">@inc.CosteIncidencia</td>
+                            <td class="text-center">@inc.FechaInicio</td>
+                            <td>
                                 <form action="./ControladorFinalizarIncidencia" method="post">
                                     <input type="hidden" name="id" value="<IdUsuario">
                                     <input type="hidden" name="idI" value="<Id_incidencia">
@@ -163,7 +163,7 @@
 
                                 <form action="./ControladorFinalizarIncidencia" method="post">
                                     <input type="hidden" name="idI" value="Id_incidencia()">
-                                    <button type="submit" class="btn btn-primary">Modificar Incidencia</button>
+                                    <button type="submit" class="btn btn-info">Modificar Incidencia</button>
                                 </form>
 
                             </td>
@@ -186,9 +186,9 @@
                         @foreach(IncidenciaDTO inc in Model.incidenciasSinAsignar){
                         
                         <tr>
-                            <td class="text-center">@inc.Descripcion_Usuario</td>
-                            <td class="text-center">@inc.Horas_Incidencia</td>
-                            <td class="text-center">@inc.Coste_Incidencia </td>
+                            <td class="text-center">@inc.DescripcionUsuario</td>
+                            <td class="text-center">@inc.HorasIncidencia</td>
+                            <td class="text-center">@inc.CosteIncidencia </td>
                             <td class="text-center">
                                 <form action="./ControladorAsignarIncidencia" method="post">
                                     <input type="hidden" name="id" value="<IdUsuario">
@@ -219,12 +219,12 @@
                         @foreach(IncidenciaDTO inc in Model.incidenciasFinalizadas){
                         
                         <tr>
-                            <td class="text-center">@inc.Descripcion_Usuario</td>
-                            <td class="text-center">@inc.Descripcion_Tecnica</td>
-                            <td class="text-center">@inc.Horas_Incidencia</td>
-                            <td class="text-center">@inc.Coste_Incidencia</td>
-                            <td class="text-center">@inc.Fecha_Inicio_Incidencia</td>
-                            <td class="text-center">@inc.Fecha_Fin_Incidencia</td>
+                            <td class="text-center">@inc.DescripcionUsuario</td>
+                            <td class="text-center">@inc.DescripcionUsuario</td>
+                            <td class="text-center">@inc.HorasIncidencia</td>
+                            <td class="text-center">@inc.CosteIncidencia</td>
+                            <td class="text-center">@inc.FechaInicio</td>
+                            <td class="text-center">@inc.FechaFin</td>
                             <td class="text-center">@inc.Usuario.Nombre_usuario</td>
                         </tr>
                             }
