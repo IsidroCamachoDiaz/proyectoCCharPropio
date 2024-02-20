@@ -1,5 +1,5 @@
 ﻿@using proyectoCCharPropio.DTOS;
-@model proyectoCCharPropio.Controllers.ControladorIncidencias.ModeloPanelIncidencias;
+@model proyectoCCharPropio.Controllers.TiposControlador.ModeloMostrarTipos;
 @{
     ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
 }
@@ -112,140 +112,73 @@
     </div>
 
     <div class="container-fluid">
-        <div class="row justify-content-center">
+        <div class="row">
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container">
                     <ul class="navbar-nav mx-auto">
                         <li class="nav-item">
-                            <a class="nav-link" onclick="mostrarTabla('tabla1')">Incidencias Propias</a>
+                            <a class="nav-link" onclick="mostrarTabla('tabla1')">Tipos De Trabajo Activos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" onclick="mostrarTabla('tabla2')">Incidencias Sin Asignar</a>
+                            <a class="nav-link" onclick="mostrarTabla('tabla2')">Tipos De Trabajo Finalizados</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" onclick="mostrarTabla('tabla3')">Incidencias Finalizadas</a>
+                            <a class="nav-link" href="@Url.Action("CrearTipo", "TiposControlador")">Crear Tipo De Trabajo</a>
                         </li>
                     </ul>
                 </div>
             </nav>
-            <div class="col-12 col-md-12 table-container">
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 table-container">
                 <table id="tabla1" class="table">
-                    <caption class="text-center text-light">Incidencias Propias</caption>
+                    <caption class="text-center text-light">Tipos De Trabajo Activos</caption>
                     <thead>
                         <tr>
-                            <th>Descripcion Del Cliente</th>
-                            <th>Descripcion Tecnica</th>
-                            <th>Horas Acumuladas</th>
-                            <th>Coste Hasta El Momento</th>
-                            <th>Fecha De Inicio</th>
+                            <th>Descripcion Del Tipo</th>
+                            <th>Precio Del Servicio</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(IncidenciaDTO inc in Model.incidenciasMias ){
+                        @foreach(TipoTrabajoDTO t in Model.tiposActivos ){
                         <tr>
-                            <td class="text-center">@inc.DescripcionUsuario</td>
-                             @if (inc.DescripcionTecnica == null || inc.DescripcionTecnica=="")
-                             {
-                            <td class="text-danger text-center">No puso Descripcion Tecnica</td>
-                            }else{
-                            <td class="text-center">@inc.DescripcionTecnica</td>
-                            }
-                            <td class="text-center">@inc.HorasIncidencia</td>
-                            <td class="text-center">@inc.CosteIncidencia</td>
-                            <td class="text-center">@inc.FechaInicio</td>
-                            <td>
-                                <form action="./ControladorFinalizarIncidencia" method="post">
-                                    <input type="hidden" name="id" value="<IdUsuario">
-                                    <input type="hidden" name="idI" value="<Id_incidencia">
-                                    <button type="submit" class="btn btn-info">Finalizar Incidencia</button>
-                                </form>
-
-                                    <a href="https://localhost:7048/ControladorIncidencias/modificarIncidencia?idI=@inc.IdIncidencia">
-                                        <button class="btn btn-info" type="button">Modificar Incidencia</button>
-                                    </a>
-
-                            </td>
-                        </tr>
-                         } 
-                    </tbody>
-                </table>
-
-                <table id="tabla2" class="table" style="display: none;">
-                    <caption class="text-center text-light">Incidencias Sin Asignar</caption>
-                    <thead>
-                        <tr>
-                            <th>Descripcion Del Cliente</th>
-                            <th>Horas Acumuladas</th>
-                            <th>Coste Hasta El Momento</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach(IncidenciaDTO inc in Model.incidenciasSinAsignar){
-                        
-                        <tr>
-                            <td class="text-center">@inc.DescripcionUsuario</td>
-                            <td class="text-center">@inc.HorasIncidencia</td>
-                            <td class="text-center">@inc.CosteIncidencia </td>
-                            <td class="text-center">
-                                <form action="./ControladorAsignarIncidencia" method="post">
-                                    <input type="hidden" name="id" value="<IdUsuario">
-                                    <input type="hidden" name="idI" value="Id_incidencia()">
-                                    <button type="submit" class="btn btn-info">Asignar Incidencia</button>
-                                </form>
-
-                            </td>
+                            <td class="text-center">@t.DescripcionTipo</td>
+                                <td class="text-center">@t.PrecioTipo</td>
+                                <td class="text-center">
+                                    <form asp-controller="TiposControlador" asp-action="FinalizarTipo" method="post" id="form">
+                                        <input type="hidden" name="IdTipo" value="@t.IdTipo>">
+                                        <button class="btn btn-danger" type="submit">Finalizar Tipo De Trabajo</button>
+                                    </form>
+                                </td>
                         </tr>
                         }
                     </tbody>
                 </table>
 
-                <table id="tabla3" class="table" style="display: none;">
-                    <caption class="text-center text-light">Incidencias Finalizadas</caption>
+                <table id="tabla2" class="table" style="display: none;">
+                    <caption class="text-center text-light">Tipos Finalizadas</caption>
                     <thead>
                         <tr>
-                            <th>Descripcion Del Cliente</th>
-                            <th>Descripcion Tecnica</th>
-                            <th>Horas Acumuladas</th>
-                            <th>Coste</th>
-                            <th>Fecha De Inicio</th>
-                            <th>Fecha Fin</th>
-                            <th>Empleado De La Incidencia</th>
+                            <th>Descripcion</th>
+                            <th>Precio Del Servicio</th>
+                            <th>Fecha De Fin De Uso</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(IncidenciaDTO inc in Model.incidenciasFinalizadas){
-                        
                         <tr>
-                            <td class="text-center">@inc.DescripcionUsuario</td>
-                            <td class="text-center">@inc.DescripcionUsuario</td>
-                            <td class="text-center">@inc.HorasIncidencia</td>
-                            <td class="text-center">@inc.CosteIncidencia</td>
-                            <td class="text-center">@inc.FechaInicio</td>
-                            <td class="text-center">@inc.FechaFin</td>
-                            <td class="text-center">@inc.Usuario.Nombre_usuario</td>
-                        </tr>
+                            @foreach(TipoTrabajoDTO t in Model.tiposFinalizados){
+                                <td class="text-center">@t.DescripcionTipo</td>
+                                <td class="text-center">@t.PrecioTipo</td>
+                                <td class="text-center">@t.FechaExpiracion</td>
                             }
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-    <script>
-        function mostrarTabla(tablaId) {
-            // Oculta todas las tablas
-            document.querySelectorAll('table').forEach(function (tabla) {
-                tabla.style.display = 'none';
-            });
-
-            // Muestra la tabla seleccionada
-            document.getElementById(tablaId).style.display = 'table';
-        }
-    </script>
-
-
 
     <script>
         function mostrarTabla(tablaId) {

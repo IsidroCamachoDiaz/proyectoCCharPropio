@@ -79,6 +79,8 @@ namespace proyectoCCharPropio.Controllers
 		[HttpGet]
         public IActionResult Index()
         {
+            HttpContext.Session.Remove("acceso");
+            HttpContext.Session.Remove("usuario");
             Util.EscribirEnElFichero("Se llevo al index");
             return View();
         }
@@ -216,7 +218,9 @@ namespace proyectoCCharPropio.Controllers
             }
 			else
 			{
+				//Ponemos alta a true
 				usuario.Alta_usuario = true;
+				//Actualizamos
 				acciones.ActualizarUsuario(usuario);
                 Util.EscribirEnElFichero("Un usuario hizo el alta correctamente: "+usuario.Nombre_usuario);
                 MostrarAlerta("Confirmado", "Su cuenta ha sido Verificada", "success");

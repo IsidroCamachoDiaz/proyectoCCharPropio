@@ -194,7 +194,7 @@ namespace proyectoCCharPropio.Recursos
 
         public bool ActualizarIncidencia(IncidenciaDTO nuevaIncidencia)
         {
-            return HacerPut($"api/Incidencia/{nuevaIncidencia}", nuevaIncidencia);
+            return HacerPut($"api/Incidencia/{nuevaIncidencia.IdIncidencia}", nuevaIncidencia);
         }
 
         public bool ActualizarSolicitud(SolicitudDTO nuevaSolicitud)

@@ -37,6 +37,14 @@ namespace proyectoCCharPropio.Controllers
 
         }
 
+        public class ModeloModificarIncidencia
+        {
+            public UsuarioDTO Usuario { get; set; }
+
+            public IncidenciaDTO incidenciaModificar { get; set; }
+
+        }
+
         public class ModeloUsuario
         {
             public UsuarioDTO Usuario { get; set; }
@@ -377,6 +385,118 @@ namespace proyectoCCharPropio.Controllers
             else
             {
                 Util.EscribirEnElFichero("Un usuario quizo cambiar una solicitud pero no cambio la descripcion");
+                MostrarAlerta("Es igual", "No modifico la descripcion", "info");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
+
+        }
+
+        [HttpGet]
+        public IActionResult ModificarIncidencia()
+        {
+            //Declaramos loq ue necesitamos
+            UsuarioDTO usuario;
+            accionesCRUD acciones = new accionesCRUD();
+            try
+            {
+                // AQUÍ VA EL CONTROL DE SESIÓN
+                string acceso = String.Empty;
+                acceso = HttpContext.Session.GetString("acceso");
+                if (acceso == null)
+                {
+                    Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index", "RegistroControlador");
+                }
+                string idUsuario = HttpContext.Session.GetString("usuario");
+                usuario = acciones.SeleccionarUsuario(idUsuario);
+                AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
+
+                if (accesoO.CodigoAcceso1 != "Empleado"&& accesoO.CodigoAcceso1 != "Administrador")
+                {
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    Util.EscribirEnElFichero("Un usuario intento modificar una solicitud");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+            }
+            catch (Exception e)
+            {
+                Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                return RedirectToAction("Index", "RegistroControlador");
+            }
+
+            //Cojemos la url entera
+            string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
+            Uri uri = new Uri(urlCompleta);
+            //Cojo el valor del id de la solicitud
+            string idIncidencia = HttpUtility.ParseQueryString(uri.Query)["idI"];
+
+            //Cogemos la solicitud
+            IncidenciaDTO incidenciaModificar = acciones.SeleccionarIncidencia(idIncidencia);
+
+            //Comprobamos si lo encontro
+            if (incidenciaModificar == null)
+            {
+                MostrarAlerta("¡Hubo un problema!", "No se encontro su solicitud", "error");
+                Util.EscribirEnElFichero("Un usuario quizo modificar una solicitud `pero no se encontro");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
+            //Comprobamos si la incidencia es del usuario
+            if (incidenciaModificar.Usuario.Id_usuario != usuario.Id_usuario)
+            {
+                MostrarAlerta("¡Hubo un problema!", "Esta incidencia no le pertenece", "error");
+                Util.EscribirEnElFichero("Un usuario quizo modificar una incidencia pero no le pertence");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
+            //Lo metemos en el modelo
+            var modelo = new ModeloModificarIncidencia
+            {
+                Usuario = usuario,
+                incidenciaModificar=incidenciaModificar
+            };
+
+            Util.EscribirEnElFichero("Se le llevo a modificar incidencia");
+            return View(modelo);
+        }
+
+        [HttpPost]
+        public ActionResult ModificarIncidencia(IncidenciaDTO incidencia)
+        {
+            //Declaramos lo que necesitemos
+            accionesCRUD acciones = new accionesCRUD();
+            bool cambio = false;
+
+            //Comprobamos si escribio algo si no escribio se avisa al usuario
+            if (incidencia.DescripcionTecnica == null || incidencia.DescripcionTecnica == "")
+            {
+                MostrarAlerta("Campo Vacio", "No puso nada en la descripcion", "error");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+            IncidenciaDTO incidenciaBD = acciones.SeleccionarIncidencia(incidencia.IdIncidencia.ToString());
+
+            //Comprobamos si es distinta a la anterior
+            if (incidencia.DescripcionTecnica != incidenciaBD.DescripcionTecnica)
+            {
+                incidenciaBD.DescripcionTecnica = incidencia.DescripcionTecnica;
+                cambio = true;
+            }
+
+            //Comprobamos si cambio los valores
+            if (cambio)
+            {
+                Util.EscribirEnElFichero("Un usuario actualizo una incidencia");
+                acciones.ActualizarIncidencia(incidenciaBD);
+                MostrarAlerta("Incidencia Modificada", "Se ha actualizado la incidencia correctamente", "success");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+            //Si no cambio la descripcion se avisa al usuario
+            else
+            {
+                Util.EscribirEnElFichero("Un usuario quizo cambiar una incidencia pero no cambio la descripcion");
                 MostrarAlerta("Es igual", "No modifico la descripcion", "info");
                 return RedirectToAction("Home", "RegistroControlador");
             }

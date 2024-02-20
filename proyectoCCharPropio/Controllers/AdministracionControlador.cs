@@ -75,9 +75,11 @@ namespace proyectoCCharPropio.Controllers
                 }
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
+                AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
 
-                if (acceso != "3")
+                if (accesoO.CodigoAcceso1 != "Administrador")
                 {
+                    Util.EscribirEnElFichero("Un usuario intento acceder a un lugar que no puede de la web");
                     MostrarAlerta("¡Alerta De Seguridad!", "Usted no tiene acceso para entrar aqui", "error");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
@@ -122,9 +124,11 @@ namespace proyectoCCharPropio.Controllers
                 }
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
+                AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
 
-                if (acceso != "3")
+                if (accesoO.CodigoAcceso1 != "Administrador")
                 {
+                    Util.EscribirEnElFichero("Un usuario intento acceder a un lugar que no puede de la web");
                     MostrarAlerta("¡Alerta De Seguridad!", "Usted no tiene acceso para entrar aqui", "error");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
@@ -181,10 +185,11 @@ namespace proyectoCCharPropio.Controllers
                 }
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
+                AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
 
-                if (acceso != "3")
+                if (accesoO.CodigoAcceso1 != "Administrador")
                 {
-                    Util.EscribirEnElFichero("Unusuario intento acceder a la modficacionde un usuario");
+                    Util.EscribirEnElFichero("Un usuario intento acceder a un lugar que no puede de la web");
                     MostrarAlerta("¡Alerta De Seguridad!", "Usted no tiene acceso para entrar aqui", "error");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
@@ -236,7 +241,7 @@ namespace proyectoCCharPropio.Controllers
             if (impl.eliminarUsuario(usuarioDTO))
             {
                 Util.EscribirEnElFichero("Se booro el usuario: " +usuarioDTO.Nombre_usuario);
-                MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
+                MostrarAlerta("Usuario Eliminado", "Se borro el usuario" + usuarioDTO.Nombre_usuario, "success");
                 return RedirectToAction("AdministracionUsuarios");
             }
             //Si no se pudo se avisa al usuario
@@ -269,7 +274,7 @@ namespace proyectoCCharPropio.Controllers
                 {
                     Util.EscribirEnElFichero("Se intento actualizar un usuario pero no se pudo");
                     MostrarAlerta("No pudimos encontrar el Usuario", "No se encontro al usuario", "error");
-                    return RedirectToAction("Index", "RegistroControlador");
+                    return RedirectToAction("Home", "RegistroControlador");
                 }
 
                 //Comprobamos si alguna campo es distinto con los modificados
@@ -289,7 +294,7 @@ namespace proyectoCCharPropio.Controllers
                         {
                             Util.EscribirEnElFichero("Se intento cambiar el acceso de un usuario pero no se pudo");
                             MostrarAlerta("Error De Acceso", "El usuario tiene asignados solicitudes o incidencias y no se puede asignar el acceso", "error");
-                            return RedirectToAction("Index", "RegistroControlador");
+                            return RedirectToAction("Home", "RegistroControlador");
                         }
                     }
                     //Cambiamos lo campos y ponemos a true el cambio
@@ -314,13 +319,14 @@ namespace proyectoCCharPropio.Controllers
                     acciones.ActualizarUsuario(usuarioCambiar);
                     Util.EscribirEnElFichero("Se actualizo el usuario: "+usuarioCambiar.Nombre_usuario);
                     MostrarAlerta("Se cambiio el usuario Correctamente", "Se modifico correctamente el usuario " + usuarioCambiar.Nombre_usuario, "success");
-                    return RedirectToAction("Index", "RegistroControlador");
+                    return RedirectToAction("Home", "RegistroControlador");
                 }
                 // Si no ha cambiado se le avisa
                 else
                 {
                     Util.EscribirEnElFichero("Se intento actualizar un usuario pero no se pudo");
                     MostrarAlerta("Campos Iguales", "No hizo ninguna modificacion", "warning");
+                    return RedirectToAction("Home", "RegistroControlador");
                 }
             }
             catch (Exception e)
