@@ -1,5 +1,5 @@
 ﻿@using proyectoCCharPropio.DTOS;
-@model proyectoCCharPropio.Controllers.TiposControlador.ModeloMostrarTipos;
+@model proyectoCCharPropio.Controllers.TrabajoControlador.ModeloMostrarTrabajos;
 @{
     ViewData["Title"] = "Inicio de sesión - Registrar Usuario - Recupera contraseña";
 }
@@ -106,79 +106,91 @@
     <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="/img/hero.jpg">
         <form class="d-flex tm-search-form">
             <div class="user-info-container2 d-flex align-items-center">
-                <h2 class="text-white">Tipos de Trabajo</h2>
+                <h2 class="text-white">Trabajos De @Model.Usuario.Nombre_usuario</h2>
             </div>
         </form>
     </div>
 
     <div class="container-fluid">
-        <div class="row">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container">
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" onclick="mostrarTabla('tabla1')">Tipos De Trabajo Activos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" onclick="mostrarTabla('tabla2')">Tipos De Trabajo Finalizados</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("CrearTipo", "TiposControlador")">Crear Tipo De Trabajo</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-
         <div class="row justify-content-center">
-            <div class="col-12 col-md-8 table-container">
-                <table id="tabla1" class="table">
-                    <caption class="text-center text-light">Tipos De Trabajo Activos</caption>
+
+            <div class="col-12 col-md-12 table-container">
+                @foreach(IncidenciaDTO incidencia in Model.incidencias) {
+                <table class="table">
+                    <caption class="text-center text-light">
+                        Incidencia
+                        @if (incidencia.DescripcionTecnica == null || incidencia.DescripcionTecnica=="")
+                        {
+                            <p>No puso Descripcion Tecnica</p>
+                        }
+                        else
+                        {
+                            <p>@incidencia.DescripcionTecnica</p>
+                        }
+                    </caption>
                     <thead>
                         <tr>
-                            <th>Descripcion Del Tipo</th>
-                            <th>Precio Del Servicio</th>
+                            <th>Descripcion Del Trabajo</th>
+                            <th>Horas Del Trabajo</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(TipoTrabajoDTO t in Model.tiposActivos ){
-                        <tr>
-                            <td class="text-center">@t.DescripcionTipo</td>
-                                <td class="text-center">@t.PrecioTipo</td>
-                                <td class="text-center">
-                                    <form asp-controller="TiposControlador" asp-action="FinalizarTipo" method="post" id="form">
-                                        <input type="hidden" name="IdTipo" value="@t.IdTipo>">
-                                        <button class="btn btn-danger" type="submit">Finalizar Tipo De Trabajo</button>
-                                    </form>
-                                </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
+                        
+                     @if(incidencia.Trabajos==null||incidencia.Trabajos.Count==0){
+                        
+                    <td colspan="4" class="text-center">No hay Ningun Trabajo Asignado</td>
+                    
+                    }
+                    else{
+                      foreach(TrabajoDTO t in incidencia.Trabajos){
+                        string estado="En Proceso";
 
-                <table id="tabla2" class="table" style="display: none;">
-                    <caption class="text-center text-light">Tipos Finalizadas</caption>
-                    <thead>
-                        <tr>
-                            <th>Descripcion</th>
-                            <th>Precio Del Servicio</th>
-                            <th>Fecha De Fin De Uso</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            @foreach(TipoTrabajoDTO t in Model.tiposFinalizados){
-                                <td class="text-center">@t.DescripcionTipo</td>
-                                <td class="text-center">@t.PrecioTipo</td>
-                                <td class="text-center">@t.FechaExpiracion</td>
+                        if(t.EstadoTrabajo==true){
+                        estado="Termindado";
+                        }
+                    
+                    <tr>
+                        <td class="text-center">@t.DescripcionTrabajo</td>
+                        <td class="text-center">@t.HorasTrabajo</td>
+                        <td class="text-center">@estado</td>
+                        <td class="text-center">                           
+                           @if(t.EstadoTrabajo==true){                                                     
+                              <p>Finalizo</p>
                             }
-                        </tr>
+                            else{
+                            
+                            <form action="../ControladorFinalizarTrabajo" method="post" id="formulario">
+                                <input type="hidden" name="idT" value="@t.IdTrabajo">
+                                <button class="btn btn-success text-center" type="submit">Finalizar Trabajo</button>
+                            </form>
+                            }
+                       </td>
+                    </tr>
+                    
+                    }    
+                    }
                     </tbody>
                 </table>
+                }
             </div>
         </div>
     </div>
+
+    <script>
+        function mostrarTabla(tablaId) {
+            // Oculta todas las tablas
+            document.querySelectorAll('table').forEach(function (tabla) {
+                tabla.style.display = 'none';
+            });
+
+            // Muestra la tabla seleccionada
+            document.getElementById(tablaId).style.display = 'table';
+        }
+    </script>
+
+
 
     <script>
         function mostrarTabla(tablaId) {

@@ -11,15 +11,14 @@ using static proyectoCCharPropio.Controllers.RegistroControlador;
 namespace proyectoCCharPropio.Controllers
 {
     [Controller]
-    public class TiposControlador : Controller
+    public class TrabajoControlador : Controller
     {
         //Modelo de administracion
-        public class ModeloMostrarTipos
+        public class ModeloMostrarTrabajos
         {
             public UsuarioDTO Usuario { get; set; }
 
-            public List<TipoTrabajoDTO> tiposActivos { get; set; }
-            public List<TipoTrabajoDTO> tiposFinalizados{ get; set; }
+            public List<IncidenciaDTO> incidencias { get; set; }
         }
 
 
@@ -91,7 +90,7 @@ namespace proyectoCCharPropio.Controllers
 
 
         [HttpGet]
-        public IActionResult ListaTipos()
+        public IActionResult ListaTrabajos()
         {
             //Declaramos lo que necesitemos
             UsuarioDTO usuario;
@@ -124,26 +123,35 @@ namespace proyectoCCharPropio.Controllers
                 MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
                 return RedirectToAction("Index", "RegistroControlador");
             }
-            //Cogemos todos los tipos
-            List<TipoTrabajoDTO> tipos = acciones.HacerGetLista<TipoTrabajoDTO>("api/TiposIncidencia");
 
-            //Filtramos por los finalizados y activos
-            List <TipoTrabajoDTO> tiposActivos=tipos.Where(x=>x.FechaExpiracion==null).ToList();
+            //Cogemos las incidencias y los trabajos
+            List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
+            List <TrabajoDTO> trabajos= acciones.HacerGetLista<TrabajoDTO>("api/Trabajo");
 
-            List<TipoTrabajoDTO> tiposFinalizados = tipos.Where(x => x.FechaExpiracion != null).ToList();
+            //Filtramos por las incidencias del usuario
+            incidencias=incidencias.Where(x=>x.Usuario!=null).Where(x=>x.Usuario.Id_usuario==usuario.Id_usuario).Where(x=>x.EstadoIncidencia==false).ToList();
 
-
-
+            //Filtramos por cada incidencia sus trabajos
+            foreach(IncidenciaDTO incidencia in incidencias)
+            {
+                foreach (TrabajoDTO t in trabajos)
+                {
+                    if (t.incidencia.IdIncidencia == incidencia.IdIncidencia)
+                    {
+                        incidencia.Trabajos.Add(t);
+                    }
+                }
+            }
+            
             //Metemos todo en el modelo
-            var modelo = new ModeloMostrarTipos
+            var modelo = new ModeloMostrarTrabajos
             {
                 Usuario=usuario,
-                tiposActivos=tiposActivos,
-                tiposFinalizados=tiposFinalizados
+                incidencias= incidencias,
 
             };
 
-            Util.EscribirEnElFichero("Se le llevo a mostrar tipos de trabajo");
+            Util.EscribirEnElFichero("Se le llevo a mostrar trabajos");
             return View(modelo);
         }
 

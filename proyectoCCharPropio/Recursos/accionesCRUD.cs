@@ -94,7 +94,7 @@ namespace proyectoCCharPropio.Recursos
 
         public bool InsertarTipoDeTrabajo(TipoTrabajoDTO nuevoTipoTrabajo)
         {
-            return HacerPost("api/TipoIncidencia", nuevoTipoTrabajo);
+            return HacerPost("api/TiposIncidencia", nuevoTipoTrabajo);
         }
 
         public bool InsertarToken(TokenDTO nuevoToken)
