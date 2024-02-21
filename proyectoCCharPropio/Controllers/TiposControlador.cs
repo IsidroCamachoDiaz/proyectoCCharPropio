@@ -151,7 +151,7 @@ namespace proyectoCCharPropio.Controllers
 
 
         [HttpPost]
-        public ActionResult FinalizarTipo(TipoTrabajoDTO tipoDTO)
+        public ActionResult FinalizarTipo(string tipoDTON)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace proyectoCCharPropio.Controllers
                 accionesCRUD acciones = new accionesCRUD();
 
                 //Cogemos el tipo de la base de datos
-                tipoDTO = acciones.SeleccionarTipoDeTrabajo(tipoDTO.IdTipo.ToString());
+                TipoTrabajoDTO tipoDTO = acciones.SeleccionarTipoDeTrabajo(tipoDTON.ToString());
 
                 //Le asignamos la fecha
                 tipoDTO.FechaExpiracion = DateTime.Now;

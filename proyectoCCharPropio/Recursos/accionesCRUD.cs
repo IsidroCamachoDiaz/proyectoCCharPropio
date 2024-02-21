@@ -36,7 +36,7 @@ namespace proyectoCCharPropio.Recursos
 
         public TipoTrabajoDTO SeleccionarTipoDeTrabajo(string queDar)
         {
-            return HacerGet<TipoTrabajoDTO>("api/TipoIncidencia/" + queDar);
+            return HacerGet<TipoTrabajoDTO>("api/TiposIncidencia/" + queDar);
         }
 
         public TokenDTO SeleccionarToken(string queDar)
@@ -204,7 +204,7 @@ namespace proyectoCCharPropio.Recursos
 
         public bool ActualizarTipoDeTrabajo(TipoTrabajoDTO nuevoTipoTrabajo)
         {
-            return HacerPut("api/TipoIncidencia/", nuevoTipoTrabajo);
+            return HacerPut("api/TiposIncidencia/"+nuevoTipoTrabajo.IdTipo, nuevoTipoTrabajo);
         }
 
         public bool ActualizarTrabajo(TrabajoDTO nuevoTrabajo)

@@ -114,8 +114,9 @@
     <div class="container-fluid">
         <div class="row justify-content-center">
 
-            <div class="col-12 col-md-12 table-container">
+           
                 @foreach(IncidenciaDTO incidencia in Model.incidencias) {
+                <div class="col-12 col-md-12 ">
                 <table class="table">
                     <caption class="text-center text-light">
                         Incidencia
@@ -173,8 +174,12 @@
                     }
                     </tbody>
                 </table>
-                }
-            </div>
+                    <a href="https://localhost:7048/TrabajoControlador/crearTrabajo?idI=@incidencia.IdIncidencia">
+                        <button class="btn btn-info" type="button">Crear Trabajo</button>
+                    </a>
+                    
+                </div>
+                }          
         </div>
     </div>
 

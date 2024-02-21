@@ -365,12 +365,23 @@ namespace proyectoCCharPropio.Controllers
             }
             SolicitudDTO solicitudBD = acciones.SeleccionarSolicitud(solicitud.IdSolicitud2.ToString());
 
+            List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incincia");
+
             //Comprobamos si es distinta a la anterior
             if (solicitud.DescripcionSolicitud2 != solicitudBD.DescripcionSolicitud2)
             {
                 solicitudBD.DescripcionSolicitud2 = solicitud.DescripcionSolicitud2;
-                solicitudBD.Incidencia2.DescripcionUsuario = solicitud.DescripcionSolicitud2;
-                cambio = true;
+
+                foreach(IncidenciaDTO inc in incidencias)
+                {
+                    if (inc.solicitud.IdSolicitud2 == solicitudBD.IdSolicitud2)
+                    {
+                        inc.DescripcionUsuario= solicitud.DescripcionSolicitud2;
+                        acciones.ActualizarIncidencia(inc);
+                        cambio = true;
+                    }
+                }
+               
             }
 
             //Comprobamos si cambio los valores

@@ -20,6 +20,15 @@ namespace proyectoCCharPropio.Controllers
 
             public List<IncidenciaDTO> incidencias { get; set; }
         }
+        public class ModeloCrearTrabajo
+        {
+            public UsuarioDTO Usuario { get; set; }
+
+            public List<TipoTrabajoDTO> tipos {get;set;}
+
+            public IncidenciaDTO incidencia { get; set; }
+        }
+
 
 
         //Metodo Para Mostrar Alerta
@@ -42,7 +51,7 @@ namespace proyectoCCharPropio.Controllers
         }
 
         [HttpGet]
-        public IActionResult CrearTipo()
+        public IActionResult CrearTrabajo()
         {
             //Declaramos lo que necesitemos
             UsuarioDTO usuario;
@@ -77,13 +86,27 @@ namespace proyectoCCharPropio.Controllers
                 return RedirectToAction("Home", "RegistroControlador");
             }
 
-            //Metemos en el modelo el usuario
-            var modelo = new ModeloUsuario
+            //Cojemos la url entera
+            string urlCompleta = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}{HttpContext.Request.QueryString}";
+            Uri uri = new Uri(urlCompleta);
+            //Cojo el valor del id de la incidencia
+            string idSincidencia = HttpUtility.ParseQueryString(uri.Query)["idI"];
+
+            IncidenciaDTO incidencia=acciones.SeleccionarIncidencia(idSincidencia);
+
+            //Filtramos por las activas
+            List<TipoTrabajoDTO> tipos = acciones.HacerGetLista<TipoTrabajoDTO>("api/TiposIncidencia");
+            tipos=tipos.Where(x=>x.FechaExpiracion==null).ToList();
+
+            //Metemos en el modelo de creacion de trabajo
+            var modelo = new ModeloCrearTrabajo
             {
                 Usuario = usuario,
+                tipos = tipos,
+                incidencia = incidencia                                       
             };
 
-            Util.EscribirEnElFichero("Se le llevo a crear tipo de trabajo");
+            Util.EscribirEnElFichero("Se le llevo a crear trabajo");
             return View(modelo);
         }
 
@@ -155,42 +178,61 @@ namespace proyectoCCharPropio.Controllers
             return View(modelo);
         }
 
-       
-
 
         [HttpPost]
-        public ActionResult FinalizarTipo(TipoTrabajoDTO tipoDTO)
+        public ActionResult CrearTrabajo(TrabajoDTO trabajo,string id_tipo,string id_incidencia)
         {
             try
-            {
-                //Declaramos lo que encesitemos
+            {   
                 accionesCRUD acciones = new accionesCRUD();
 
-                //Cogemos el tipo de la base de datos
-                tipoDTO = acciones.SeleccionarTipoDeTrabajo(tipoDTO.IdTipo.ToString());
-
-                //Le asignamos la fecha
-                tipoDTO.FechaExpiracion = DateTime.Now;
-
-                //Usamos el metodo para actualizar
-                if (acciones.ActualizarTipoDeTrabajo(tipoDTO))
+                IncidenciaDTO inc = acciones.SeleccionarIncidencia(id_incidencia);
+                TipoTrabajoDTO tipo = acciones.SeleccionarTipoDeTrabajo(id_tipo);
+                //Comprobamos que no haya valores nulos
+                if (trabajo.DescripcionTrabajo==null|| trabajo.DescripcionTrabajo==""|| trabajo.HorasTrabajo==0
+                   ||inc==null||tipo==null )
                 {
-                    Util.EscribirEnElFichero("Se finalizo un tipo de trabajo");
-                    MostrarAlerta("Tipo Finalizado", "El tipo de trabajo se finalizo correctamente", "success");
+                    MostrarAlerta("Valores vacios","No puso todos los campos", "error");
+                    Util.EscribirEnElFichero("Un usuario quiso crear un trabajo pero puso valores nulos");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
-                //Si no se pudo se avisa al usuario
-                else
+
+                //Asignamos los objetos y el estado
+                trabajo.incidencia = inc;
+                trabajo.tipo = tipo;
+                trabajo.EstadoTrabajo = false;
+
+                //Declaramos la implementacion
+                implementacionTrabajo impl = new implementacionTrabajo();
+
+                try
                 {
-                    Util.EscribirEnElFichero("Se intento finalizar un tipo pero no se pudo");
-                    MostrarAlerta("Error", "No se pudo finalizar el tipo de trabajo", "error");
+                    //Comprobamos si se creo bien el trabajo
+                    if (impl.crearTrabajo(trabajo))
+                    {
+                        MostrarAlerta("Tipo Creado", "El trabajo se creo correctamente", "success");
+                        Util.EscribirEnElFichero("Un usuario creo un trabajo");
+                        return RedirectToAction("Home", "RegistroControlador");
+                    }
+                    //Si no se creo bien avisamos al usuario
+                    else
+                    {
+                        MostrarAlerta("No se pudo crear", "No se pudo crear el  trabajo", "error");
+                        Util.EscribirEnElFichero("Un usuario quiso crear  trabajo pero no se pudo insertar");
+                        return RedirectToAction("Home", "RegistroControlador");
+                    }
+                }
+                catch (IOException e)
+                {
+                    MostrarAlerta("Hubo un error", "Hubo un error intentelo de nuevo mas tarde", "error");
+                    Util.EscribirEnElFichero("Hubo un error en crear trabajo " + e.Message);
                     return RedirectToAction("Home", "RegistroControlador");
                 }
 
             }
             catch (Exception e)
             {
-                Util.EscribirEnElFichero("Hubo un error en Finalizar tupo de trabajo " + e.Message);
+                Util.EscribirEnElFichero("Hubo un error en crear trabajo " + e.Message);
                 try
                 {
                     return RedirectToAction("Home", "RegistroControlador");
@@ -200,53 +242,60 @@ namespace proyectoCCharPropio.Controllers
                 }
             }
             return RedirectToAction("Home", "RegistroControlador");
+
         }
 
         [HttpPost]
-        public ActionResult CrearTipo(TipoTrabajoDTO tipoDTO)
+        public ActionResult FinalizarTrabajo(TrabajoDTO trabajo)
         {
             try
             {
+                accionesCRUD acciones = new accionesCRUD();
+
+                trabajo = acciones.SeleccionarTrabajo(trabajo.IdTrabajo.ToString());
+
+
                 //Comprobamos que no haya valores nulos
-                if (tipoDTO.DescripcionTipo == null || tipoDTO.DescripcionTipo=="" || tipoDTO.PrecioTipo == null || tipoDTO.PrecioTipo == 0)
+                if (true)
                 {
-                    MostrarAlerta("Valores vacios","No puso todos los campos", "error");
-                    Util.EscribirEnElFichero("Un usuario quiso crear un tipo de trabajo pero puso valores nulos");
+                    MostrarAlerta("Valores vacios", "No puso todos los campos", "error");
+                    Util.EscribirEnElFichero("Un usuario quiso crear un trabajo pero puso valores nulos");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
 
 
+
                 //Declaramos la implementacion
-                implementaciontipos impl = new implementaciontipos();
+                implementacionTrabajo impl = new implementacionTrabajo();
 
                 try
                 {
-                    //Comprobamos si se creo bien la incidencia
-                    if (impl.CrearTipo(tipoDTO))
+                    //Comprobamos si se creo bien el trabajo
+                    if (impl.crearTrabajo(trabajo))
                     {
-                        MostrarAlerta("Tipo Creado", "El tipo de trabajo se creo correctamente", "success");
-                        Util.EscribirEnElFichero("Un usuario creo un tipo de trabajo");
+                        MostrarAlerta("Tipo Creado", "El trabajo se creo correctamente", "success");
+                        Util.EscribirEnElFichero("Un usuario creo un trabajo");
                         return RedirectToAction("Home", "RegistroControlador");
                     }
                     //Si no se creo bien avisamos al usuario
                     else
                     {
-                        MostrarAlerta("No se pudo crear", "No se pudo crear el tipo de trabajo", "error");
-                        Util.EscribirEnElFichero("Un usuario quiso crear un tipo de trabajo pero no se pudo insertar");
+                        MostrarAlerta("No se pudo crear", "No se pudo crear el  trabajo", "error");
+                        Util.EscribirEnElFichero("Un usuario quiso crear  trabajo pero no se pudo insertar");
                         return RedirectToAction("Home", "RegistroControlador");
                     }
                 }
                 catch (IOException e)
                 {
                     MostrarAlerta("Hubo un error", "Hubo un error intentelo de nuevo mas tarde", "error");
-                    Util.EscribirEnElFichero("Hubo un error en crear tipo de trabajo " + e.Message);
+                    Util.EscribirEnElFichero("Hubo un error en crear trabajo " + e.Message);
                     return RedirectToAction("Home", "RegistroControlador");
                 }
 
             }
             catch (Exception e)
             {
-                Util.EscribirEnElFichero("Hubo un error en crear tipo de trabajo " + e.Message);
+                Util.EscribirEnElFichero("Hubo un error en crear trabajo " + e.Message);
                 try
                 {
                     return RedirectToAction("Home", "RegistroControlador");

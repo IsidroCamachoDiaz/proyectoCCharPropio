@@ -45,11 +45,6 @@ namespace proyectoCCharPropio.DTOS
         [JsonProperty("IdUsuario")]
         private int idUsuarioNumero { get; set; }
 
-        /// <summary>
-        /// Incidencia asociada a la solicitud.
-        /// </summary>
-        [JsonProperty("Incidencia")]
-        private IncidenciaDTO incidencia;
 
         /// <summary>
         /// Identificador de la solicitud.
@@ -76,10 +71,6 @@ namespace proyectoCCharPropio.DTOS
         /// </summary>
         public UsuarioDTO IdUsuario2 { get => idUsuario; set => idUsuario = value; }
 
-        /// <summary>
-        /// Incidencia asociada a la solicitud.
-        /// </summary>
-        public IncidenciaDTO Incidencia2 { get => incidencia; set => incidencia = value; }
 
         /// <summary>
         /// Constructor para crear un objeto SolicitudDTO con todos los atributos.
@@ -90,14 +81,13 @@ namespace proyectoCCharPropio.DTOS
         /// <param name="fechaLimite">Fecha límite de la solicitud.</param>
         /// <param name="idUsuario">Usuario asociado a la solicitud.</param>
         /// <param name="incidencia">Incidencia asociada a la solicitud.</param>
-        public SolicitudDTO(int idSolicitud, string descripcionSolicitud, bool estado, DateTime fechaLimite, UsuarioDTO idUsuario, IncidenciaDTO incidencia)
+        public SolicitudDTO(int idSolicitud, string descripcionSolicitud, bool estado, DateTime fechaLimite, UsuarioDTO idUsuario)
         {
             IdSolicitud2 = idSolicitud;
             DescripcionSolicitud2 = descripcionSolicitud;
             Estado2 = estado;
             FechaLimite2 = fechaLimite;
             IdUsuario2 = idUsuario;
-            Incidencia2 = incidencia;
         }
 
         /// <summary>

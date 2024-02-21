@@ -10,7 +10,8 @@ namespace proyectoCCharPropio.Servicios
         {
             accionesCRUD acciones = new accionesCRUD();
             IncidenciaDTO inc=new IncidenciaDTO(solicitud.DescripcionSolicitud2,solicitud.Estado2,solicitud);
-            solicitud.Incidencia2 = inc;
+            inc.solicitud = solicitud;
+            acciones.InsertarIncidencia(inc);
             return acciones.InsertarSolicitud(solicitud);
         }
     }
