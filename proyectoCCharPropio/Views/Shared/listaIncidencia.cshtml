@@ -189,9 +189,9 @@
                             <td class="text-center">@inc.HorasIncidencia</td>
                             <td class="text-center">@inc.CosteIncidencia </td>
                             <td class="text-center">
-                                <form action="./ControladorAsignarIncidencia" method="post">
-                                    <input type="hidden" name="id" value="<IdUsuario">
-                                    <input type="hidden" name="idI" value="Id_incidencia()">
+                                    <form asp-controller="ControladorIncidencias" asp-action="AsignarIncidencia" method="post">
+                                    <input type="hidden" name="id" value="@Model.Usuario.Id_usuario">
+                                    <input type="hidden" name="idI" value="@inc.IdIncidencia">
                                     <button type="submit" class="btn btn-info">Asignar Incidencia</button>
                                 </form>
 

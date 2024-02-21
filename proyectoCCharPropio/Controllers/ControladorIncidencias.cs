@@ -85,6 +85,12 @@ namespace proyectoCCharPropio.Controllers
                 acceso = HttpContext.Session.GetString("acceso");
                 string idUsuario = HttpContext.Session.GetString("usuario");
                 usuario = acciones.SeleccionarUsuario(idUsuario);
+                if (usuario == null)
+                {
+                    Util.EscribirEnElFichero("Una persona que no estaba registrada intento acceder");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    return RedirectToAction("Index", "RegistroControlador");
+                }
                 AccesoDTO accesoO = acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
 
                 if (accesoO.CodigoAcceso1!="Usuario")
@@ -365,7 +371,7 @@ namespace proyectoCCharPropio.Controllers
             }
             SolicitudDTO solicitudBD = acciones.SeleccionarSolicitud(solicitud.IdSolicitud2.ToString());
 
-            List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incincia");
+            List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
 
             //Comprobamos si es distinta a la anterior
             if (solicitud.DescripcionSolicitud2 != solicitudBD.DescripcionSolicitud2)
@@ -514,6 +520,42 @@ namespace proyectoCCharPropio.Controllers
 
 
         }
+        [HttpPost]
+        public ActionResult AsignarIncidencia(string id,string idI)  
+        {
+            //Declaramos lo que necesitemos
+            accionesCRUD acciones = new accionesCRUD();
+
+            //Cogemos los valores del formulario y los buscamos en al  bd
+            IncidenciaDTO incidenciaBD = acciones.SeleccionarIncidencia(idI);
+            UsuarioDTO usuarioBD = acciones.SeleccionarUsuario(id);    
+
+            //Comprobamos si  se encontro
+            if (incidenciaBD==null|usuarioBD==null)
+            {
+                MostrarAlerta("No se Encontro", "No se encontro el usuario o la incidencia", "error");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
+            incidenciaBD.Usuario = usuarioBD;
+            //Comprobamos si cambio los valores
+            if (acciones.ActualizarIncidencia(incidenciaBD))
+            {
+                Util.EscribirEnElFichero("Un usuario se asigno una incidencia");
+                MostrarAlerta("Incidencia Modificada", "Se ha actualizado la incidencia correctamente", "success");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+            //Si no cambio la descripcion se avisa al usuario
+            else
+            {
+                Util.EscribirEnElFichero("Un usuario quizo asignarse una incidencia pero no se pudo actualizar");
+                MostrarAlerta("No Se Asigno", "No se pudo asignar la incidencia", "error");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
+
+        }
+
 
     }
 }
