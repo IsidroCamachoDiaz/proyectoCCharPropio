@@ -71,6 +71,9 @@ namespace proyectoCCharPropio.DTOS
         [JsonProperty("IdSolicitudNavigation")]
         public SolicitudDTO solicitud;
 
+        /// <summary>
+        /// Lista de trabajo que tiene la incidencia la usamos como auxiliar
+        /// </summary>
         [JsonIgnore]
         public ICollection<TrabajoDTO> Trabajos { get; set; } = new List<TrabajoDTO>();
 

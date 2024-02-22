@@ -106,7 +106,7 @@ namespace proyectoCCharPropio.Controllers
                 MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
                 return RedirectToAction("Index");
             }
-
+			//Cojo el id usuario de la seion y buscamos el usuario en la base de datos
             string idUsuario = HttpContext.Session.GetString("usuario");
 			accionesCRUD acciones =new accionesCRUD();
 			UsuarioDTO usuario = acciones.SeleccionarUsuario(idUsuario);
@@ -172,6 +172,7 @@ namespace proyectoCCharPropio.Controllers
             }
             Util.EscribirEnElFichero("Se le llevo al home");
 
+			//Cogemos el acceso de la base de datos
 			AccesoDTO accesoO=acciones.SeleccionarAcceso(usuario.Id_acceso.ToString());
 
             var modelo = new ModeloHome
@@ -227,6 +228,8 @@ namespace proyectoCCharPropio.Controllers
 				//Borramos el token para que no se vuelva a usar
 				acciones.EliminarToken(token.Id_usuario.ToString());
 			}
+
+            Util.EscribirEnElFichero("Se le llevo al alta de usuario");
 
             return View();
         }

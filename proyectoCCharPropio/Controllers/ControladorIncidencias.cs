@@ -13,6 +13,7 @@ namespace proyectoCCharPropio.Controllers
     [Controller]
     public class ControladorIncidencias : Controller
     {
+        //Modelo de la lista de solicitudes
         public class ModeloIncidencias
         {   
             public UsuarioDTO Usuario { get; set; }
@@ -21,6 +22,7 @@ namespace proyectoCCharPropio.Controllers
             public List<SolicitudDTO> ListaSolicitudesPendientes { get; set; }
         }
 
+        //Modelo de lista de incidencias
         public class ModeloPanelIncidencias
         {
             public UsuarioDTO Usuario { get; set; }
@@ -30,6 +32,7 @@ namespace proyectoCCharPropio.Controllers
             public List<IncidenciaDTO> incidenciasFinalizadas { get; set; }
         }
 
+        //Modelo de modificar solicitud
         public class ModeloIncidenciasModificar
         {
             public UsuarioDTO Usuario { get; set; }
@@ -38,6 +41,7 @@ namespace proyectoCCharPropio.Controllers
 
         }
 
+        //Modelo de modificar incidencia
         public class ModeloModificarIncidencia
         {
             public UsuarioDTO Usuario { get; set; }
@@ -46,6 +50,7 @@ namespace proyectoCCharPropio.Controllers
 
         }
 
+        //Modelo de usuario
         public class ModeloUsuario
         {
             public UsuarioDTO Usuario { get; set; }
@@ -96,7 +101,7 @@ namespace proyectoCCharPropio.Controllers
 
                 if (accesoO.CodigoAcceso1!="Usuario")
                 {
-                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted no puede acceder este lugar de la web", "error");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
             }
@@ -152,7 +157,7 @@ namespace proyectoCCharPropio.Controllers
                 if (accesoO.CodigoAcceso1 != "Empleado"&& accesoO.CodigoAcceso1 != "Administrador")
                 {
                     Util.EscribirEnElFichero("Un usuario intento acceder a las incidencias");
-                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted no puede acceder este lugar de la web", "error");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
             }
@@ -198,7 +203,7 @@ namespace proyectoCCharPropio.Controllers
 
              };
 
-            Util.EscribirEnElFichero("Se le llevo a mostar las incidencias");
+            Util.EscribirEnElFichero("Se le llevo a mostrar las incidencias");
             return View(modelo);
         }
 
@@ -225,7 +230,7 @@ namespace proyectoCCharPropio.Controllers
 
                 if (accesoO.CodigoAcceso1 != "Usuario")
                 {
-                    MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
+                    MostrarAlerta("¡Alerta De Seguridad!", "Usted no puede acceder a este lugar de la web", "error");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
             }
@@ -249,6 +254,15 @@ namespace proyectoCCharPropio.Controllers
             if (solicitudModificar == null)
             {
                 MostrarAlerta("¡Hubo un problema!", "No se encontro su solicitud", "error");
+                Util.EscribirEnElFichero("Intento acceder a modificar solicitud pero no se encontro");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
+            //Comprobamos si es suya la solicitud
+            if(solicitudModificar.IdUsuario2==null|| solicitudModificar.IdUsuario2.Id_usuario != usuario.Id_usuario)
+            {
+                MostrarAlerta("¡Hubo un problema!", "Esta solicitud no le pertenece", "error");
+                Util.EscribirEnElFichero("Intento acceder a modificar solicitud pero no le pertenece");
                 return RedirectToAction("Home", "RegistroControlador");
             }
 
@@ -477,7 +491,7 @@ namespace proyectoCCharPropio.Controllers
             }
 
             //Comprobamos si la incidencia es del usuario
-            if (incidenciaModificar.Usuario.Id_usuario != usuario.Id_usuario)
+            if (incidenciaModificar.Usuario==null || incidenciaModificar.Usuario.Id_usuario != usuario.Id_usuario)
             {
                 MostrarAlerta("¡Hubo un problema!", "Esta incidencia no le pertenece", "error");
                 Util.EscribirEnElFichero("Un usuario quizo modificar una incidencia pero no le pertence");

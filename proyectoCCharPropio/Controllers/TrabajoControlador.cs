@@ -20,6 +20,8 @@ namespace proyectoCCharPropio.Controllers
 
             public List<IncidenciaDTO> incidencias { get; set; }
         }
+
+        //Modelo de crear ek trabajo
         public class ModeloCrearTrabajo
         {
             public UsuarioDTO Usuario { get; set; }
@@ -93,6 +95,14 @@ namespace proyectoCCharPropio.Controllers
             string idSincidencia = HttpUtility.ParseQueryString(uri.Query)["idI"];
 
             IncidenciaDTO incidencia=acciones.SeleccionarIncidencia(idSincidencia);
+
+            //Comprobamos si lo encontro
+            if (incidencia == null)
+            {
+                Util.EscribirEnElFichero("Se intento acceder a crear trabajo pero no se encontro la incidencia");
+                MostrarAlerta("¡Hubo Un Error!", "No se encontro la incidencia", "error");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
 
             //Filtramos por las activas
             List<TipoTrabajoDTO> tipos = acciones.HacerGetLista<TipoTrabajoDTO>("api/TiposIncidencia");

@@ -213,6 +213,14 @@ namespace proyectoCCharPropio.Controllers
             //Cogemos el usuario que queremos modificar
             UsuarioDTO usuarioModificar = acciones.SeleccionarUsuario(idUsuarioModificar);
 
+            //Comprobamos si lo encontro
+            if (usuarioModificar == null)
+            {
+                Util.EscribirEnElFichero("Se intento acceder a modificar usuario pero no se encontro");
+                MostrarAlerta("¡Hubo Un Error!", "No se encontro el usuario", "error");
+                return RedirectToAction("Home", "RegistroControlador");
+            }
+
             //Cogemos todos los accesos
             List<AccesoDTO> accesos = acciones.HacerGetLista<AccesoDTO>("api/Acceso");
 
@@ -386,6 +394,7 @@ namespace proyectoCCharPropio.Controllers
                     Util.EscribirEnElFichero("Se creo un usuario: "+usuarioDTO.Nombre_usuario);
                     MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
                 }
+                //Si no se crea bien se avisa al usuario
                 else
                 {
                     Util.EscribirEnElFichero("Se intento crear un usuario pero hubo un error en la creacion");
