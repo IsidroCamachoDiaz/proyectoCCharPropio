@@ -126,8 +126,8 @@
                         </div>
                         <!-- Campo de precio -->
                         <div class="form-group">
-                            <label for="precio">Precio Del Servicio:</label>
-                            <input type="number" class="form-control" id="precio" name="PrecioTipo" required step="any">
+                            <label for="precio">Precio Del Servicio:</label>            
+                            <input type="number" class="form-control" id="precio" name="PrecioTipo" required step="any" oninput="validarDecimal(this)" pattern="\d+(\.\d{1,2})?">
                         </div>
 
                         <div class="mb-4 text-center" style="margin-top:10px;">
@@ -178,6 +178,26 @@
             } else {
                 // El formulario no ha sido modificado, no se muestra la alerta
                 document.getElementById("formulario").submit();
+            }
+        }
+    </script>
+    <script>
+        //Funcion para comprobar que meta 2 decimales
+        function validarDecimal(input) {
+            var valor = input.value;
+            if (valor !== "") {
+                if (!isNaN(valor)) {
+                    var partes = valor.split(".");
+                    if (partes.length === 2 && partes[1].length === 2) {
+                        input.setCustomValidity("");
+                    } else {
+                        input.setCustomValidity("Debe ingresar un número decimal con dos decimales.");
+                    }
+                } else {
+                    input.setCustomValidity("Debe ingresar un número válido.");
+                }
+            } else {
+                input.setCustomValidity("");
             }
         }
     </script>

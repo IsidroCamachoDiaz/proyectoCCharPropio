@@ -129,7 +129,7 @@
                 </div>
             </nav>
             <div class="col-12 col-md-12 table-container">
-                <table id="tabla1" class="table">
+                <table id="tabla1" >
                     <caption class="text-center text-light">Incidencias Propias</caption>
                     <thead>
                         <tr>
@@ -155,10 +155,9 @@
                             <td class="text-center">@inc.CosteIncidencia</td>
                             <td class="text-center">@inc.FechaInicio</td>
                             <td>
-                                <form action="./ControladorFinalizarIncidencia" method="post">
-                                    <input type="hidden" name="id" value="<IdUsuario">
-                                    <input type="hidden" name="idI" value="<Id_incidencia">
-                                    <button type="submit" class="btn btn-info">Finalizar Incidencia</button>
+                                <form asp-controller="ControladorIncidencias" asp-action="FinalizarIncidencia" method="post">
+                                    <input type="hidden" name="IdIncidencia" value="@inc.IdIncidencia">
+                                    <button type="submit" class="btn btn-danger">Finalizar Incidencia</button>
                                 </form>
 
                                     <a href="https://localhost:7048/ControladorIncidencias/modificarIncidencia?idI=@inc.IdIncidencia">
@@ -171,7 +170,7 @@
                     </tbody>
                 </table>
 
-                <table id="tabla2" class="table" style="display: none;">
+                <table id="tabla2"  style="display: none;">
                     <caption class="text-center text-light">Incidencias Sin Asignar</caption>
                     <thead>
                         <tr>
@@ -201,7 +200,7 @@
                     </tbody>
                 </table>
 
-                <table id="tabla3" class="table" style="display: none;">
+                <table id="tabla3"  style="display: none;">
                     <caption class="text-center text-light">Incidencias Finalizadas</caption>
                     <thead>
                         <tr>
@@ -219,7 +218,7 @@
                         
                         <tr>
                             <td class="text-center">@inc.DescripcionUsuario</td>
-                            <td class="text-center">@inc.DescripcionUsuario</td>
+                            <td class="text-center">@inc.DescripcionTecnica</td>
                             <td class="text-center">@inc.HorasIncidencia</td>
                             <td class="text-center">@inc.CosteIncidencia</td>
                             <td class="text-center">@inc.FechaInicio</td>

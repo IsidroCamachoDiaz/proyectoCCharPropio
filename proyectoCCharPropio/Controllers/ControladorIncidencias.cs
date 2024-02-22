@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using proyectoCCharPropio.DTOS;
@@ -170,35 +171,22 @@ namespace proyectoCCharPropio.Controllers
             //Vamos filtrando por cada lista segun el estado y la asignacion de empleados
             foreach (IncidenciaDTO inc in incidencias)
             {
-                
+                //Si no esta asifando
                 if (inc.Usuario == null)
                 {
                     incidenciasSinAsignar.Add(inc);
                 }
+                //Si es del usuario
                 else if (inc.Usuario.Id_usuario == usuario.Id_usuario&&inc.EstadoIncidencia==false)
                 {
                     incidenciasMias.Add(inc);
                 }
+                //Esta acabada
                 else if(inc.EstadoIncidencia == true)
                 {
                     incidenciasAcabadas.Add(inc);
                 }
             }
-
-            //Incidencias Sin Asignar
-           // List<IncidenciaDTO> incidenciasSinAsignar = incidencias.Where(x => x.Usuario == null).ToList();
-
-            //Quitamos los que no tienen usuario
-            //List <IncidenciaDTO> aux= incidencias.Where(x => x.Usuario != null).ToList();
-
-            //Incidencias Propias Acabadas
-            //List <IncidenciaDTO> incidenciasMias = aux.Where(x => x.Usuario.Id_usuario == usuario.Id_usuario).ToList();
-            //incidenciasMias =incidenciasMias.Where(x => x.Estado == false).ToList();
-            
-            //Incidencias Acabadas
-            //List <IncidenciaDTO> incidenciasAcabadas = aux.Where(x => x.Estado==true).ToList();
-
-
 
             //Las metemos en el modelo
             var modelo = new ModeloPanelIncidencias
@@ -324,12 +312,13 @@ namespace proyectoCCharPropio.Controllers
         [HttpPost]
         public ActionResult CrearSolicitud(SolicitudDTO solicitud)
         {
+            try { 
             //Declaramos lo que encesitemos
             accionesCRUD acciones = new accionesCRUD();
 
             //Le añadimos los valores
             solicitud.Estado2 = false;
-            solicitud.FechaLimite2=DateTime.Now;
+            solicitud.FechaLimite2 = DateTime.Now;
 
             //Cogemos el id del usuario para buscarlo en la base d edatos y asignarle la solicitud
             string idUsuario = HttpContext.Session.GetString("usuario");
@@ -337,7 +326,7 @@ namespace proyectoCCharPropio.Controllers
             solicitud.IdUsuario2 = acciones.SeleccionarUsuario(idUsuario);
 
             implementacionIncidencias implInci = new implementacionIncidencias();
-            
+
             //Comprobamos si se inserto bien
             if (implInci.crearSolicitud(solicitud))
             {
@@ -353,60 +342,86 @@ namespace proyectoCCharPropio.Controllers
                 return RedirectToAction("Home", "RegistroControlador");
             }
 
+            }catch (Exception e)
+            {
+                Util.EscribirEnElFichero("Hubo un error en crear solicitud " + e.Message);
+                try
+                {
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                catch (IOException e1)
+                {
+                }
+            }
+            return RedirectToAction("Home", "RegistroControlador");
 
         }
 
         [HttpPost]
         public ActionResult ModificarSolicitud(SolicitudDTO solicitud)
         {
-            //Declaramos lo que necesitemos
-            accionesCRUD acciones = new accionesCRUD();
-            bool cambio = false;
+            try { 
+                //Declaramos lo que necesitemos
+                accionesCRUD acciones = new accionesCRUD();
+                bool cambio = false;
 
-            //Comprobamos si escribio algo si no escribio se avisa al usuario
-            if (solicitud.DescripcionSolicitud2 == null || solicitud.DescripcionSolicitud2 == "")
-            {
-                MostrarAlerta("Campo Vacio", "No puso nada en la descripcion", "error");
-                return RedirectToAction("Home", "RegistroControlador");
-            }
-            SolicitudDTO solicitudBD = acciones.SeleccionarSolicitud(solicitud.IdSolicitud2.ToString());
-
-            List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
-
-            //Comprobamos si es distinta a la anterior
-            if (solicitud.DescripcionSolicitud2 != solicitudBD.DescripcionSolicitud2)
-            {
-                solicitudBD.DescripcionSolicitud2 = solicitud.DescripcionSolicitud2;
-
-                foreach(IncidenciaDTO inc in incidencias)
+                //Comprobamos si escribio algo si no escribio se avisa al usuario
+                if (solicitud.DescripcionSolicitud2 == null || solicitud.DescripcionSolicitud2 == "")
                 {
-                    if (inc.solicitud.IdSolicitud2 == solicitudBD.IdSolicitud2)
-                    {
-                        inc.DescripcionUsuario= solicitud.DescripcionSolicitud2;
-                        acciones.ActualizarIncidencia(inc);
-                        cambio = true;
-                    }
+                    MostrarAlerta("Campo Vacio", "No puso nada en la descripcion", "error");
+                    return RedirectToAction("Home", "RegistroControlador");
                 }
-               
-            }
+                SolicitudDTO solicitudBD = acciones.SeleccionarSolicitud(solicitud.IdSolicitud2.ToString());
 
-            //Comprobamos si cambio los valores
-            if (cambio)
+                List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
+
+                //Comprobamos si es distinta a la anterior
+                if (solicitud.DescripcionSolicitud2 != solicitudBD.DescripcionSolicitud2)
+                {
+                    //Se loa signamos
+                    solicitudBD.DescripcionSolicitud2 = solicitud.DescripcionSolicitud2;
+
+                    //Buscamos la incidencia que tenga la solicitud y le actualizamos la descripcion del usuario
+                    foreach (IncidenciaDTO inc in incidencias)
+                    {
+                        if (inc.solicitud.IdSolicitud2 == solicitudBD.IdSolicitud2)
+                        {
+                            inc.DescripcionUsuario = solicitud.DescripcionSolicitud2;
+                            acciones.ActualizarIncidencia(inc);
+                            cambio = true;
+                        }
+                    }
+
+                }
+
+                //Comprobamos si cambio los valores
+                if (cambio)
+                {
+                    Util.EscribirEnElFichero("Un usuario actualizo una solicitud");
+                    acciones.ActualizarSolicitud(solicitudBD);
+                    MostrarAlerta("Solicitud Modificada", "Solicitud Modificada Correctamente nuestros tecnico se pondran con su solicitud", "success");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                //Si no cambio la descripcion se avisa al usuario
+                else
+                {
+                    Util.EscribirEnElFichero("Un usuario quizo cambiar una solicitud pero no cambio la descripcion");
+                    MostrarAlerta("Es igual", "No modifico la descripcion", "info");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+
+             }catch (Exception e)
             {
-                Util.EscribirEnElFichero("Un usuario actualizo una solicitud");
-                acciones.ActualizarSolicitud(solicitudBD);
-                MostrarAlerta("Solicitud Modificada", "Solicitud Modificada Correctamente nuestros tecnico se pondran con su solicitud", "success");
-                return RedirectToAction("Home", "RegistroControlador");
+                Util.EscribirEnElFichero("Hubo un error en modificar solicitud " + e.Message);
+                try
+                {
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                catch (IOException e1)
+                {
+                }
             }
-            //Si no cambio la descripcion se avisa al usuario
-            else
-            {
-                Util.EscribirEnElFichero("Un usuario quizo cambiar una solicitud pero no cambio la descripcion");
-                MostrarAlerta("Es igual", "No modifico la descripcion", "info");
-                return RedirectToAction("Home", "RegistroControlador");
-            }
-
-
+            return RedirectToAction("Home", "RegistroControlador");
         }
 
         [HttpGet]
@@ -483,79 +498,185 @@ namespace proyectoCCharPropio.Controllers
         [HttpPost]
         public ActionResult ModificarIncidencia(IncidenciaDTO incidencia)
         {
-            //Declaramos lo que necesitemos
-            accionesCRUD acciones = new accionesCRUD();
-            bool cambio = false;
-
-            //Comprobamos si escribio algo si no escribio se avisa al usuario
-            if (incidencia.DescripcionTecnica == null || incidencia.DescripcionTecnica == "")
+            try
             {
-                MostrarAlerta("Campo Vacio", "No puso nada en la descripcion", "error");
-                return RedirectToAction("Home", "RegistroControlador");
-            }
-            IncidenciaDTO incidenciaBD = acciones.SeleccionarIncidencia(incidencia.IdIncidencia.ToString());
+                //Declaramos lo que necesitemos
+                accionesCRUD acciones = new accionesCRUD();
+                bool cambio = false;
 
-            //Comprobamos si es distinta a la anterior
-            if (incidencia.DescripcionTecnica != incidenciaBD.DescripcionTecnica)
-            {
-                incidenciaBD.DescripcionTecnica = incidencia.DescripcionTecnica;
-                cambio = true;
-            }
+                //Comprobamos si escribio algo si no escribio se avisa al usuario
+                if (incidencia.DescripcionTecnica == null || incidencia.DescripcionTecnica == "")
+                {
+                    MostrarAlerta("Campo Vacio", "No puso nada en la descripcion", "error");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                IncidenciaDTO incidenciaBD = acciones.SeleccionarIncidencia(incidencia.IdIncidencia.ToString());
 
-            //Comprobamos si cambio los valores
-            if (cambio)
-            {
-                Util.EscribirEnElFichero("Un usuario actualizo una incidencia");
-                acciones.ActualizarIncidencia(incidenciaBD);
-                MostrarAlerta("Incidencia Modificada", "Se ha actualizado la incidencia correctamente", "success");
-                return RedirectToAction("Home", "RegistroControlador");
-            }
-            //Si no cambio la descripcion se avisa al usuario
-            else
-            {
-                Util.EscribirEnElFichero("Un usuario quizo cambiar una incidencia pero no cambio la descripcion");
-                MostrarAlerta("Es igual", "No modifico la descripcion", "info");
-                return RedirectToAction("Home", "RegistroControlador");
-            }
+                //Comprobamos si es distinta a la anterior
+                if (incidencia.DescripcionTecnica != incidenciaBD.DescripcionTecnica)
+                {
+                    incidenciaBD.DescripcionTecnica = incidencia.DescripcionTecnica;
+                    cambio = true;
+                }
 
+                //Comprobamos si cambio los valores
+                if (cambio)
+                {
+                    Util.EscribirEnElFichero("Un usuario actualizo una incidencia");
+                    acciones.ActualizarIncidencia(incidenciaBD);
+                    MostrarAlerta("Incidencia Modificada", "Se ha actualizado la incidencia correctamente", "success");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                //Si no cambio la descripcion se avisa al usuario
+                else
+                {
+                    Util.EscribirEnElFichero("Un usuario quizo cambiar una incidencia pero no cambio la descripcion");
+                    MostrarAlerta("Es igual", "No modifico la descripcion", "info");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+            }
+            catch (Exception e)
+            {
+                Util.EscribirEnElFichero("Hubo un error en modificar incidencia " + e.Message);
+                try
+                {
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                catch (IOException e1)
+                {
+                }
+            }
+            return RedirectToAction("Home", "RegistroControlador");
 
         }
         [HttpPost]
         public ActionResult AsignarIncidencia(string id,string idI)  
         {
-            //Declaramos lo que necesitemos
-            accionesCRUD acciones = new accionesCRUD();
-
-            //Cogemos los valores del formulario y los buscamos en al  bd
-            IncidenciaDTO incidenciaBD = acciones.SeleccionarIncidencia(idI);
-            UsuarioDTO usuarioBD = acciones.SeleccionarUsuario(id);    
-
-            //Comprobamos si  se encontro
-            if (incidenciaBD==null|usuarioBD==null)
+            try
             {
-                MostrarAlerta("No se Encontro", "No se encontro el usuario o la incidencia", "error");
-                return RedirectToAction("Home", "RegistroControlador");
-            }
+                //Declaramos lo que necesitemos
+                accionesCRUD acciones = new accionesCRUD();
 
-            incidenciaBD.Usuario = usuarioBD;
-            //Comprobamos si cambio los valores
-            if (acciones.ActualizarIncidencia(incidenciaBD))
-            {
-                Util.EscribirEnElFichero("Un usuario se asigno una incidencia");
-                MostrarAlerta("Incidencia Modificada", "Se ha actualizado la incidencia correctamente", "success");
-                return RedirectToAction("Home", "RegistroControlador");
+                //Cogemos los valores del formulario y los buscamos en al  bd
+                IncidenciaDTO incidenciaBD = acciones.SeleccionarIncidencia(idI);
+                UsuarioDTO usuarioBD = acciones.SeleccionarUsuario(id);
+
+                //Comprobamos si  se encontro
+                if (incidenciaBD == null | usuarioBD == null)
+                {
+                    MostrarAlerta("No se Encontro", "No se encontro el usuario o la incidencia", "error");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                //Le asignamos el usuario y la fecha de inicio
+                incidenciaBD.Usuario = usuarioBD;
+                incidenciaBD.FechaInicio = DateTime.Now;
+
+                //Comprobamos si cambio los valores
+                if (acciones.ActualizarIncidencia(incidenciaBD))
+                {
+                    Util.EscribirEnElFichero("Un usuario se asigno una incidencia");
+                    MostrarAlerta("Incidencia Modificada", "Se ha actualizado la incidencia correctamente", "success");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                //Si no cambio la descripcion se avisa al usuario
+                else
+                {
+                    Util.EscribirEnElFichero("Un usuario quizo asignarse una incidencia pero no se pudo actualizar");
+                    MostrarAlerta("No Se Asigno", "No se pudo asignar la incidencia", "error");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+
             }
-            //Si no cambio la descripcion se avisa al usuario
-            else
+            catch (Exception e)
             {
-                Util.EscribirEnElFichero("Un usuario quizo asignarse una incidencia pero no se pudo actualizar");
-                MostrarAlerta("No Se Asigno", "No se pudo asignar la incidencia", "error");
-                return RedirectToAction("Home", "RegistroControlador");
+                Util.EscribirEnElFichero("Hubo un error en asignar incidencia " + e.Message);
+                try
+                {
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                catch (IOException e1)
+                {
+                }
             }
+            return RedirectToAction("Home", "RegistroControlador");
 
 
         }
 
+        [HttpPost]
+        public ActionResult FinalizarIncidencia(IncidenciaDTO incidencia)
+        {
+            try
+            {
+                //Declaramos lo que necesitemos
+                accionesCRUD acciones = new accionesCRUD();
+
+                //Cogemos el trabajo completo
+                incidencia = acciones.SeleccionarIncidencia(incidencia.IdIncidencia.ToString());
+
+                //Comprobamos si es null algo
+                if (incidencia == null)
+                {
+                    MostrarAlerta("No Se Finalizo", "No se encontro al usuario o la incidencia", "error");
+                    Util.EscribirEnElFichero("Un usuario quiso finalizar una incidencia pero no se encontro el usuario o la incidencia");
+                    return RedirectToAction("Home", "RegistroControlador");
+                    
+                }
+
+                //Cogemos todos los trabajos y los filtramos por los de la incidencia
+                List<TrabajoDTO> trabajos = acciones.HacerGetLista<TrabajoDTO>("api/Trabajo");
+                incidencia.Trabajos=new List<TrabajoDTO>();
+
+                foreach (TrabajoDTO tra in trabajos)
+                {
+                    if (tra.incidencia.IdIncidencia == incidencia.IdIncidencia)
+                    {
+                        incidencia.Trabajos.Add(tra);
+                    }
+                }
+
+
+                //Comprobamos si tienes trabajos asignados
+                if (incidencia.Trabajos == null || incidencia.Trabajos.Count==0)
+                {
+                    MostrarAlerta("No Se Finalizo", "La incidencia indicada no tiene ningun trabajo hecho", "error");
+                    Util.EscribirEnElFichero("Un usuario quiso finalizar una incidencia pero la incidencia no tiene ningun trabajo hecho");
+                    return RedirectToAction("Home", "RegistroControlador");
+                    
+                }
+
+                implementacionIncidencias impl= new implementacionIncidencias();
+
+                //Comprobamos si lo finaliza bien
+                if (impl.FinalizarIncidencia(incidencia))
+                {
+                    MostrarAlerta("Incidencia Finalizada", "La incidencia se finalizo correctamente", "success");
+                    Util.EscribirEnElFichero("Un usuario finalizo un incidencia");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                //Si no conseigue finalizarlo se avisa al usuario
+                else
+                {
+                    MostrarAlerta("No Se Finalizo", "No se pudo finalizar la incidencia", "error");
+                    Util.EscribirEnElFichero("Un usuario quiso finalizar ua incdencia pero no se pudo finalizar");
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+               
+
+            }
+            catch (Exception e)
+            {
+                Util.EscribirEnElFichero("Hubo un error en finalizar trabajo " + e.Message);
+                try
+                {
+                    return RedirectToAction("Home", "RegistroControlador");
+                }
+                catch (IOException e1)
+                {
+                }
+            }
+            return RedirectToAction("Home", "RegistroControlador");
+        }
 
     }
 }

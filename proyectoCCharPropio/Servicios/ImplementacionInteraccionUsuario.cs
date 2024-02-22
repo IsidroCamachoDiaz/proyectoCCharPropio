@@ -107,6 +107,12 @@ namespace pruebaRazor.DTOs
                 usuario.Contrasenia_usuario = Util.EncriptarContra(usuario.Contrasenia_usuario);
 				//Buscamos al usuario
                 UsuarioDTO usuarioBD = acciones.SeleccionarUsuario("correo/" + usuario.Correo_usuario);
+
+				if(usuarioBD == null)
+				{
+                    Util.EscribirEnElFichero("Una persona puso un correo que no esta asociada a ninguna cuenta");
+					return false;
+                }
 				//ponemos los valores que necesitemos
                 httpContext.Session.SetString("usuario", usuarioBD.Id_usuario.ToString());
                 httpContext.Session.SetString("acceso", usuarioBD.Id_acceso.ToString());

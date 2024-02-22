@@ -19,12 +19,16 @@ namespace proyectoCCharPropio.Servicios
             {
                 //Cogemos todas las incidencias
                 List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
+               
                 //Cogemos todos los tokens
                 List<TokenDTO> tokens = acciones.HacerGetLista<TokenDTO>("api/Token");
+                
                 //Cogemos los tokens del usuario
                 tokens = tokens.Where(x => x.Id_usuario == usu.Id_usuario).ToList();
+                
                 //Cogemos las incidencias del usuario
-                incidencias = incidencias.Where(x => x.Solicitud.IdSolicitud2 == usu.Id_usuario).ToList();
+                incidencias = incidencias.Where(x=>x.IdUsuario!=null).Where(x => x.Usuario.Id_usuario == usu.Id_usuario).ToList();
+                
                 //Si no tiene borramos todo lo que tenemos del usuario 
                 if (incidencias.Count == 0)
                 {
@@ -40,6 +44,16 @@ namespace proyectoCCharPropio.Servicios
                 //Si tiene incidencias lo damos de baja
                 else
                 {
+                    //Le designamos las incidencias pendientes
+                    foreach(IncidenciaDTO inc in incidencias)
+                    {
+                        if (inc.EstadoIncidencia == false)
+                        {
+                            inc.Usuario = null;
+                            inc.IdUsuario = null;
+                            acciones.ActualizarIncidencia(inc);
+                        }                     
+                    }
                     usu.Fecha_baja = DateTime.Now;
                     acciones.ActualizarUsuario(usu);
                     Util.EscribirEnElFichero("Un usuario se dio de baja en la web " + usu.Nombre_usuario);
@@ -77,7 +91,6 @@ namespace proyectoCCharPropio.Servicios
                     return true;
                 }
             }
-            return false;
         }
 
         public bool CambiarAcceso(UsuarioDTO usuario, string idAcceso)

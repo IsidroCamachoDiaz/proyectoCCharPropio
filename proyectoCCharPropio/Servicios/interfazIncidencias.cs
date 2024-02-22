@@ -16,5 +16,12 @@ namespace proyectoCCharPropio.Servicios
         /// <param name="solicitud">Solicitud de incidencia a crear.</param>
         /// <returns>True si se creó la solicitud correctamente, False en caso contrario.</returns>
         public bool crearSolicitud(SolicitudDTO solicitud);
+
+        /// <summary>
+        /// Finaliza incidencia en el sistema.
+        /// </summary>
+        /// <param name="incidencia">Incidencia que se va a fianlizar</param>
+        /// <returns>True si se finalizo correctamente, False en caso contrario.</returns>
+        public bool FinalizarIncidencia(IncidenciaDTO incidencia);
     }
 }

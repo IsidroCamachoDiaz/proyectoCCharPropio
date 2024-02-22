@@ -16,5 +16,11 @@ namespace proyectoCCharPropio.Servicios
         /// <param name="trabajo">Trabajo de incidencia a crear.</param>
         /// <returns>True si se creó la solicitud correctamente, False en caso contrario.</returns>
         public bool crearTrabajo(TrabajoDTO trabajo);
+        /// <summary>
+        ///Finaliza trabajo de incidencia en el sistema.
+        /// </summary>
+        /// <param name="trabajo">Trabajo de incidencia a finalizar.</param>
+        /// <returns>True si se finalizo correctamente, False en caso contrario.</returns>
+        public bool finalizarTrabajo(TrabajoDTO trabajo);
     }
 }

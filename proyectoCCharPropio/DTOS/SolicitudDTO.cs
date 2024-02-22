@@ -43,7 +43,7 @@ namespace proyectoCCharPropio.DTOS
         private UsuarioDTO idUsuario;
 
         [JsonProperty("IdUsuario")]
-        private int idUsuarioNumero { get; set; }
+        public int idUsuarioNumero { get; set; }
 
 
         /// <summary>

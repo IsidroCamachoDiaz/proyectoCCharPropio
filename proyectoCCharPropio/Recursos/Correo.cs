@@ -93,11 +93,11 @@ namespace proyectoCCharPropio.Recursos
         }
 
         /**
- * Método donde crea el cuerpo del correo
- * @param token
- * @param direccion
- * @return string
- */
+         * Método donde crea el cuerpo del correo
+         * @param token
+         * @param direccion
+         * @return string
+         */
         public string MensajeCorreo(string token, string direccion)
         {
             return $@"
@@ -120,7 +120,12 @@ namespace proyectoCCharPropio.Recursos
 ";
         }
 
-
+        /**
+         * Método donde crea el cuerpo del correo de alta
+         * @param token
+         * @param direccion
+         * @return string
+         */
         public string MensajeCorreoAlta(string token, string direccion)
         {
             return $@"
@@ -142,7 +147,11 @@ namespace proyectoCCharPropio.Recursos
     </div>
 ";
         }
-
+        /**
+         * Método donde crea el cuerpo de comfirmacion de alta
+         * @param nombreUsuario
+         * @return string
+         */
         public string MensajeCorreoConfirmacionAlta(string nombreUsuario)
         {
             // Cuerpo del correo en formato HTML
@@ -152,6 +161,20 @@ namespace proyectoCCharPropio.Recursos
                 <p style=""color: white;"">Gracias por ser parte de nuestra plataforma.</p>
             </div>";
         }
+        /**
+         * Método donde crea el cuerpo del correo de incidencia Terminada
+         * @param nombreUsuario
+         * @return string
+         */
+        public string MensajeCorreoConfirmacionTerminada(string nombreUsuario)
+        {
+            return "<div style=\"text-align: center; background-color: #3498db; padding: 20px;\">\r\n"
+                + "    <p style=\"color: white;\">¡Hola " + nombreUsuario + ", tu Incidencia ha sido terminada!</p>\r\n"
+                + "    <p style=\"color: white;\">Puedes verificar el estado de tu Incidencia en nuestra plataforma.</p>\r\n"
+                + "    <p style=\"color: white;\">Gracias por utilizar nuestros servicios.</p>\r\n"
+                + "</div>";
+        }
+
 
 
     }

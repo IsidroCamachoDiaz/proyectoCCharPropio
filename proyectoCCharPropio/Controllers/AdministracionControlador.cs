@@ -139,8 +139,11 @@ namespace proyectoCCharPropio.Controllers
                 MostrarAlerta("¡Alerta De Seguridad!", "Usted tiene que iniciar Sesion Para Poder acceder", "error");
                 return RedirectToAction("Index", "RegistroControlador");
             }
-            //Cogemos todos los usuario y eliminamos de la lista el propio usuario paarq ue no se pueda modificar solo
+            //Cogemos todos los usuario y eliminamos de la lista el propio usuario para que no se pueda modificar solo
             List<UsuarioDTO> usuarios =acciones.HacerGetLista<UsuarioDTO>("api/Usuario");
+
+            //Quitamos los usuarios que esten de baja
+            usuarios =usuarios.Where(x => x.Fecha_baja == null).ToList();
 
             for (int i = 0; i < usuarios.Count; i++)
             {
@@ -230,29 +233,35 @@ namespace proyectoCCharPropio.Controllers
         [HttpPost]
         public ActionResult BorrarUsuario(UsuarioDTO usuarioDTO)
         {
-            //Declaramos lo que encesitemos
-            accionesCRUD acciones= new accionesCRUD();
-
-            //Cogemos el usuario a borrar
-            usuarioDTO=acciones.SeleccionarUsuario(usuarioDTO.Id_usuario.ToString());
-
-            implementacionAdminsitracion impl = new implementacionAdminsitracion();
-            //Usamos el metodo para borrar
-            if (impl.eliminarUsuario(usuarioDTO))
+            try
             {
-                Util.EscribirEnElFichero("Se booro el usuario: " +usuarioDTO.Nombre_usuario);
-                MostrarAlerta("Usuario Eliminado", "Se borro el usuario" + usuarioDTO.Nombre_usuario, "success");
-                return RedirectToAction("AdministracionUsuarios");
-            }
-            //Si no se pudo se avisa al usuario
-            else
-            {
-                Util.EscribirEnElFichero("Se intento borrar un usuario pero no se pudo");
-                MostrarAlerta("Error", "No se pudo borrar el usuario", "error");
-                return RedirectToAction("AdministracionUsuarios");
-            }
+                //Declaramos lo que encesitemos
+                accionesCRUD acciones = new accionesCRUD();
 
-            
+                //Cogemos el usuario a borrar
+                usuarioDTO = acciones.SeleccionarUsuario(usuarioDTO.Id_usuario.ToString());
+
+                implementacionAdminsitracion impl = new implementacionAdminsitracion();
+                //Usamos el metodo para borrar
+                if (impl.eliminarUsuario(usuarioDTO))
+                {
+                    Util.EscribirEnElFichero("Se booro el usuario: " + usuarioDTO.Nombre_usuario);
+                    MostrarAlerta("Usuario Eliminado", "Se borro el usuario" + usuarioDTO.Nombre_usuario, "success");
+                    return RedirectToAction("AdministracionUsuarios");
+                }
+                //Si no se pudo se avisa al usuario
+                else
+                {
+                    Util.EscribirEnElFichero("Se intento borrar un usuario pero no se pudo");
+                    MostrarAlerta("Error", "No se pudo borrar el usuario", "error");
+                    return RedirectToAction("AdministracionUsuarios");
+                }
+            }catch(Exception e)
+            {
+                Util.EscribirEnElFichero("Hubo un error en Borrar Usuario " + e.Message);
+            }
+            return RedirectToAction("AdministracionUsuarios");
+
         }
 
         [HttpPost]

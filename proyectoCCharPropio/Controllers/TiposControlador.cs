@@ -199,6 +199,7 @@ namespace proyectoCCharPropio.Controllers
         {
             try
             {
+                tipoDTO.PrecioTipo=tipoDTO.PrecioTipo / 100;
                 //Comprobamos que no haya valores nulos
                 if (tipoDTO.DescripcionTipo == null || tipoDTO.DescripcionTipo=="" || tipoDTO.PrecioTipo == null || tipoDTO.PrecioTipo == 0)
                 {

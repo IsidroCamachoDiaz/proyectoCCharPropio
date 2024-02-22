@@ -12,5 +12,14 @@ namespace proyectoCCharPropio.Servicios
             //Insertamos el trabajo
             return acciones.InsertarTrabajo(trabajo);
         }
+
+        public bool finalizarTrabajo(TrabajoDTO trabajo)
+        {
+            //Declaramos loq ue necesitemos
+            accionesCRUD acciones = new accionesCRUD();
+
+            acciones.ActualizarTrabajo(trabajo);
+            return acciones.ActualizarIncidencia(trabajo.incidencia);
+        }
     }
 }

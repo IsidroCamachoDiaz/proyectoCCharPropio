@@ -162,8 +162,8 @@
                             }
                             else{
                             
-                            <form action="../ControladorFinalizarTrabajo" method="post" id="formulario">
-                                <input type="hidden" name="idT" value="@t.IdTrabajo">
+                            <form asp-controller="TrabajoControlador" asp-action="FinalizarTrabajo" method="post" id="formulario">
+                                <input type="hidden" name="IdTrabajo" value="@t.IdTrabajo">
                                 <button class="btn btn-success text-center" type="submit">Finalizar Trabajo</button>
                             </form>
                             }

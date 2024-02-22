@@ -167,13 +167,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            @foreach(TipoTrabajoDTO t in Model.tiposFinalizados){
+                        @foreach(TipoTrabajoDTO t in Model.tiposFinalizados){
+                        <tr>                          
                                 <td class="text-center">@t.DescripcionTipo</td>
                                 <td class="text-center">@t.PrecioTipo</td>
-                                <td class="text-center">@t.FechaExpiracion</td>
-                            }
+                                <td class="text-center">@t.FechaExpiracion</td>                          
                         </tr>
+                        }
                     </tbody>
                 </table>
             </div>

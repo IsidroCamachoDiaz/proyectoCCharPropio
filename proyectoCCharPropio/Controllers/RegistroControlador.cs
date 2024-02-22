@@ -322,7 +322,7 @@ namespace proyectoCCharPropio.Controllers
 				}
 			}catch(Exception e)
 			{
-                MostrarAlerta("¡Hubo un erro!", "Hubo un erroe intentelo mas tarde", "error");
+                MostrarAlerta("¡Hubo un error!", "Hubo un erroe intentelo mas tarde", "error");
                 return RedirectToAction("Index", new { error = "parametrosIncorrectos" });
             }
         }

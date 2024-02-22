@@ -209,7 +209,7 @@ namespace proyectoCCharPropio.Recursos
 
         public bool ActualizarTrabajo(TrabajoDTO nuevoTrabajo)
         {
-            return HacerPut("api/Trabajo/", nuevoTrabajo);
+            return HacerPut("api/Trabajo/"+nuevoTrabajo.IdTrabajo, nuevoTrabajo);
         }
 
         public bool ActualizarUsuario(UsuarioDTO nuevoUsuario)
