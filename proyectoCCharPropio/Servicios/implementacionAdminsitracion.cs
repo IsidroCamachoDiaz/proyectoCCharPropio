@@ -136,7 +136,7 @@ namespace proyectoCCharPropio.Servicios
                 }
             }
             //Si se quiere dar empleado
-            else if (accesoTiene.CodigoAcceso1 == "Empleado")
+            else if (accesoDar.CodigoAcceso1  == "Empleado")
             {
                 //Si es administrador se le da directamente porque el adminsitracion tiene el plus de gestion de ussuarios
                 if (accesoTiene.CodigoAcceso1 == "Administrador")
