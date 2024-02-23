@@ -145,7 +145,7 @@
                         @foreach(TipoTrabajoDTO t in Model.tiposActivos ){
                         <tr>
                             <td class="text-center">@t.DescripcionTipo</td>
-                                <td class="text-center">@t.PrecioTipo</td>
+                                <td class="text-center">@t.PrecioTipo €</td>
                                 <td class="text-center">
                                     <form asp-controller="TiposControlador" asp-action="FinalizarTipo" method="post" id="form">
                                         <input type="hidden" name="tipoDTON" value="@t.IdTipo">
@@ -170,7 +170,7 @@
                         @foreach(TipoTrabajoDTO t in Model.tiposFinalizados){
                         <tr>                          
                                 <td class="text-center">@t.DescripcionTipo</td>
-                                <td class="text-center">@t.PrecioTipo</td>
+                                <td class="text-center">@t.PrecioTipo €</td>
                                 <td class="text-center">@t.FechaExpiracion</td>                          
                         </tr>
                         }

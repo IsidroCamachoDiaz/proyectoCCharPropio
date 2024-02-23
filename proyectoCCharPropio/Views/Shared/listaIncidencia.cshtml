@@ -152,7 +152,7 @@
                             <td class="text-center">@inc.DescripcionTecnica</td>
                             }
                             <td class="text-center">@inc.HorasIncidencia</td>
-                            <td class="text-center">@inc.CosteIncidencia</td>
+                            <td class="text-center">@inc.CosteIncidencia €</td>
                             <td class="text-center">@inc.FechaInicio</td>
                             <td>
                                 <form asp-controller="ControladorIncidencias" asp-action="FinalizarIncidencia" method="post">
@@ -186,7 +186,7 @@
                         <tr>
                             <td class="text-center">@inc.DescripcionUsuario</td>
                             <td class="text-center">@inc.HorasIncidencia</td>
-                            <td class="text-center">@inc.CosteIncidencia </td>
+                            <td class="text-center">@inc.CosteIncidencia €</td>
                             <td class="text-center">
                                     <form asp-controller="ControladorIncidencias" asp-action="AsignarIncidencia" method="post">
                                     <input type="hidden" name="id" value="@Model.Usuario.Id_usuario">
@@ -220,7 +220,7 @@
                             <td class="text-center">@inc.DescripcionUsuario</td>
                             <td class="text-center">@inc.DescripcionTecnica</td>
                             <td class="text-center">@inc.HorasIncidencia</td>
-                            <td class="text-center">@inc.CosteIncidencia</td>
+                            <td class="text-center">@inc.CosteIncidencia €</td>
                             <td class="text-center">@inc.FechaInicio</td>
                             <td class="text-center">@inc.FechaFin</td>
                             <td class="text-center">@inc.Usuario.Nombre_usuario</td>
