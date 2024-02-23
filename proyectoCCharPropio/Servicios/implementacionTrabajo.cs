@@ -7,7 +7,7 @@ namespace proyectoCCharPropio.Servicios
     {
         public bool crearTrabajo(TrabajoDTO trabajo)
         {
-            //Declaramos loq ue necesitemos
+            //Declaramos lo que necesitemos
             accionesCRUD acciones = new accionesCRUD();
             //Insertamos el trabajo
             return acciones.InsertarTrabajo(trabajo);
@@ -15,9 +15,10 @@ namespace proyectoCCharPropio.Servicios
 
         public bool finalizarTrabajo(TrabajoDTO trabajo)
         {
-            //Declaramos loq ue necesitemos
+            //Declaramos lo que necesitemos
             accionesCRUD acciones = new accionesCRUD();
 
+            //Actualizamos el trabajo y la incidencia
             acciones.ActualizarTrabajo(trabajo);
             return acciones.ActualizarIncidencia(trabajo.incidencia);
         }

@@ -10,6 +10,7 @@ namespace proyectoCCharPropio.Servicios
     {
         public bool crearSolicitud(SolicitudDTO solicitud)
         {
+            //Declararmos lo que encesitemos e enviamos si se inserta bien o no
             accionesCRUD acciones = new accionesCRUD();
             return acciones.InsertarSolicitud(solicitud);            
         }
@@ -34,6 +35,7 @@ namespace proyectoCCharPropio.Servicios
             //Si esta terminado se actualiza los campos
             if (terminado)
             {
+                //Se pone fecha de fin y se cambia el estado
                 incidencia.FechaFin=DateTime.Now;
                 incidencia.EstadoIncidencia = true;
                 incidencia.solicitud.Estado2 = true;

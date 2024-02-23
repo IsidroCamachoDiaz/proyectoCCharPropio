@@ -12,6 +12,7 @@ namespace proyectoCCharPropio.Recursos
     /// </autor>
     public class accionesCRUD
     {
+        //URL de la api
         private const string BASE_URL = "http://localhost:5299/";
 
         public UsuarioDTO SeleccionarUsuario(string queDar)
@@ -53,19 +54,30 @@ namespace proyectoCCharPropio.Recursos
         {
             try
             {
+                //Juntamos toda la url
                 var url = new Uri(BASE_URL + endpoint);
+
+                //Lo mandamos a la peticion
                 var request = WebRequest.Create(url);
+
+                //Indicamos que se hara un GET
                 request.Method = "GET";
 
+                // Realiza una solicitud HTTP y obtiene la respuesta del servidor
                 using (var response = request.GetResponse())
+
+                // Crea un lector para leer el contenido de la respuesta
                 using (var reader = new StreamReader(response.GetResponseStream()))
                 {
+                    // Lee todo el contenido de la respuesta como una cadena de texto JSON
                     var jsonResponse = reader.ReadToEnd();
+                    // Lee todo el contenido de la respuesta como una cadena de texto JSON
                     return JsonConvert.DeserializeObject<T>(jsonResponse);
                 }
             }
             catch (Exception e)
             {
+                Util.EscribirEnElFichero($"[ERROR-InteraccionEntidad-HacerGet] Error al realizar la solicitud GET. | {e}");
                 Console.Error.WriteLine($"[ERROR-InteraccionEntidad-HacerGet] Error al realizar la solicitud GET. | {e}");
             }
 
@@ -111,27 +123,43 @@ namespace proyectoCCharPropio.Recursos
         {
             try
             {
+                //Juntamos toda la url
                 var url = new Uri(BASE_URL + endpoint);
+
+                //Lo mandamos a la peticion
                 var request = WebRequest.Create(url);
+
+                //Indicamos que haremos una peticion POST
                 request.Method = "POST";
+                //Indicamos que sera en JSON
                 request.ContentType = "application/json";
 
+                // Crea una instancia de JsonSerializerSettings para personalizar la serialización JSON
                 JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings()
                 {
+                    // Establece cómo manejar los bucles de referencia durante la serialización
+                    // Ignore indica que se deben omitir los bucles de referencia
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 };
+
+                //Creamos la entidad en un json e indicamos que omita la refencia circular
                 var jsonEntidad = JsonConvert.SerializeObject(entidad,jsonSerializerSettings);
 
+                // Crea un lector para leer el contenido de la respuesta
                 using (var streamWriter = new StreamWriter(request.GetRequestStream()))
                 {
                     streamWriter.Write(jsonEntidad);
                 }
 
+                //Cogemos la respuesta de la peticion
                 var response = (HttpWebResponse)request.GetResponse();
+
+                //Comprobamos si se creo bien
                 return response.StatusCode == HttpStatusCode.Created;
             }
             catch (Exception e)
             {
+                Util.EscribirEnElFichero($"[ERROR-InteraccionEntidad-HacerPost] Error al realizar la solicitud POST. | {e}");
                 Console.Error.WriteLine($"[ERROR-InteraccionEntidad-HacerPost] Error al realizar la solicitud POST. | {e}");
             }
 
@@ -177,15 +205,21 @@ namespace proyectoCCharPropio.Recursos
         {
             try
             {
+                //Juntamos la url
                 var url = new Uri(BASE_URL + endpoint);
+                //Se lo mandamos a la peticion
                 var request = WebRequest.Create(url);
+                //Indicamos que es una peticion DELETE
                 request.Method = "DELETE";
 
+                //Cogemos el estado de la peticion
                 var response = (HttpWebResponse)request.GetResponse();
+                //Comprobamso si se hizo bien
                 return response.StatusCode == HttpStatusCode.OK;
             }
             catch (Exception e)
             {
+                Util.EscribirEnElFichero($"[ERROR-InteraccionEntidad-HacerDelete] Error al realizar la solicitud DELETE. | {e}");
                 Console.Error.WriteLine($"[ERROR-InteraccionEntidad-HacerDelete] Error al realizar la solicitud DELETE. | {e}");
             }
 
@@ -221,28 +255,39 @@ namespace proyectoCCharPropio.Recursos
         {
             try
             {
+                //Juntamos la url
                 var url = new Uri(BASE_URL + endpoint);
+                //Lo metemos en la peticion
                 var request = WebRequest.Create(url);
+                //Indicamos a la peticion que haremos un PUT y que sera en formato JSON
                 request.Method = "PUT";
                 request.ContentType = "application/json";
 
+                // Crea una instancia de JsonSerializerSettings para personalizar la serialización JSON
                 JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings()
                 {
+                    // Establece cómo manejar los bucles de referencia durante la serialización
+                    // Ignore indica que se deben omitir los bucles de referencia
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 };
 
+                //Convertimos la entidad en formato JSON y le añadimos que omita la referencia circular
                 var jsonEntidad = JsonConvert.SerializeObject(entidad,jsonSerializerSettings);
 
+                // Crea un lector para leer el contenido de la respuesta
                 using (var streamWriter = new StreamWriter(request.GetRequestStream()))
                 {
                     streamWriter.Write(jsonEntidad);
                 }
 
+                //Cogemos el estado de la peticion
                 var response = (HttpWebResponse)request.GetResponse();
+                //Comprobamos si se hizo bien
                 return response.StatusCode == HttpStatusCode.NoContent;
             }
             catch (Exception e)
             {
+                Util.EscribirEnElFichero($"[ERROR-InteraccionEntidad-HacerPut] Error al realizar la solicitud PUT. | {e}");
                 Console.Error.WriteLine($"[ERROR-InteraccionEntidad-HacerPut] Error al realizar la solicitud PUT. | {e}");
             }
 
@@ -254,19 +299,28 @@ namespace proyectoCCharPropio.Recursos
         {
             try
             {
+                //Juntamos la url
                 var url = new Uri(BASE_URL + endpoint);
+                //Se lo asignamos a la peticion
                 var request = WebRequest.Create(url);
+                //Indicamos que es un metodo GET
                 request.Method = "GET";
 
+                // Realiza una solicitud HTTP y obtiene la respuesta del servidor
                 using (var response = request.GetResponse())
+
+                // Crea un lector para leer el contenido de la respuesta
                 using (var reader = new StreamReader(response.GetResponseStream()))
                 {
+                    // Lee todo el contenido de la respuesta como una cadena de texto JSON
                     var jsonResponse = reader.ReadToEnd();
+                    // Deserializa la cadena JSON en una lista del objeto del tipo especificado
                     return JsonConvert.DeserializeObject<List<T>>(jsonResponse);
                 }
             }
             catch (Exception e)
             {
+                Util.EscribirEnElFichero($"[ERROR-InteraccionEntidad-HacerGet] Error al realizar la solicitud GET. | {e}");
                 Console.Error.WriteLine($"[ERROR-InteraccionEntidad-HacerGet] Error al realizar la solicitud GET. | {e}");
             }
 

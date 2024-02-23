@@ -8,7 +8,7 @@ namespace proyectoCCharPropio.Servicios
     {
         public bool CrearTipo(TipoTrabajoDTO tipo)
         {
-            //Declaramos loq ue necesitemos
+            //Declaramos lo que necesitemos
             accionesCRUD acciones = new accionesCRUD();
 
             //Comprobamos si se inserto bien el tipo

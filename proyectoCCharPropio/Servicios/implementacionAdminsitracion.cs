@@ -54,6 +54,7 @@ namespace proyectoCCharPropio.Servicios
                             acciones.ActualizarIncidencia(inc);
                         }                     
                     }
+                    //Se pone la fecha de baja y se actualiza
                     usu.Fecha_baja = DateTime.Now;
                     acciones.ActualizarUsuario(usu);
                     Util.EscribirEnElFichero("Un usuario se dio de baja en la web " + usu.Nombre_usuario);
@@ -85,6 +86,7 @@ namespace proyectoCCharPropio.Servicios
                 //Si tiene solicitudes lo damos de baja
                 else
                 {
+                    //Se pone la fecah de baja y se actualiza
                     usu.Fecha_baja = DateTime.Now;
                     acciones.ActualizarUsuario(usu);
                     Util.EscribirEnElFichero("Un usuario se dio de baja en la web " + usu.Nombre_usuario);
@@ -183,13 +185,19 @@ namespace proyectoCCharPropio.Servicios
         {
             try
             {
+                //Declaramos lo que necesitemos
                 accionesCRUD acciones = new accionesCRUD();
+
+                //Se encripta la contraseña y se le da de alta al crearlo un administrador
                 usu.Contrasenia_usuario = Util.EncriptarContra(usu.Contrasenia_usuario);
                 usu.Alta_usuario = true;
+
+                //Comprobamos que se inserte bien
                 if (acciones.InsertarUsuario(usu))
                 {
                     Correo c = new Correo();
 
+                    //Creamos el mensaje de comfirmacion de alta
                     String mensaje = c.MensajeCorreoConfirmacionAlta(usu.Nombre_usuario);
 
                     //Comprobamos si se ha enviado bien el correo

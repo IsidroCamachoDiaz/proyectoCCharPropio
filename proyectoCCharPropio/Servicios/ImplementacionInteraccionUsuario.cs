@@ -16,10 +16,16 @@ namespace pruebaRazor.DTOs
 		{
 			try
 			{
+				//Declaramos lo que necesitemos
 				accionesCRUD acciones = new accionesCRUD();
+
+				//Le asignamos el id del usuario
 				usu.Id_acceso = 3;
                 usu.Contrasenia_usuario = Util.EncriptarContra(usu.Contrasenia_usuario);
+				//Le asiganamos que no esta dado de alta
 				usu.Alta_usuario = false;
+
+				//Comproabamos si se inserto bien
                 if (acciones.InsertarUsuario(usu))
 				{
                     // Creamos el token
@@ -37,6 +43,7 @@ namespace pruebaRazor.DTOs
 					//Creamos el token
                     TokenDTO tokenDto = new TokenDTO(token, usuarioConId.Id_usuario, fechaLimite);
 
+					//Creamos el mensaje de correo de alta
                     String mensaje = c.MensajeCorreoAlta(token, "https://localhost:7048/RegistroControlador/altaHecha");
                    
 					//Comprobamos si se ha enviado bien el correo
@@ -108,25 +115,29 @@ namespace pruebaRazor.DTOs
 				//Buscamos al usuario
                 UsuarioDTO usuarioBD = acciones.SeleccionarUsuario("correo/" + usuario.Correo_usuario);
 
+				//Comprobamos si encontro el usuario
 				if(usuarioBD == null)
 				{
                     Util.EscribirEnElFichero("Una persona puso un correo que no esta asociada a ninguna cuenta");
 					return false;
                 }
+
 				//ponemos los valores que necesitemos
                 httpContext.Session.SetString("usuario", usuarioBD.Id_usuario.ToString());
                 httpContext.Session.SetString("acceso", usuarioBD.Id_acceso.ToString());
 				//Este campo es para verificar el controlador si esta dado de alta
                 httpContext.Session.SetString("verificado", "");
 
+				//Comprobamos si coincide con la de la base de datos
                 if (usuario.Contrasenia_usuario!=usuarioBD.Contrasenia_usuario)
 				{
                     Util.EscribirEnElFichero("Un usuario intento acceder a la web y puso datos que no se asocian con ninguna cuenta");
                     return false;
 				}
+				//Si coincide
 				else
 				{
-                    DateTime fecha = new DateTime(1, 1, 1, 0, 0, 0);
+					//Comprobamos si no esta de alta
                     if (!usuarioBD.Alta_usuario)
                     {
                         Util.EscribirEnElFichero("Un usuario intento logearse sin haber dado de alta la cuenta");
@@ -134,12 +145,14 @@ namespace pruebaRazor.DTOs
                         httpContext.Session.SetString("verificado", "false");
                         return false;
                     }
+					//Comprobamos si esta de baja
 					if (usuarioBD.Fecha_baja!=null)
 					{
                         Util.EscribirEnElFichero("Un usuario intento logearse pero esta dado de baja");
                         //Ponemos la variable a false
                         return false;
                     }
+
                     Util.EscribirEnElFichero("Un usuario accedio correctamente a la web: "+usuarioBD.Nombre_usuario);
                     return true;
 				}
@@ -159,6 +172,7 @@ namespace pruebaRazor.DTOs
 
 		public bool RecuperarContrasenya(UsuarioDTO usu)
 		{
+			//Declaramos lo que necesitemos
 			bool ok = false;
 			accionesCRUD acciones = new accionesCRUD();
            
@@ -173,12 +187,11 @@ namespace pruebaRazor.DTOs
                 Guid guid = Guid.NewGuid();
 
                 // Convertir el GUID a una cadena (string)
-                string token = guid.ToString();
-        
+                string token = guid.ToString();        
 
-                Console.WriteLine(token);
 				//Creamos el token
                 TokenDTO tokenDto = new TokenDTO(token, usu.Id_usuario, fechaLimite);
+
 				//Comprobamos si se creo bien
 				if (acciones.InsertarToken(tokenDto))
 				{
@@ -194,7 +207,7 @@ namespace pruebaRazor.DTOs
                         Util.EscribirEnElFichero("Se envio un correo para cambiar una contraseña: "+usu.Nombre_usuario);
                         return true;
                     }
-
+					//Si no se envio bien se avisa al usuario
 					else
 					{
                         Util.EscribirEnElFichero("Hubo un error para enviar un correo a un usuario");
@@ -244,6 +257,7 @@ namespace pruebaRazor.DTOs
 		// Método cambiar
 		public async Task<bool> CambiarContrasenia(String contrasenia, TokenDTO to)
 		{
+			//Declaramos lo que necesitemos
 			accionesCRUD acciones= new accionesCRUD();
 			UsuarioDTO usuario = null;
 
@@ -251,14 +265,17 @@ namespace pruebaRazor.DTOs
 			{
 				//Buscamos al usuario por el id de usuario del token
 				usuario = acciones.SeleccionarUsuario(to.Id_usuario.ToString());
+
 				//Si no lo encuentra
 				if (usuario == null)
 				{
                     Util.EscribirEnElFichero("Error al cambiar la contarseña no se encontro al usuario");
                     return false;
                 }
+
 				//Si esta se le cambia la contraseña
 				usuario.Contrasenia_usuario= contrasenia;
+
 				//Se actualiza en la base de datos y se comprueba que este bien
 				if (acciones.ActualizarUsuario(usuario))
 				{
@@ -284,10 +301,12 @@ namespace pruebaRazor.DTOs
 
 		public async Task<TokenDTO> ObtenerToken(string valorTk)
 		{
+			//Declaramos lo que necesitemos
 			accionesCRUD acciones = new accionesCRUD();
 
 			try
 			{
+				//Buscamos el token y lo devolvemos
                 TokenDTO tokenEncontrado = acciones.SeleccionarToken("token/" + valorTk);
 				return tokenEncontrado;
 			}
@@ -307,6 +326,7 @@ namespace pruebaRazor.DTOs
 
         public bool EnviarCorreoConToken(UsuarioDTO usu)
 		{
+			//Declaramos lo que encesitemos
 			accionesCRUD acciones = new accionesCRUD();
 
             // Creamos el token
@@ -322,6 +342,7 @@ namespace pruebaRazor.DTOs
             //Creamos el token
             TokenDTO tokenDto = new TokenDTO(token, usu.Id_usuario, fechaLimite);
 
+			//Creamos el mensaje de correo de alta
             String mensaje = c.MensajeCorreoAlta(token, "https://localhost:7048/RegistroControlador/altaHecha");
 
             //Comprobamos si se ha enviado bien el correo
@@ -332,6 +353,7 @@ namespace pruebaRazor.DTOs
                 Util.EscribirEnElFichero("Se hizo una peticion de alta y se envio correctamente el correo y se actualizo el usuario: "+usu.Nombre_usuario);
                 return true;
             }
+			//Si no se envia se devuelve false
             else
             {
                 Util.EscribirEnElFichero("No se pudo enviar un correo para un alta");
