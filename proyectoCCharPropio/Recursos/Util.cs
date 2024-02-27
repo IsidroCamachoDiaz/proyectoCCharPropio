@@ -46,7 +46,7 @@ namespace proyectoCCharPropio.Recursos
 		{
 			interfazEscritura es= new implementacionEscritura();
 			DateTime ahora = DateTime.Now;
-			StreamWriter sw= es.AbrirOCrearFichero("C:\\Users\\Puesto3\\Desktop\\FicheroLog\\log.txt", true);
+			StreamWriter sw= es.AbrirOCrearFichero("log.txt", true);
             //StreamWriter sw = es.AbrirOCrearFichero("C:\\Users\\isidr\\OneDrive\\Escritorio\\Ficheros\\log.txt", true);
             es.escribir(sw,String.Format("[{0}]-{1}",ahora.ToString(),texto));
 			es.cerrar(sw);
