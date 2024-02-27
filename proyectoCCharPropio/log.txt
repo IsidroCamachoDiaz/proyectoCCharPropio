@@ -119,3 +119,17 @@
 [27/02/2024 19:53:47]-Se le llevo al modificar perfil
 [27/02/2024 19:53:51]-Se le llevo al home
 [27/02/2024 19:55:18]-Se llevo al index
+[27/02/2024 20:37:18]-Un usuario accedio correctamente a la web: Victor Blade
+[27/02/2024 20:37:19]-Se le llevo al home
+[27/02/2024 20:37:21]-Se le llevo a la administracion de usuarios
+[27/02/2024 20:37:24]-Se le llevo a modificar Usuario
+[27/02/2024 20:37:53]-Un usuario accedio correctamente a la web: Victor Blade
+[27/02/2024 20:37:53]-Se le llevo al home
+[27/02/2024 20:37:56]-Se le llevo a la administracion de usuarios
+[27/02/2024 20:38:01]-Se le llevo a modificar Usuario
+[27/02/2024 20:38:08]-Una persona que no estaba registrada intento acceder
+[27/02/2024 20:38:09]-Se llevo al index
+[27/02/2024 20:39:57]-Un usuario accedio correctamente a la web: Victor Blade
+[27/02/2024 20:39:58]-Se le llevo al home
+[27/02/2024 20:40:01]-Se le llevo a la administracion de usuarios
+[27/02/2024 20:40:04]-Se le llevo a modificar Usuario
