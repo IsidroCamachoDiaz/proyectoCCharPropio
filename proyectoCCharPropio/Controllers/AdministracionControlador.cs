@@ -335,7 +335,7 @@ namespace proyectoCCharPropio.Controllers
                     //Actualizamos el usuario y avisamos al usuario
                     acciones.ActualizarUsuario(usuarioCambiar);
                     Util.EscribirEnElFichero("Se actualizo el usuario: "+usuarioCambiar.Nombre_usuario);
-                    MostrarAlerta("Se cambiio el usuario Correctamente", "Se modifico correctamente el usuario " + usuarioCambiar.Nombre_usuario, "success");
+                    MostrarAlerta("Se cambio el usuario Correctamente", "Se modifico correctamente el usuario " + usuarioCambiar.Nombre_usuario, "success");
                     return RedirectToAction("Home", "RegistroControlador");
                 }
                 // Si no ha cambiado se le avisa
@@ -392,7 +392,7 @@ namespace proyectoCCharPropio.Controllers
                 if (implAd.CrearUsuario(usuarioDTO))
                 {
                     Util.EscribirEnElFichero("Se creo un usuario: "+usuarioDTO.Nombre_usuario);
-                    MostrarAlerta("Registro Completo", "Se le ha enviado un correo para verificar su identidad", "success");
+                    MostrarAlerta("Usuario Creado", "Se le ha creado el usuario nuevo se le envio un correo", "success");
                 }
                 //Si no se crea bien se avisa al usuario
                 else
