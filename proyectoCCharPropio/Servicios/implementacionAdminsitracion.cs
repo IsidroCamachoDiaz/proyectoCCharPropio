@@ -108,7 +108,7 @@ namespace proyectoCCharPropio.Servicios
             List<SolicitudDTO> solicitudes = acciones.HacerGetLista<SolicitudDTO>("api/Solicitud");
 
             //Las filtramos por la del usuario
-            solicitudes = solicitudes.Where(x => x.IdUsuario2.Id_usuario == usuario.Id_usuario).ToList();
+            solicitudes = solicitudes.Where(x => x.IdUsuario2!=null).Where(x => x.IdUsuario2.Id_usuario == usuario.Id_usuario).ToList();
 
             //Comprobamos que usuario se le va a dar
             if (accesoDar.CodigoAcceso1 == "Administrador")
@@ -167,7 +167,7 @@ namespace proyectoCCharPropio.Servicios
                 //Cogemos las incidencias y se filtran por las del el usuario
                 List<IncidenciaDTO> incidencias = acciones.HacerGetLista<IncidenciaDTO>("api/Incidencia");
 
-                incidencias = incidencias.Where(x => x.Usuario.Id_usuario == usuario.Id_usuario).ToList();
+                incidencias = incidencias.Where(x=>x.Usuario!=null).Where(x => x.Usuario.Id_usuario == usuario.Id_usuario).ToList();
                 //Si no tiene ninguna incidencia se le da el rol de usuario
                 if (incidencias.Count == 0)
                 {
