@@ -402,7 +402,7 @@ namespace proyectoCCharPropio.Controllers
                 }
 
                 // Redireccionar a la vista de index
-                return RedirectToAction("CrearUsuario", "AdministracionControlador");
+                return RedirectToAction("AdministracionUsuarios");
             }
         }
 
