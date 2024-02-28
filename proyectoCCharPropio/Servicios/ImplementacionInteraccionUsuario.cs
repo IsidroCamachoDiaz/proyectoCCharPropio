@@ -19,8 +19,21 @@ namespace pruebaRazor.DTOs
 				//Declaramos lo que necesitemos
 				accionesCRUD acciones = new accionesCRUD();
 
-				//Le asignamos el id del usuario
-				usu.Id_acceso = 3;
+				//Cogemos todos los accesos
+				List<AccesoDTO> accesos = acciones.HacerGetLista<AccesoDTO>("api/Acceso");
+
+				//Buscamos el acceso del usuario
+				foreach(AccesoDTO a in accesos)
+				{
+					//Comprobamos si es el acceso del usuario
+					if (a.CodigoAcceso1 == "Usuario")
+					{
+                        //Le asignamos el id del usuario
+                        usu.Id_acceso = a.IdAcceso1;
+						break;
+					}
+				}
+			
                 usu.Contrasenia_usuario = Util.EncriptarContra(usu.Contrasenia_usuario);
 				//Le asiganamos que no esta dado de alta
 				usu.Alta_usuario = false;

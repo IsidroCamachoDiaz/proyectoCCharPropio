@@ -133,3 +133,18 @@
 [27/02/2024 20:39:58]-Se le llevo al home
 [27/02/2024 20:40:01]-Se le llevo a la administracion de usuarios
 [27/02/2024 20:40:04]-Se le llevo a modificar Usuario
+[28/02/2024 10:38:55]-[ERROR-InteraccionEntidad-HacerGet] Error al realizar la solicitud GET. | System.Net.WebException: The remote server returned an error: (404) Not Found.
+   at System.Net.HttpWebRequest.GetResponse()
+   at proyectoCCharPropio.Recursos.accionesCRUD.HacerGet[T](String endpoint) in C:\Users\isidr\OneDrive\Documentos\proyectoCCharPropio\proyectoCCharPropio\Recursos\accionesCRUD.cs:line 67
+[28/02/2024 10:39:34]-Se ha creado un usuario correctamente se le envio un correo de alta
+[28/02/2024 10:39:34]-Se llevo al index
+[28/02/2024 10:39:51]-Un usuario hizo el alta correctamente: pruebaUsuario
+[28/02/2024 10:39:51]-Se le llevo al alta de usuario
+[28/02/2024 10:39:53]-Se llevo al index
+[28/02/2024 10:39:59]-Un usuario accedio correctamente a la web: pruebaUsuario
+[28/02/2024 10:39:59]-Se le llevo al home
+[28/02/2024 10:40:02]-Se le llevo a mostar las solicitudes
+[28/02/2024 10:40:05]-Se le llevo a crear solicitud
+[28/02/2024 10:40:09]-Se le llevo a mostar las solicitudes
+[28/02/2024 10:40:12]-Se le llevo al home
+[28/02/2024 10:40:16]-Se llevo al index
